@@ -11,12 +11,13 @@ function Form(props) {
         });
     }
 
-    function handleRunClick(e) {
+    async function handleRunClick(e) {
+        // queries the API for the data with the given params
         e.preventDefault();
         const { dimension, filter } = params
-        fetch(`http://localhost:9000/query?dimension=${dimension}&filter=${filter}`)
-        .then(response => response.json())
-        .then(data => props.addTableData(data))
+        const response = await fetch(`http://localhost:9000/query?dimension=${dimension}&filter=${filter}`)
+        const data = await response.json();
+        props.addTableData(data)
     }
 
     return (
