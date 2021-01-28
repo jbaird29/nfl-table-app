@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 
-function Form() {
+function Form(props) {
+    // these are the currently selected fields ('parameters')
     const [params, setParams] = useState({dimension: "player", filter: "pass"});
 
     function handleSelect(e) {
@@ -13,9 +14,9 @@ function Form() {
     function handleRunClick(e) {
         e.preventDefault();
         const { dimension, filter } = params
-        // fetch(`/query?dimension=${dimension}&filter=${filter}`)
-        // .then(response => response.json())
-        // .then(data => document.querySelector('#data').innerText = JSON.stringify(data))
+        fetch(`http://localhost:9000/query?dimension=${dimension}&filter=${filter}`)
+        .then(response => response.json())
+        .then(data => props.addTableData(data))
     }
 
     return (
