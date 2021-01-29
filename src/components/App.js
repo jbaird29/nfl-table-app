@@ -5,9 +5,9 @@ import Table from './Table'
 
 function App() {
   // this controls the state for the table's data; fields are updated via the form addTableData prop
-  const [tableData, setTableData] = useState();
+  const [tableData, setTableData] = useState([]);
   function addTableData(tableData) {
-    setTableData(prevData => tableData)
+    setTableData(prevData => tableData);
   }
 
 
