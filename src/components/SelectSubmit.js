@@ -6,11 +6,14 @@ import 'antd/dist/antd.css';
 function SelectSubmit(props) {
 
   async function handleClick(e) {
-    const queryParams = new URLSearchParams(props.query)
     const fetchOptions = {
-      method: 'GET',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(props.query)
     }
-    const response = await fetch(`http://localhost:9000/query?${queryParams.toString()}`, fetchOptions)
+    const response = await fetch(`http://localhost:9000/query`, fetchOptions)
     const tableData = await response.json();
     tableData.columns.forEach(column => {
       if(column.dataType === 'number') {
