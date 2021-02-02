@@ -4,11 +4,9 @@ import 'antd/dist/antd.css';
 
 
 function SelectRow(props) {
-  const [row, setRow] = useState("player");
 
   function handleRowChange(e) {
-    setRow(prevValue => e.target.value);
-    props.addQuery({row: e.target.value})
+    props.setRow(prevValue => e.target.value);
   }
 
 

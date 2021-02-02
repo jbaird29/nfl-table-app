@@ -4,11 +4,9 @@ import 'antd/dist/antd.css';
 
 
 function SelectColumns(props) {
-  const [columns, setColumns] = useState([]);
 
   function handleColumnsChange (value) {
-    setColumns(prevValue => value);
-    props.addQuery({columns: value})
+    props.setColumns(prevValue => value);
   }
 
   const treeData = [
@@ -46,7 +44,6 @@ function SelectColumns(props) {
 
   const tProps = {
     treeData,
-    value: columns,
     onChange: handleColumnsChange,
     treeCheckable: true,
     placeholder: "Select columns",

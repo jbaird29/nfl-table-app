@@ -4,11 +4,9 @@ import 'antd/dist/antd.css';
 
 
 function SelectYears(props) {
-  const [years, setYears] = useState([]);
 
   function handleYearChange (value) {
-    setYears(prevValue => value);
-    props.addQuery({years: value})
+    props.setYears(prevValue => value);
   }
 
   const treeData = [
@@ -31,7 +29,6 @@ function SelectYears(props) {
 
   const tProps = {
     treeData,
-    value: years,
     onChange: handleYearChange,
     treeCheckable: true,
     placeholder: "Select years",
