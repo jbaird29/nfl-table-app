@@ -5,18 +5,24 @@ import Table from './Table'
 import SelectRow from './SelectRow'
 import SelectYears from './SelectYears'
 import SelectColumns from './SelectColumns'
+import FilterInside20 from './FilterInside20'
+import FilterPassAtt from './FilterPassAtt'
 import { Layout, Button } from 'antd';
 
 const { Content, Sider } = Layout;
 
 
 function App() {
-  // controls the "row" selection - string, 'player_name' or 'team_name'
+  // controls the "row" selection - string: 'player_name' or 'team_name'
   const [row, setRow] = useState('player_name');
   // controls the "columns" selection - array of strings: ['sum_yds_pass', 'sum_att_rush', ...]
   const [columns, setColumns] = useState([]);
   // controls the "years" selection - array of strings: ['2020', '2019', ...]
   const [years, setYears] = useState([]);
+  // controls the "inside20" selection - string: '1' or '0' or null
+  const [inside20, setInside20] = useState(null)
+  // controls the "minPassAtt" selection - number: 100 or 10
+  const [minPassAtt, setMinPassAtt] = useState()
 
   // controls the table's data; data is received via submit button
   const [tableData, setTableData] = useState([]);
@@ -29,7 +35,13 @@ function App() {
     const queryBody = {
       row: row,
       columns: columns,
-      years: years
+      years: years,
+      havingFilters: {
+        minPassAtt: minPassAtt,
+      },
+      whereFilters: {
+        inside20: inside20,
+      }
     }
     const fetchOptions = {
       method: 'POST',
@@ -72,6 +84,8 @@ function App() {
         <SelectRow setRow={setRow} />
         <SelectYears setYears={setYears} />
         <SelectColumns setColumns={setColumns} />
+        <FilterInside20 setInside20={setInside20} />
+        <FilterPassAtt setMinPassAtt={setMinPassAtt} />
         <Button type="primary" onClick={handleSubmit} >Run</Button>
       </Sider>
     <Layout className="site-layout" style={{ marginLeft: 200 }}>

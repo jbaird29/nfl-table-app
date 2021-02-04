@@ -2,10 +2,17 @@ import React, { useState } from "react";
 import { InputNumber } from 'antd';
 
 
-function FilterPassAtt(props) {  
+function FilterPassAtt(props) { 
 
+  function handleChange(value) {
+    props.setMinPassAtt(prevValue => value ? value : null);
+  }
+  
   return (
-    <InputNumber min={1} defaultValue={100} />
+    <div>
+      <label for='minPassAtt'>Minimum Pass Attempts</label>
+      <InputNumber id='minPassAtt' min={1} onChange={handleChange} />
+    </div>
   )
 }
 
