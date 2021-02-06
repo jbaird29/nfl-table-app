@@ -59,8 +59,8 @@ function App() {
     function addRender(column) {
       if (column.format === 'dec_0') {
         column.render = (text, row, index) => (!text ? text : <span>{`${text.toLocaleString()}`}</span>)
-      } else if (column.format === 'dec_2') {
-        column.render = (text, row, index) => (!text ? text : <span>{`${text.toFixed(2).toLocaleString()}`}</span>)
+      } else if (column.format === 'dec_1') {
+        column.render = (text, row, index) => (!text ? text : <span>{`${text.toFixed(1).toLocaleString()}`}</span>)
       } else if (column.format === 'index') {
         column.render = (text, row, index) => (!text ? text : <span>{`${index + 1} - ${text}`}</span>)
       }

@@ -24,6 +24,16 @@ function SelectYears(props) {
       title: "2018",
       value: "2018",
       key: "2018"
+    },
+    {
+      title: "2017",
+      value: "2017",
+      key: "2017"
+    },
+    {
+      title: "2016",
+      value: "2016",
+      key: "2016"
     }
   ];
 
