@@ -3,10 +3,10 @@ import { TreeSelect } from 'antd';
 import 'antd/dist/antd.css';
 
 
-function SelectColumns(props) {
+function SelectStats(props) {
 
-  function handleColumnsChange (value) {
-    props.setColumns(prevValue => value);
+  function handleChange (value) {
+    props.setStats(prevValue => value);
   }
 
   const treeData = [
@@ -44,9 +44,9 @@ function SelectColumns(props) {
 
   const tProps = {
     treeData,
-    onChange: handleColumnsChange,
+    onChange: handleChange,
     treeCheckable: true,
-    placeholder: "Select columns",
+    placeholder: "Select stats",
     maxTagCount: 3,
     style: {
       width: "100%"
@@ -58,4 +58,4 @@ function SelectColumns(props) {
   )
 }
 
-export default SelectColumns
+export default SelectStats

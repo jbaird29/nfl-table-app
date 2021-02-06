@@ -4,7 +4,7 @@ import 'antd/dist/antd.css';
 import Table from './Table'
 import SelectRow from './SelectRow'
 import SelectYears from './SelectYears'
-import SelectColumns from './SelectColumns'
+import SelectStats from './SelectStats'
 import FilterInside20 from './FilterInside20'
 import FilterPassAtt from './FilterPassAtt'
 import { Layout, Button } from 'antd';
@@ -13,16 +13,12 @@ const { Content, Sider } = Layout;
 
 
 function App() {
-  // controls the "row" selection - string: 'player_name' or 'team_name'
-  const [row, setRow] = useState('player_name');
-  // controls the "columns" selection - array of strings: ['sum_yds_pass', 'sum_att_rush', ...]
-  const [columns, setColumns] = useState([]);
-  // controls the "years" selection - array of strings: ['2020', '2019', ...]
-  const [years, setYears] = useState([]);
-  // controls the "inside20" selection - string: '1' or '0' or null
-  const [inside20, setInside20] = useState(null)
-  // controls the "minPassAtt" selection - number: 100 or 10
-  const [minPassAtt, setMinPassAtt] = useState()
+  // the states for query request
+  const [row, setRow] = useState('player_name');  // string: 'player_name' or 'team_name'
+  const [stats, setStats] = useState([]);  // array of strings: ['sum_yds_pass', 'sum_att_rush', ...]
+  const [years, setYears] = useState([]);  // array of strings: ['2020', '2019', ...]
+  const [inside20, setInside20] = useState(null);  // string: '1' or '0' or null
+  const [minPassAtt, setMinPassAtt] = useState()  // number: 100 or 10
 
   // controls the table's data; data is received via submit button
   const [tableData, setTableData] = useState([]);
@@ -32,17 +28,21 @@ function App() {
   
   // handles submission of query and updating table data results
   async function handleSubmit(e) {
+    const where = []  // construct where filters; only add properties whose values are not null or undefined
+    inside20 && where.push({field: 'inside_20', operator: '=', values: [inside20]})
+
+    const having = []  // construct having filters; only add properties whose values are not null or undefined
+    minPassAtt && having.push({field: 'sum_att_pass', operator: '>=', value: minPassAtt})
+
+    // build the body for the API request
     const queryBody = {
       row: row,
-      columns: columns,
+      stats: stats,
       years: years,
-      havingFilters: {
-        minPassAtt: minPassAtt,
-      },
-      whereFilters: {
-        inside20: inside20,
-      }
+      where: where,
+      having: having,
     }
+    // fetch the data
     const fetchOptions = {
       method: 'POST',
       headers: {
@@ -52,6 +52,7 @@ function App() {
     }
     const response = await fetch(`http://localhost:9000/query`, fetchOptions)
     const tableData = await response.json();
+    // for each column, depending on string/number, add (1) sorter function (2) render function
     tableData.columns.forEach(column => {
       if(column.dataType === 'number') {
         const columnName = column.dataIndex
@@ -64,6 +65,7 @@ function App() {
         } 
       }
     })
+    // add the new response to the tableData state
     addTableData(tableData)
   }
 
@@ -83,7 +85,7 @@ function App() {
       <Sider {... siderProps}>
         <SelectRow setRow={setRow} />
         <SelectYears setYears={setYears} />
-        <SelectColumns setColumns={setColumns} />
+        <SelectStats setStats={setStats} />
         <FilterInside20 setInside20={setInside20} />
         <FilterPassAtt setMinPassAtt={setMinPassAtt} />
         <Button type="primary" onClick={handleSubmit} >Run</Button>
