@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { TreeSelect } from 'antd';
 import 'antd/dist/antd.css';
 
@@ -6,7 +6,7 @@ import 'antd/dist/antd.css';
 function SelectYears(props) {
 
   function handleYearChange (value) {
-    props.setYears(prevValue => value);
+    props.setYears(value);
   }
 
   const treeData = [

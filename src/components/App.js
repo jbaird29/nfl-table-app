@@ -34,15 +34,8 @@ function App() {
     const having = []  // construct having filters; only add properties whose values are not null or undefined
     minPassAtt && having.push({field: 'sum_att_pass', operator: '>=', value: minPassAtt})
 
-    // build the body for the API request
-    const queryBody = {
-      row: row,
-      stats: stats,
-      years: years,
-      where: where,
-      having: having,
-    }
-    // fetch the data
+    // build the body and options for the fetch request
+    const queryBody = {row: row, stats: stats, years: years, where: where, having: having}
     const fetchOptions = {
       method: 'POST',
       headers: {
@@ -52,17 +45,37 @@ function App() {
     }
     const response = await fetch(`http://localhost:9000/query`, fetchOptions)
     const tableData = await response.json();
-    // for each column, depending on string/number, add (1) sorter function (2) render function
-    tableData.columns.forEach(column => {
-      if(column.dataType === 'number') {
+
+    function addSorter(column) {
+      if (column.dataType === 'number') {
         const columnName = column.dataIndex
         column.sorter = (a, b) => a[columnName] - b[columnName]
       } else if (column.dataType === 'string') {
-        column.render = (text, row, index) => (<span>{`${index+1} - ${text}`}</span>)
         const columnName = column.dataIndex
-        column.sorter = (a, b) => {
-          return a[columnName].toUpperCase() < b[columnName].toUpperCase() ? -1 : 1
-        } 
+        column.sorter = (a, b) => (a[columnName].toUpperCase() < b[columnName].toUpperCase() ? -1 : 1)
+      }
+    }
+
+    function addRender(column) {
+      if (column.format === 'dec_0') {
+        column.render = (text, row, index) => (!text ? text : <span>{`${text.toLocaleString()}`}</span>)
+      } else if (column.format === 'dec_2') {
+        column.render = (text, row, index) => (!text ? text : <span>{`${text.toFixed(2).toLocaleString()}`}</span>)
+      } else if (column.format === 'index') {
+        column.render = (text, row, index) => (!text ? text : <span>{`${index + 1} - ${text}`}</span>)
+      }
+    }
+
+    // for each column, add (1) sorter function (2) render function
+    tableData.columns.forEach(column => {
+      if ('children' in column) {
+        column.children.forEach(child => {
+          addSorter(child);
+          addRender(child);
+        })
+      } else {
+        addSorter(column);
+        addRender(column);
       }
     })
     // add the new response to the tableData state

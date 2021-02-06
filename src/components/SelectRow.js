@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Radio } from 'antd';
 import 'antd/dist/antd.css';
 
@@ -6,7 +6,7 @@ import 'antd/dist/antd.css';
 function SelectRow(props) {
 
   function handleRowChange(e) {
-    props.setRow(prevValue => e.target.value);
+    props.setRow(e.target.value);
   }
 
 
