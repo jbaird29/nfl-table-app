@@ -11,7 +11,7 @@ function FilterInside20(props) {
   
   return (
     <>
-      <label for='inside20'>Inside 20 Yard Line?</label>
+      <label>Inside 20 Yard Line?</label>
       <Radio.Group id='inside20' size='small' defaultValue="either" buttonStyle="solid" onChange={handleChange} >
         <Radio.Button value="either">Either</Radio.Button>
         <Radio.Button value="1">Inside</Radio.Button>

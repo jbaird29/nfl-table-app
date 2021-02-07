@@ -10,7 +10,7 @@ function FilterPassAtt(props) {
   
   return (
     <div>
-      <label for='minPassAtt'>Minimum Pass Attempts</label>
+      <label>Minimum Pass Attempts</label>
       <InputNumber id='minPassAtt' min={1} onChange={handleChange} />
     </div>
   )

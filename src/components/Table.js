@@ -8,7 +8,8 @@ function Table(props) {
   const columns = props.tableData.columns
 
   return (
-    <AntTable 
+    <AntTable
+      style={{ overflow: 'initial',  }}
       dataSource={dataSource}
       columns={columns}
       pagination={{   // https://ant.design/components/pagination/#API

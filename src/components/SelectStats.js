@@ -1,70 +1,57 @@
 import React, { useState, useEffect } from "react";
-import { TreeSelect } from 'antd';
+import { Select } from 'antd';
 import 'antd/dist/antd.css';
 
-
 function SelectStats(props) {
-  const [inputs, setInputs] = useState([])
+    const [passOptions, setPassOptions] = useState([])
+    const [rushOptions, setRushOptions] = useState([])
+    const [recvOptions, setRecvOptions] = useState([])
 
-  useEffect(() => {
-    fetch(`http://localhost:9000/stats-inputs`)
-    .then(resp => resp.json())
-    .then(data => setInputs(data))
-  }, []);
+    useEffect(() => {
+        fetch(`http://localhost:9000/stats-inputs/pass`)
+            .then(resp => resp.json()).then(data => setPassOptions(data))
+    }, []);
+    useEffect(() => {
+        fetch(`http://localhost:9000/stats-inputs/rush`)
+            .then(resp => resp.json()).then(data => setRushOptions(data))
+    }, []);
+    useEffect(() => {
+        fetch(`http://localhost:9000/stats-inputs/rush`)
+            .then(resp => resp.json()).then(data => setRecvOptions(data))
+    }, []);
 
-  function handleChange (value) {
-    props.setStats(value);
-  }
 
-  const treeData = inputs
-
-  // const treeData = [
-  //   {
-  //     title: "Pass Yards",
-  //     value: "sum_yds_pass",
-  //     key: "sum_yds_pass"
-  //   },
-  //   {
-  //     title: "Pass Attempts",
-  //     value: "sum_att_pass",
-  //     key: "sum_att_pass"
-  //   },
-  //   {
-  //     title: "Rush Yards",
-  //     value: "sum_yds_rush",
-  //     key: "sum_yds_rush"
-  //   },
-  //   {
-  //     title: "Rush Attempts",
-  //     value: "sum_att_rush",
-  //     key: "sum_att_rush"
-  //   },
-  //   {
-  //     title: "Receiving Yards",
-  //     value: "sum_yds_recv",
-  //     key: "sum_yds_recv"
-  //   },
-  //   {
-  //     title: "Receiving Targets",
-  //     value: "sum_tgt_recv",
-  //     key: "sum_tgt_recv"
-  //   },
-  // ];
-
-  const tProps = {
-    treeData,
-    onChange: handleChange,
-    treeCheckable: true,
-    placeholder: "Select stats",
-    maxTagCount: 3,
-    style: {
-      width: "100%"
+    function handlePassChange (value) {
+        props.setPassStats(value);
     }
-  };
+    function handleRushChange (value) {
+        props.setRushStats(value);
+    }
+    function handleRecvChange (value) {
+        props.setRecvStats(value);
+    }
 
-  return (
-    <TreeSelect {...tProps} />
-  )
+
+    const selectProps = {
+        placeholder: "Please select",
+        align: 'center',
+        style: { width: '75%'},
+        mode: "multiple",
+        allowClear: true,
+        optionFilterProp: "label",
+        maxTagCount: 'responsive',
+    }
+
+    return (
+        <div style={{textAlign: 'right'}}>
+            <label style={{ width: '25%', textAlign: 'left' }}>Passing: </label>
+            <Select {...selectProps} onChange={handlePassChange} options={passOptions}/>
+            <label style={{ width: '25%', textAlign: 'left' }}>Rushing: </label>
+            <Select {...selectProps} onChange={handleRushChange} options={rushOptions}/>
+            <label style={{ width: '25%', textAlign: 'left' }}>Receiving: </label>
+            <Select {...selectProps} onChange={handleRecvChange} options={recvOptions}/>
+        </div>
+    )
 }
 
 export default SelectStats
