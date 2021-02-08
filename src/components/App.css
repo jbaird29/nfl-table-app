@@ -16,15 +16,27 @@
 /*  border-radius: 2px;*/
 /*}*/
 
+/* this sets the padding for the "Collapse Panels" */
 .ant-collapse-header {
-  padding-top: 5px !important;
-  padding-bottom: 5px !important;
+  padding-top: 7px !important;
+  padding-bottom: 7px !important;
 }
-
 .ant-collapse-arrow {
-  padding-top: 5px !important;
+  padding-top: 7px !important;
+}
+.ant-collapse-content-box {
+  padding: 7px !important;
 }
 
-.ant-collapse-content-box {
-  padding: 5px !important;
+/* this sets styles for the table */
+.custom-table {
+  font-size: large;
+}
+
+.custom-table-row {
+  font-size: small;
+}
+
+.ant-table-cell {
+  padding: 4px 8px !important;
 }

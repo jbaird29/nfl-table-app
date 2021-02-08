@@ -9,21 +9,23 @@ function Table(props) {
 
   return (
     <AntTable
-      style={{ overflow: 'initial',  }}
+      style={{ overflow: 'initial'}}
       dataSource={dataSource}
       columns={columns}
       pagination={{   // https://ant.design/components/pagination/#API
-        pageSize: 100, 
-        hideOnSinglePage: false, 
+        pageSize: 2000,
+        hideOnSinglePage: true,
         position: ["bottomRight"],
         size: "small"
       }} 
       bordered
-      scroll={{ y: 500 }}
-      size={"small"}
+      scroll={{ x: 175, y: '75vh' }}
+      size="small"
       showSorterTooltip={true}
       sortDirections={['descend', 'ascend', 'descend']}
       rowKey='player_name'
+      className={'custom-table'}
+      rowClassName={'custom-table-row'}
     />
   )
 }
