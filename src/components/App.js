@@ -86,7 +86,7 @@ function App() {
       } else if (column.format === 'dec_2') {
         column.render = (text, row, index) => (!text ? text : <span>{`${text.toFixed(2).toLocaleString()}`}</span>)
       } else if (column.format === 'index') {
-        column.render = (text, row, index) => (!text ? text : <span>{`${index + 1} - ${text}`}</span>)
+        column.render = (text, row, index) => (!text ? text : <span>{`${index + 1}`}</span>)
       }
     }
 
