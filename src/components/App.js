@@ -46,9 +46,9 @@ function App() {
     // concatenate the pass rush and receiving stats
     const stats = passStats.concat(rushStats).concat(recvStats)
 
-    // fill out the years array
+    // fill out the years array; original array is [2018, 2020] this makes it [2020, 2019, 2018]
     const years = []
-    for (let i = yearRange[0]; i <= yearRange[1]; i++) {
+    for (let i = yearRange[1]; i >= yearRange[0]; i--) {
       years.push(i)
     }
 
