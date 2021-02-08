@@ -19,7 +19,7 @@ function Table(props) {
         size: "small"
       }} 
       bordered
-      scroll={{ x: 190, y: '75vh' }}
+      scroll={{ x: 230, y: '75vh' }}
       size="small"
       showSorterTooltip={true}
       sortDirections={['descend', 'ascend', 'descend']}
