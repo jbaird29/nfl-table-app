@@ -29,14 +29,10 @@
 }
 
 /* this sets styles for the table */
-.custom-table {
-  font-size: large;
-}
-
 .custom-table-row {
   font-size: small;
 }
 
 .ant-table-cell {
-  padding: 4px 8px !important;
+  padding: 3px 8px !important;
 }

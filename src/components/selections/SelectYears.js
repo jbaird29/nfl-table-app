@@ -18,7 +18,7 @@ function SelectYears2(props) {
     range: true,
     max: 2020,
     min: 2016,
-    defaultValue: [2019, 2020],
+    defaultValue: [2020, 2020],
     onChange: onChange,
     marks: marks,
     included: true

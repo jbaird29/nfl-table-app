@@ -7,22 +7,52 @@ import SelectYears from './selections/SelectYears'
 import SelectStats from './selections/SelectStats'
 import FilterInside20 from './filters/FilterInside20'
 import FilterPassAtt from './filters/FilterPassAtt'
+import FilterRushAtt from "./filters/FilterRushAtt";
+import FilterReceptions from "./filters/FilterReceptions";
 import { Modal, Row, Col, Layout, Button, Collapse, Divider } from 'antd';
+import FilterWasBlitz from "./filters/FilterWasBlitz";
 
 const { Content, Sider, Footer } = Layout;
 const { Panel } = Collapse;
+
+// add sort functions depending on data type
+function addSorter(column) {
+  if (column.dataType === 'number') {
+    const columnName = column.dataIndex
+    column.sorter = (a, b) => a[columnName] - b[columnName]
+  } else if (column.dataType === 'string') {
+    const columnName = column.dataIndex
+    column.sorter = (a, b) => (a[columnName].toUpperCase() < b[columnName].toUpperCase() ? -1 : 1)
+  }
+}
+
+// add render functions depending on format type
+function addRender(column) {
+  if (column.format === 'dec_0') {
+    column.render = (text, row, index) => (!text ? text : <span>{`${text.toLocaleString()}`}</span>)
+  } else if (column.format === 'dec_1') {
+    column.render = (text, row, index) => (!text ? text : <span>{`${text.toFixed(1).toLocaleString()}`}</span>)
+  } else if (column.format === 'dec_2') {
+    column.render = (text, row, index) => (!text ? text : <span>{`${text.toFixed(2).toLocaleString()}`}</span>)
+  } else if (column.format === 'index') {
+    column.render = (text, row, index) => (!text ? text : <span>{`${index + 1}`}</span>)
+  }
+}
 
 function App() {
   // --------------------------------------------------------------------------------------------------------------
   // the states for query request
   // --------------------------------------------------------------------------------------------------------------
   const [row, setRow] = useState('player_name');  // string: 'player_name' or 'team_name'
-  const [yearRange, setYearRange] = useState([2019, 2020]);  // array of min/max years: [2016, 2020]
+  const [yearRange, setYearRange] = useState([2020, 2020]);  // array of min/max years: [2016, 2020]
   const [passStats, setPassStats] = useState([]);  // array of strings: ['sum_yds_pass', ...]
   const [rushStats, setRushStats] = useState([]);  // array of strings: ['sum_yds_pass', ...]
   const [recvStats, setRecvStats] = useState([]);  // array of strings: ['sum_yds_pass', ...]
   const [inside20, setInside20] = useState(null);  // string: '1' or '0' or null
   const [minPassAtt, setMinPassAtt] = useState()  // number: 100 or 10
+  const [minRushAtt, setMinRushAtt] = useState()  // number: 100 or 10
+  const [minReceptions, setMinReceptions] = useState()  // number: 100 or 10
+  const [wasBlitz, setWasBlitz] = useState();  // string: '1' or '0' or null
 
   // controls the table's data; data is received via submit button
   const [tableData, setTableData] = useState([]);
@@ -30,16 +60,18 @@ function App() {
     setTableData(prevData => tableData);
   }
 
+  const hasPass = passStats.length > 0
+  const hasRush = rushStats.length > 0
+  const hasRecv = recvStats.length > 0
+
 
   // --------------------------------------------------------------------------------------------------------------
   // handles submission of query and updating table data results
   // --------------------------------------------------------------------------------------------------------------
   async function handleSubmit(e) {
+    // if no stats are selected, short-circuit and display an error message to user
     if (passStats.length === 0 && rushStats.length === 0 && recvStats.length === 0) {
-      Modal.error({
-        title: 'Please select at least one stat',
-        content: 'Underneath the the Select Stats drop down box',
-      });
+      Modal.error({title: 'Please select at least one stat', content: 'Underneath the the Select Stats drop down box',});
       return
     }
 
@@ -54,9 +86,12 @@ function App() {
 
     const where = []  // construct where filters; only add properties whose values are not null or undefined
     inside20 && where.push({field: 'inside_20', operator: '=', values: [inside20]})
+    hasPass && wasBlitz && where.push({field: 'pass_blitzed', operator: '=', values: [wasBlitz]})
 
     const having = []  // construct having filters; only add properties whose values are not null or undefined
-    minPassAtt && having.push({field: 'sum_att_pass', operator: '>=', value: minPassAtt})
+    hasPass && minPassAtt && having.push({field: 'sum_att_pass', operator: '>=', value: minPassAtt})
+    hasRush && minRushAtt && having.push({field: 'sum_att_rush', operator: '>=', value: minRushAtt})
+    hasRecv && minReceptions && having.push({field: 'sum_rec_recv', operator: '>=', value: minReceptions})
 
     // build the body and options for the fetch request
     const queryBody = {row: row, stats: stats, years: years, where: where, having: having}
@@ -65,30 +100,6 @@ function App() {
     }
     const response = await fetch(`http://localhost:9000/query`, fetchOptions)
     const tableData = await response.json();
-
-    // add sort functions depending on data type
-    function addSorter(column) {
-      if (column.dataType === 'number') {
-        const columnName = column.dataIndex
-        column.sorter = (a, b) => a[columnName] - b[columnName]
-      } else if (column.dataType === 'string') {
-        const columnName = column.dataIndex
-        column.sorter = (a, b) => (a[columnName].toUpperCase() < b[columnName].toUpperCase() ? -1 : 1)
-      }
-    }
-
-    // add render functions depending on format type
-    function addRender(column) {
-      if (column.format === 'dec_0') {
-        column.render = (text, row, index) => (!text ? text : <span>{`${text.toLocaleString()}`}</span>)
-      } else if (column.format === 'dec_1') {
-        column.render = (text, row, index) => (!text ? text : <span>{`${text.toFixed(1).toLocaleString()}`}</span>)
-      } else if (column.format === 'dec_2') {
-        column.render = (text, row, index) => (!text ? text : <span>{`${text.toFixed(2).toLocaleString()}`}</span>)
-      } else if (column.format === 'index') {
-        column.render = (text, row, index) => (!text ? text : <span>{`${index + 1}`}</span>)
-      }
-    }
 
     // for each column, add (1) sorter function (2) render function
     tableData.columns.forEach(column => {
@@ -140,9 +151,19 @@ function App() {
             <SelectStats setPassStats={setPassStats} setRushStats={setRushStats} setRecvStats={setRecvStats} />
           </Panel>
           <Panel header="Select Filters" key="2" className="site-collapse-custom-panel">
+            <Divider plain orientation="center" style={{margin: '5px 0px 5px'}} >Situational Filters</Divider>
             <FilterInside20 setInside20={setInside20} />
+
+            <Divider plain orientation="center" style={{margin: '10px 0px 5px'}} >Pass Filters</Divider>
+            <FilterPassAtt disabled={!hasPass} setMinPassAtt={setMinPassAtt} />
             <Divider dashed style={{margin: '5px 0px'}} />
-            <FilterPassAtt setMinPassAtt={setMinPassAtt} />
+            <FilterWasBlitz disabled={!hasPass} setWasBlitz={setWasBlitz} />
+
+            <Divider plain orientation="center" style={{margin: '10px 0px 5px'}} >Rush Filters</Divider>
+            <FilterRushAtt disabled={!hasRush} setMinRushAtt={setMinRushAtt}/>
+
+            <Divider plain orientation="center" style={{margin: '10px 0px 5px'}} >Receiving Filters</Divider>
+            <FilterReceptions disabled={!hasRecv} setMinReceptions={setMinReceptions} />
           </Panel>
         </Collapse>
       </Sider>

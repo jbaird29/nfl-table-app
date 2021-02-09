@@ -16,7 +16,7 @@ function SelectStats(props) {
             .then(resp => resp.json()).then(data => setRushOptions(data))
     }, []);
     useEffect(() => {
-        fetch(`http://localhost:9000/stats-inputs/receiving`)
+        fetch(`http://localhost:9000/stats-inputs/receive`)
             .then(resp => resp.json()).then(data => setRecvOptions(data))
     }, []);
 

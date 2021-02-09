@@ -2,17 +2,17 @@ import React, {useState} from "react";
 import {Row, Col, InputNumber} from 'antd';
 
 
-function FilterPassAtt(props) {
+function FilterReceptions(props) {
 
     function handleChange(value) {
-        props.setMinPassAtt(prevValue => value ? value : null);
+        props.setMinReceptions(prevValue => value ? value : null);
     }
 
     return (
         <>
             <Row align='middle'>
                 <Col span={18} style={{textAlign: 'left'}}>
-                    <label>Minimum Pass Attempts</label>
+                    <label>Minimum Receptions</label>
                 </Col>
                 <Col span={6} style={{textAlign: 'right'}}>
                     <InputNumber disabled={props.disabled} min={0} onChange={handleChange}/>
@@ -22,4 +22,4 @@ function FilterPassAtt(props) {
     )
 }
 
-export default FilterPassAtt
+export default FilterReceptions
