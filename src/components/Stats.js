@@ -33,15 +33,15 @@ export default function Stats(props) {
 
     return (
         <>
-            <Form.Item name={['stats', 'pass']} label="Passing">
+            <Form.Item name={['stats', 'pass']} label="Passing Stats">
                 <Select {...selectProps} options={passOptions}/>
             </Form.Item>
             {/*<Divider dashed style={{margin: '5px 0px'}}/>*/}
-            <Form.Item name={['stats', 'rush']} label="Rushing">
+            <Form.Item name={['stats', 'rush']} label="Rushing Stats">
                 <Select {...selectProps} options={rushOptions}/>
             </Form.Item>
             {/*<Divider dashed style={{margin: '5px 0px'}}/>*/}
-            <Form.Item name={['stats', 'recv']} label="Receiving">
+            <Form.Item name={['stats', 'recv']} label="Receiving Stats">
                 <Select {...selectProps} options={recvOptions}/>
             </Form.Item>
         </>

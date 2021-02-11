@@ -28,6 +28,11 @@
   padding: 7px !important;
 }
 
+/* this sets the format for the form items */
+.ant-form-item {
+ margin-bottom: 14px !important;
+}
+
 /* this sets styles for the table */
 .custom-table-row {
   font-size: small;
