@@ -14,9 +14,11 @@ export function addRender(column) {
     if (column.format === 'dec_0') {
         column.render = (text, row, index) => (!text ? text : <span>{`${text.toLocaleString()}`}</span>)
     } else if (column.format === 'dec_1') {
-        column.render = (text, row, index) => (!text ? text : <span>{`${text.toFixed(1).toLocaleString()}`}</span>)
+        column.render = (text, row, index) => (!text ? text : <span>{`${text.toLocaleString(undefined,{minimumFractionDigits: 1, maximumFractionDigits: 1})}`}</span>)
     } else if (column.format === 'dec_2') {
-        column.render = (text, row, index) => (!text ? text : <span>{`${text.toFixed(2).toLocaleString()}`}</span>)
+        column.render = (text, row, index) => (!text ? text : <span>{`${text.toLocaleString(undefined,{minimumFractionDigits: 2, maximumFractionDigits: 2})}`}</span>)
+    } else if (column.format === 'percent') {
+        column.render = (text, row, index) => (!text ? text : <span>{`${(text*100).toLocaleString(undefined,{minimumFractionDigits: 2, maximumFractionDigits: 2})}%`}</span>)
     } else if (column.format === 'index') {
         column.render = (text, row, index) => (!text ? text : <span>{`${index + 1}`}</span>)
     }

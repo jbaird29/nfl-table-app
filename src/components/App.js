@@ -4,29 +4,46 @@ import 'antd/dist/antd.css';
 import Table from './Table'
 import ColumnTabs from './Column-Tabs'
 import RowForm from './Row-Form'
-import {Modal, Row, Col, Layout, Button, Collapse, Divider, Radio, Drawer, Tabs} from 'antd';
-import {buildRequestBody, makeRequest} from './submit-functions'
+import CustomCalc from './Custom-Calc'
+import {Modal, Row, Col, Layout, Button, Collapse, Divider, Radio, Drawer, Tabs, message, Space} from 'antd';
+import {addRender, addSorter, buildRequestBody, makeRequest} from './submit-functions'
 
 const { Content, Sider, Footer } = Layout;
 const { Panel } = Collapse;
 const { TabPane } = Tabs;
 
 function App() {
-    const [tableData, setTableData] = useState([]);
-    const [isDrawerVisible, setIsDrawerVisible] = useState(false);
+    const [tableData, setTableData] = useState({});
+    const [isFieldDrawerVisible, setIsFieldDrawerVisible] = useState(false);
+    const [isCalcDrawerVisible, setIsCalcDrawerVisible] = useState(false);
     const [globalForm, setGlobalForm] = useState({
         row: {field: 'player_name'},
         col1: {}
     });
 
-    function showDrawer() { setIsDrawerVisible(true) }
-    function onClose() { setIsDrawerVisible(false) }
     async function onSubmit() {
         console.log(globalForm)
-        const requestBody = buildRequestBody(globalForm)
-        console.log(requestBody)
-        const tableData = await makeRequest(requestBody)
-        setTableData(tableData)
+        const hide = message.loading({content: 'Loading the data', style: {fontSize: '1rem'}}, 0)
+        try {
+            const requestBody = buildRequestBody(globalForm)
+            console.log(requestBody)    
+            // const tableData = await makeRequest(requestBody)
+            // setTableData(tableData)
+            // setIsFieldDrawerVisible(false)
+            hide() 
+        } catch(err) {
+            console.log(err)
+            hide()
+            message.error({content: 'An error occurred. Please refresh the page and try again.', duration: 5, style: {fontSize: '1rem'} })
+        }
+    }
+
+    function handleShowCalc() {
+        if (tableData.columns && tableData.columns.length > 0) {
+            setIsCalcDrawerVisible(true)
+        } else {
+            message.error({content: 'Please select fields first', duration: 2.5, style: {fontSize: '1rem'} })
+        }
     }
 
     // function onFinish(values) {
@@ -41,29 +58,47 @@ function App() {
     //     }
     // };
 
-    const drawerProps = {
+    const fieldDrawerProps = {
         title: 'Edit Fields',
         width: '60%',
-        visible: isDrawerVisible,
+        visible: isFieldDrawerVisible,
         placement: 'left',
-        onClose: onClose,
+        onClose: () => setIsFieldDrawerVisible(false),
         bodyStyle: { paddingBottom: 80 }
     }
 
+    const calcDrawerProps = {
+        title: 'Edit Custom Calculations',
+        width: '60%',
+        visible: isCalcDrawerVisible,
+        placement: 'left',
+        onClose: () => setIsCalcDrawerVisible(false),
+        bodyStyle: { paddingBottom: 80 }
+    }
 
     return (
     <>
     <Layout hasSider={false} className="site-layout-background" style={{ minHeight: '100vh' }}>
         <Content style={{ margin: '20px 16px 0px', overflow: 'initial'}}>
-            <Button type="primary" onClick={showDrawer}>Edit Fields</Button>
+
+            <Button type="primary" onClick={() => setIsFieldDrawerVisible(true)}>Edit Fields</Button>
+            <Button type="secondary" onClick={handleShowCalc}>Edit Custom Calcs</Button>
+            <Button type="secondary" onClick={() => console.log(tableData)}>See Table Data</Button>
+
             <Table tableData={tableData} />
-            <Drawer {...drawerProps} >
-                <Button onClick={onClose} style={{ marginRight: 8 }}> Close </Button>
+
+            <Drawer {...fieldDrawerProps} >
+                <Button onClick={() => setIsFieldDrawerVisible(false)} style={{ marginRight: 8 }}> Close </Button>
                 <Button onClick={onSubmit} type="primary"> Submit </Button>
                 <RowForm setGlobalForm={setGlobalForm} />
                 <ColumnTabs setGlobalForm={setGlobalForm} />
             </Drawer>
+
+            <Drawer {...calcDrawerProps} >
+                <CustomCalc setTableData={setTableData} tableData={tableData}/>
+            </Drawer>
         </Content>
+
         <Footer style={{ textAlign: 'center', padding: '12px'}}>NFL Plays Table ©2020 Created by Jon Baird</Footer>
     </Layout>
     </>

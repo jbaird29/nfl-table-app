@@ -3,7 +3,6 @@ import {Collapse, Form, Input, Button, Radio, Slider, Modal, Select, InputNumber
 import { InfoCircleOutlined } from '@ant-design/icons';
 import statsInputs from './inputs/statsInputs.json'
 import filtersPass from './inputs/filtersPass.json'
-import ColumnFormFilters from './Column-Form-Filters'
 const { Option, OptGroup } = Select;
 const {Panel} = Collapse;
 
@@ -12,12 +11,6 @@ const {Panel} = Collapse;
 export default function ColumnForm(props) {
     const [form] = Form.useForm()
     const [statType, setStatType] = useState()
-    // const [filtersPass, setFiltersPass] = useState([])
-
-    // useEffect(() => {
-    //     setFiltersPass(filtersPassData)
-    // }, []);
-
 
     function onValuesChange(e) {
         const colName = `col${props.index}`

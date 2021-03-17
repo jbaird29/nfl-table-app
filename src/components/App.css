@@ -7,6 +7,10 @@
   background: #fff;
 }
 
+.custom-calc {
+  background-color: #f3faf2 !important;
+}
+
 /*[data-theme='compact'] .site-collapse-custom-collapse .site-collapse-custom-panel,*/
 /*.site-collapse-custom-collapse .site-collapse-custom-panel {*/
 /*  margin-bottom: 24px;*/
