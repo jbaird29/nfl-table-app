@@ -22,46 +22,47 @@ export function addRender(column) {
     }
 }
 
-export function buildRequestBody(values) {
-    // row: can be inserted 'as-is'
-    const row = values.row
-    // years: fill out the array; original array is [2018, 2020] this makes it [2020, 2019, 2018]
+export function buildRequestBody(body) {
+    const output = {}
+    output.row = body.row
+    output.columns = []
+    output.where = []
     const years = []
-    for (let i = values.years[1]; i >= values.years[0]; i--) {
-        years.push(i)
-    }
-    // stats: if stat type's value is not 'undefined', add its value to the array
-    const stats = []
-    for (const statType in values.stats) {
-        values.stats[statType] && stats.push(...values.stats[statType])
-    }
-    // where & having: if where and having are not undefined, add them, otherwise make it an empty object
-    const whereObj = values.where || {}
-    const havingObj = values.having || {}
-    // turn where and having from object into an array of type: [{ field: 'inside_20', values: [1]}, ...]
-    const where = Object.entries(whereObj).map(entry => {
-        if (entry[1]) {  // if the value  is not undefined or empty, add it, otherwise add undefined
-            const key = entry[0]
-            const values = Array.isArray(entry[1]) ? entry[1] : [entry[1]]  // makes values an array, even if single item
-            return {field: key, values: values}
+    const statTypes = []
+    for (const name in body) {
+        if (name.startsWith('col')) {
+            const column = {}
+            column.field = body[name].field
+            if (body[name].field.includes('pass')) { statTypes.push(`'pass'`) }
+            if (body[name].field.includes('rush')) { statTypes.push(`'rush'`) }
+            if (body[name].field.includes('recv')) { statTypes.push(`'receive'`) }
+            // for each column, loop through its filters
+            column.filters = []
+            for (const colEntry in body[name]) {
+                if (colEntry.startsWith('filter')) {
+                    for (const filterName in body[name][colEntry]) {
+                        if (filterName === 'year') { years.push(body[name][colEntry][filterName])}
+                        let value = body[name][colEntry][filterName]
+                        if (typeof(value) !== "undefined" && value !== null) {
+                            value = Array.isArray(value) ? value : [value]
+                            column.filters.push({field: filterName, values: value})    
+                        }
+                    }
+                }
+            }
+            output.columns.push(column)
         }
-    }).filter(entry => entry)
-    const having = Object.entries(havingObj).map(entry => {
-        if (entry[1]) {
-            const key = entry[0]
-            const value = entry[1] // for HAVING, value is single number (always >= for now)
-            return {field: key, value: value}
-        }
-    }).filter(entry => entry)
-    // return the request body
-    return {row: row, years: years, stats: stats, where: where, having: having}
+    }
+    output.where.push({field: 'year', values: years})
+    output.where.push({field: 'stat_type', values: statTypes})
+    return output
 }
 
-export async function makeRequest(body) {
+export async function makeRequest(params) {
     const fetchOptions = { method: 'POST', headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(body)
+        body: JSON.stringify(params)
     }
-    const response = await fetch(`http://localhost:9000/query`, fetchOptions)
+    const response = await fetch(`http://localhost:9000/run-query`, fetchOptions)
     const tableData = await response.json();
 
     // for each column, add (1) sorter function (2) render function
