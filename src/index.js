@@ -2,16 +2,11 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import App from './components/App';
-import { ConfigProvider } from 'antd'
 import reportWebVitals from './components/1unused/reportWebVitals';
 
 ReactDOM.render(
   <React.StrictMode>
-      <ConfigProvider
-          // componentSize="small"
-      >
-        <App />
-      </ConfigProvider>
+    <App />
   </React.StrictMode>,
   document.getElementById('root')
 );
