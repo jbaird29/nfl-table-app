@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {Collapse, Form, Input, Button, Radio, Slider, Modal, Select, InputNumber, Divider} from 'antd';
+import { InfoCircleOutlined } from '@ant-design/icons';
 import statsInputs from './inputs/statsInputs.json'
 import filtersPass from './inputs/filtersPass.json'
 import ColumnFormFilters from './Column-Form-Filters'
@@ -27,12 +28,8 @@ export default function ColumnForm(props) {
     }
 
     const topLayout = {
-        labelCol: {
-            span: 10,
-        },
-        wrapperCol: {
-            span: 14,
-        },
+        labelCol: { span: 10, },
+        wrapperCol: { span: 14, },
         labelAlign: 'left',
         colon: false
     };
@@ -72,8 +69,14 @@ export default function ColumnForm(props) {
         align: 'center',
         allowClear: true,
         maxTagCount: 'responsive',
+        style: {width: '50%', marginLeft: '50%'},
         options: [{value: '2020'}, {value: '2019'}, {value: '2018'}, {value: '2017'}, {value: '2016'}]
     }
+
+    const minInputProps = {
+        style: {width: '50%', marginLeft: '50%'}
+    }
+
 
     return (
         <Form {...formProps}>
@@ -86,7 +89,13 @@ export default function ColumnForm(props) {
             </Form.Item>
 
             <Divider orientation="center" plain>General Filters</Divider>
-            
+
+            <Form.Item name='having' label="Minimum Value" 
+                tooltip={{ title: 'E.g. if you selected "Pass Attempts" as the Stat Type, entering "100" in this box would filter to rows with at least 100 pass attempts', 
+                icon: <InfoCircleOutlined /> }}>
+                <InputNumber {...minInputProps}/>
+            </Form.Item>
+
             <Divider orientation="center" plain>Stat-Specific Filters</Divider>
             {statType === 'pass' && <Form.List name="filtersPass">
                 {() => (

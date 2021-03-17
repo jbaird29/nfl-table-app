@@ -27,13 +27,15 @@ export function buildRequestBody(body) {
     output.row = body.row
     output.columns = []
     output.where = []
+    output.having = []
     const years = []
     const statTypes = []
     for (const key in body) {
         if (key.startsWith('col')) {
             const column = {}
+            const columnID = key.slice(3) // extracts '10' from 'col10'
+            column.id = columnID
             column.field = body[key].field
-            column.id = key.slice(3)   // extracts '10' from 'col10'
             if (body[key].field.includes('pass')) { statTypes.push(`'pass'`) }
             if (body[key].field.includes('rush')) { statTypes.push(`'rush'`) }
             if (body[key].field.includes('recv')) { statTypes.push(`'receive'`) }
@@ -48,6 +50,11 @@ export function buildRequestBody(body) {
                             value = Array.isArray(value) ? value : [value]
                             column.filters.push({field: filterName, values: value})    
                         }
+                    }
+                } else if (colEntry === 'having') {
+                    const value = body[key][colEntry]
+                    if (typeof(value) !== "undefined" && value !== null) {
+                        output.having.push({id: columnID, value: value})
                     }
                 }
             }
