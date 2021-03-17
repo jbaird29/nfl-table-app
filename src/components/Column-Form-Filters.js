@@ -2,15 +2,22 @@ import React, {useEffect, useState} from "react";
 import {Collapse, Form, Input, Button, Radio, Slider, Modal, Select, InputNumber} from 'antd';
 import { MinusCircleOutlined } from '@ant-design/icons';
 import statsInputs from './inputs/statsInputs.json'
-import filtersPass from './inputs/filtersPass.json'
-import filtersRush from './inputs/filtersRush.json'
-import filtersReceive from './inputs/filtersReceive.json'
+import filtersPassData from './inputs/filtersPass.json'
+import filtersRushData from './inputs/filtersRush.json'
+import filtersReceiveData from './inputs/filtersReceive.json'
 const { Option, OptGroup } = Select;
 const {Panel} = Collapse;
 
 
 
 export default function ColumnFormFilters(props) {
+    const [filtersPass, setFiltersPass] = useState([])
+
+    useEffect(() => {
+        setFiltersPass(filtersPassData)
+    }, []);
+
+    
 
     return (
     <>

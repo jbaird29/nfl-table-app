@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from "react";
-import {Collapse, Form, Input, Button, Radio, Slider, Modal, Select, InputNumber} from 'antd';
+import {Collapse, Form, Input, Button, Radio, Slider, Modal, Select, InputNumber, Divider} from 'antd';
 import statsInputs from './inputs/statsInputs.json'
+import filtersPass from './inputs/filtersPass.json'
 import ColumnFormFilters from './Column-Form-Filters'
 const { Option, OptGroup } = Select;
 const {Panel} = Collapse;
@@ -10,6 +11,12 @@ const {Panel} = Collapse;
 export default function ColumnForm(props) {
     const [form] = Form.useForm()
     const [statType, setStatType] = useState()
+    // const [filtersPass, setFiltersPass] = useState([])
+
+    // useEffect(() => {
+    //     setFiltersPass(filtersPassData)
+    // }, []);
+
 
     function onValuesChange(e) {
         const colName = `col${props.index}`
@@ -42,9 +49,11 @@ export default function ColumnForm(props) {
     }
 
     const onSelect = (value) => {
-        if (value.includes('pass')) { setStatType('pass') }
-        else if (value.includes('rush')) { setStatType('rush') }
-        else if (value.includes('recv')) { setStatType('recv') }
+        if (value.includes('pass'))      { setStatType('pass'); form.resetFields(['filtersRush']); form.resetFields(['filtersRecv']) }
+        else if (value.includes('rush')) { setStatType('rush'); form.resetFields(['filtersPass']); form.resetFields(['filtersRecv']) }
+        else if (value.includes('recv')) { setStatType('recv'); form.resetFields(['filtersPass']); form.resetFields(['filtersRush']) }
+        const colName = `col${props.index}`
+        props.setGlobalForm(prior => ({ ...prior, [colName]: form.getFieldsValue() }))
     }
 
     const selectProps = {
@@ -57,6 +66,7 @@ export default function ColumnForm(props) {
         onSelect: onSelect,
         options: statsInputs
     }
+
     const yearProps = {
         placeholder: "Please select",
         align: 'center',
@@ -75,7 +85,24 @@ export default function ColumnForm(props) {
                 <Select {...yearProps}/>
             </Form.Item>
 
-            <ColumnFormFilters />           
+            <Divider orientation="center" plain>General Filters</Divider>
+            
+            <Divider orientation="center" plain>Stat-Specific Filters</Divider>
+            {statType === 'pass' && <Form.List name="filtersPass">
+                {() => (
+                    <div>
+                    {filtersPass.map(filter => (
+                        <Form.Item {...filter.formProps} fieldKey={[filter.formProps.name]}>
+                            {filter.ui.type === 'select' ? <Select {...filter.ui.props} /> : 
+                            filter.ui.type === 'slider' ? <Slider {...filter.ui.props} /> : 
+                            filter.ui.type === 'inputNumber' ? <InputNumber {...filter.ui.props} /> : null
+                            }
+                        </Form.Item>                        
+                    ))}
+                    </div>
+                )}
+                </Form.List>}
+
         </Form>
     );
 };

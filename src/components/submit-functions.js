@@ -29,20 +29,21 @@ export function buildRequestBody(body) {
     output.where = []
     const years = []
     const statTypes = []
-    for (const name in body) {
-        if (name.startsWith('col')) {
+    for (const key in body) {
+        if (key.startsWith('col')) {
             const column = {}
-            column.field = body[name].field
-            if (body[name].field.includes('pass')) { statTypes.push(`'pass'`) }
-            if (body[name].field.includes('rush')) { statTypes.push(`'rush'`) }
-            if (body[name].field.includes('recv')) { statTypes.push(`'receive'`) }
+            column.field = body[key].field
+            column.id = key.slice(3)   // extracts '10' from 'col10'
+            if (body[key].field.includes('pass')) { statTypes.push(`'pass'`) }
+            if (body[key].field.includes('rush')) { statTypes.push(`'rush'`) }
+            if (body[key].field.includes('recv')) { statTypes.push(`'receive'`) }
             // for each column, loop through its filters
             column.filters = []
-            for (const colEntry in body[name]) {
+            for (const colEntry in body[key]) {
                 if (colEntry.startsWith('filter')) {
-                    for (const filterName in body[name][colEntry]) {
-                        if (filterName === 'year') { years.push(body[name][colEntry][filterName])}
-                        let value = body[name][colEntry][filterName]
+                    for (const filterName in body[key][colEntry]) {
+                        if (filterName === 'year') { years.push(body[key][colEntry][filterName])}
+                        let value = body[key][colEntry][filterName]
                         if (typeof(value) !== "undefined" && value !== null) {
                             value = Array.isArray(value) ? value : [value]
                             column.filters.push({field: filterName, values: value})    

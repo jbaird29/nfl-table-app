@@ -25,8 +25,8 @@ function App() {
         console.log(globalForm)
         const requestBody = buildRequestBody(globalForm)
         console.log(requestBody)
-        // const tableData = await makeRequest(requestBody)
-        // setTableData(tableData)
+        const tableData = await makeRequest(requestBody)
+        setTableData(tableData)
     }
 
     // function onFinish(values) {
