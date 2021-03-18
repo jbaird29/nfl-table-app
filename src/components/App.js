@@ -26,7 +26,16 @@ function App() {
     // }
 
     async function onSubmit() {
-        console.log(globalForm)
+        if (!globalForm.columns || globalForm.columns.length === 0) {
+            message.error({content: 'Please select fields', duration: 2.5, style: {fontSize: '1rem'} })
+            return
+        } else if (globalForm.columns.filter(column => typeof(column.field) === 'undefined').length > 0) {
+            message.error({content: 'Ensure every column has a stat type selected.', duration: 2.5, style: {fontSize: '1rem'} })
+            return
+        } else if (globalForm.columns.filter(column => typeof(column.filtersOther.year) === 'undefined').length > 0) {
+            message.error({content: 'Ensure every column has a year selected.', duration: 2.5, style: {fontSize: '1rem'} })
+            return
+        }
         const hide = message.loading({content: 'Loading the data', style: {fontSize: '1rem'}}, 0)
         try {
             const requestBody = buildRequestBody(globalForm)
