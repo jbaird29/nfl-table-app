@@ -1,11 +1,8 @@
-import React, {useEffect, useState} from "react";
-import {Collapse, Form, Input, Button, Radio, Slider, Modal, Select, InputNumber, Divider} from 'antd';
+import React, {useState} from "react";
+import {Collapse, Form, Input, Button, Radio, Slider, Select, InputNumber, Divider} from 'antd';
 import { InfoCircleOutlined } from '@ant-design/icons';
-import statsInputs from './inputs/statsInputs.json'
-import filtersPass from './inputs/filtersPass.json'
-const { Option, OptGroup } = Select;
-const {Panel} = Collapse;
-
+import statsInputs from '../inputs/statsInputs.json'
+import filtersPass from '../inputs/filtersPass.json'
 
 
 export default function ColumnForm(props) {
@@ -14,7 +11,7 @@ export default function ColumnForm(props) {
 
     function onValuesChange() {
         const colIndex = `col${props.index}`
-        props.setGlobalForm(prior => ({
+        props.setQueryFields(prior => ({
             ...prior,
             columns: [...prior.columns.filter(column => column.colIndex !== colIndex), {colIndex: colIndex, ...form.getFieldsValue()}],
         }))
@@ -43,7 +40,7 @@ export default function ColumnForm(props) {
         else if (value.includes('rush')) { setStatType('rush'); form.resetFields(['filtersPass']); form.resetFields(['filtersRecv']) }
         else if (value.includes('recv')) { setStatType('recv'); form.resetFields(['filtersPass']); form.resetFields(['filtersRush']) }
         const colIndex = `col${props.index}`
-        props.setGlobalForm(prior => ({
+        props.setQueryFields(prior => ({
             ...prior,
             columns: [...prior.columns.filter(column => column.colIndex !== colIndex), {colIndex: colIndex, ...form.getFieldsValue()}],
         }))

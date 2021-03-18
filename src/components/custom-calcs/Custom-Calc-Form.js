@@ -1,9 +1,5 @@
-import React, {useEffect, useState} from "react";
-import {Collapse, Form, Input, Button, Radio, Slider, Modal, Select, InputNumber, Divider} from 'antd';
-import {addRender, addSorter, buildRequestBody, makeRequest} from './submit-functions'
-import CustomCalcTabs from './Custom-Calc-Tabs'
-const { Option, OptGroup } = Select;
-const {Panel} = Collapse;
+import React, {} from "react";
+import {Form, Input, Select, } from 'antd';
 
 
 export default function CustomCalcForm(props) {

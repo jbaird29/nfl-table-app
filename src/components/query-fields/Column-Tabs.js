@@ -1,18 +1,14 @@
-import React, { useState } from "react";
-import {Button, Tabs} from 'antd';
-import CustomCalcForm from './Custom-Calc-Form'
+import React, {  } from "react";
+import {Tabs} from 'antd';
+import ColumnForm from './Column-Form'
 const { TabPane } = Tabs;
 
-/*
-    TBU - goal will be to change the 'Custom Calculations' UI to incorporate tabbing, similar
-    to the Edit Fields UI
-*/
 
 const initialPanes = [
-    { title: 'Calculation 1', key: '1' },
+    { title: 'Column 1', key: '1' },
 ];
   
-export default class CustomCalcTabs extends React.Component {
+class ColumnTabs extends React.Component {
     tabIndex = 1;
   
     state = {
@@ -33,7 +29,7 @@ export default class CustomCalcTabs extends React.Component {
         const { panes } = this.state;
         const activeKey = `${this.tabIndex}`;
         const newPanes = [...panes];
-        newPanes.push({ title: `Calculation ${this.tabIndex}`, key: activeKey });
+        newPanes.push({ title: `Column ${this.tabIndex}`, key: activeKey });
         this.setState({
             panes: newPanes,
             activeKey,
@@ -64,9 +60,17 @@ export default class CustomCalcTabs extends React.Component {
             activeKey: newActiveKey,
         });
 
-        // removes the calculation from the global state
-        const calcIndex = `calc${targetKey}`
-        this.props.setCustomCalcs(prior => prior.filter(form => form.calcIndex !== calcIndex))
+        const colIndex = `col${targetKey}`
+        // this.props.setQueryFields(prior => (
+        //     Object.assign(...Object.keys(prior)
+        //     .filter(key => key !== colName)
+        //     .map(key => ({[key]: prior[key]}))
+        //     )
+        // ))
+        this.props.setQueryFields(prior => ({
+            ...prior,
+            columns: prior.columns.filter(column => column.colIndex !== colIndex)
+        }))
     };
   
     render() {
@@ -80,10 +84,13 @@ export default class CustomCalcTabs extends React.Component {
         >
         {panes.map(pane => (
             <TabPane tab={pane.title} key={pane.key}>
-              <CustomCalcForm setCustomCalcs={this.props.setCustomCalcs} tableData={this.props.tableData} index={pane.key} />
+              <ColumnForm setQueryFields={this.props.setQueryFields} index={pane.key} />
             </TabPane>
         ))}
         </Tabs>
         );
     }
 }
+
+
+export default ColumnTabs;

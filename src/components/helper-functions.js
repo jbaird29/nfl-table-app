@@ -1,4 +1,7 @@
-// add sort functions depending on data type
+/**
+ * Given a TableProps column object, adds a sorter function depending on format type
+ * @param {Object} column - tableProps Column
+ */
 export function addSorter(column) {
     if (column.dataType === 'number') {
         const columnName = column.dataIndex
@@ -9,7 +12,10 @@ export function addSorter(column) {
     }
 }
 
-// add render functions depending on format type
+/**
+ * Given a TableProps column object, adds a render function depending on format type
+ * @param {Object} column - tableProps Column
+ */
 export function addRender(column) {
     if (column.format === 'dec_0') {
         column.render = (text, row, index) => (!text ? text : <span>{`${text.toLocaleString()}`}</span>)
@@ -24,9 +30,14 @@ export function addRender(column) {
     }
 }
 
-export function buildRequestBody(body) {
+/**
+ * Given a queryFields state object, formats the state into a manner necessary for the API request
+ * @param {Object} queryFields 
+ * @returns {Object} apiRequestBody 
+ */
+export function buildRequestBody(queryFields) {
     const output = {
-        row: body.row,
+        row: queryFields.row,
         columns: [],
         where: [],
         having: []
@@ -34,7 +45,7 @@ export function buildRequestBody(body) {
     const statTypes = []    
 
     // modify the column into appropriate formate for API request
-    body.columns.forEach(column => {
+    queryFields.columns.forEach(column => {
         // append the appropriate statType filter based on the field
         if (column.field.includes('pass')) { statTypes.push(`'pass'`) }
         if (column.field.includes('rush')) { statTypes.push(`'rush'`) }
@@ -62,17 +73,23 @@ export function buildRequestBody(body) {
         }
     })
     // push the required years and stat type filters
-    const years = Array.from(new Set(body.columns.map(column => column.filtersOther.year)))
+    const years = Array.from(new Set(queryFields.columns.map(column => column.filtersOther.year)))
     output.where.push({field: 'year', values: years})
-    output.where.push({field: 'stat_type', values: statTypes})
+    output.where.push({field: 'stat_type', values: Array.from(new Set(statTypes)) })
     // sort the columns by id
     output.columns.sort((a, b) => a.id - b.id)
     return output
 }
 
-export async function makeRequest(params) {
+
+/**
+ * Given an apiRequestBody, makes the request and returns the tableData
+ * @param {Object} params 
+ * @returns {Object} tableData
+ */
+export async function makeRequest(apiRequestBody) {
     const fetchOptions = { method: 'POST', headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(params)
+        body: JSON.stringify(apiRequestBody)
     }
     const response = await fetch(`http://localhost:9000/run-query`, fetchOptions)
     const tableData = await response.json();
@@ -91,4 +108,51 @@ export async function makeRequest(params) {
     })
     // add the new response to the tableData state
     return tableData
+}
+
+
+/**
+ * Given a customCalc Object and the array of previous tableData.columns, creates the new array of tableData.columns
+ * @param {*} customCalc 
+ * @param {*} prevColumns 
+ * @returns tableData.columns
+ */
+export function buildTableCalcColumn(customCalc, prevColumns) {
+    const {calcIndex, colIndex1, operation, colIndex2, format, title} = customCalc
+    const newColumnIndex = calcIndex
+    const newColumn = {
+        title: `Calculation ${calcIndex.slice(4)}`,  // extracts '10' from 'calc10'
+        align: 'center',
+        children: [{
+            dataIndex: newColumnIndex, 
+            title: title,
+            align: "right",
+            width: "75px",
+            className: 'custom-calc',
+            format: format,
+            dataType: 'number'
+        }]
+    }
+    addRender(newColumn.children[0])
+    addSorter(newColumn.children[0])
+    return [...prevColumns, newColumn]
+}
+
+
+/**
+ * Given a customCalc Object and the array of previous tableData.dataSource, creates the new array of tableData.dataSource
+ * @param {*} customCalc 
+ * @param {*} prevDataSource 
+ * @returns tableData.dataSource
+ */
+export function buildTableCalcDataSource(customCalc, prevDataSource) {
+    const {calcIndex, colIndex1, operation, colIndex2, format, title} = customCalc
+    return prevDataSource.map(dataSource => {
+        const newDataSource = (operation === '/' ? dataSource[colIndex1] / dataSource[colIndex2] :
+        operation === '*' ? dataSource[colIndex1] * dataSource[colIndex2] :
+        operation === '+' ? dataSource[colIndex1] + dataSource[colIndex2] :
+        operation === '-' ? dataSource[colIndex1] - dataSource[colIndex2] :
+        null)
+        return {...dataSource, [calcIndex]: newDataSource}
+    })
 }

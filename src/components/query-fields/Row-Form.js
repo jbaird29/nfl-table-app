@@ -1,8 +1,6 @@
 import React from "react";
-import {Collapse, Form, Input, Button, Radio, Slider, Modal} from 'antd';
-import {buildRequestBody, makeRequest} from "./submit-functions";
+import {Form, Radio, } from 'antd';
 
-const {Panel} = Collapse;
 
 export default function RowForm(props) {
     const [form] = Form.useForm()
@@ -19,7 +17,7 @@ export default function RowForm(props) {
     };
 
     function onValuesChange(e) {
-        props.setGlobalForm(prior => ({
+        props.setQueryFields(prior => ({
             ...prior,
             row: form.getFieldsValue()
         }))
