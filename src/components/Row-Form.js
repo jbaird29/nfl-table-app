@@ -17,12 +17,6 @@ export default function RowForm(props) {
         labelAlign: 'left',
         colon: false
     };
-    const buttonLayout = {
-        wrapperCol: {
-            offset: 10,
-            span: 14,
-        },
-    };
 
     function onValuesChange(e) {
         props.setGlobalForm(prior => ({

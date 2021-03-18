@@ -60,13 +60,17 @@ class ColumnTabs extends React.Component {
             activeKey: newActiveKey,
         });
 
-        const colName = `col${targetKey}`
-        this.props.setGlobalForm(prior => (
-            Object.assign(...Object.keys(prior)
-            .filter(key => key !== colName)
-            .map(key => ({[key]: prior[key]}))
-            )
-        ))
+        const colIndex = `col${targetKey}`
+        // this.props.setGlobalForm(prior => (
+        //     Object.assign(...Object.keys(prior)
+        //     .filter(key => key !== colName)
+        //     .map(key => ({[key]: prior[key]}))
+        //     )
+        // ))
+        this.props.setGlobalForm(prior => ({
+            ...prior,
+            columns: prior.columns.filter(column => column.colIndex !== colIndex)
+        }))
     };
   
     render() {

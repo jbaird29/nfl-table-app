@@ -15,11 +15,15 @@ const { TabPane } = Tabs;
 function App() {
     const [tableData, setTableData] = useState({});
     const [isFieldDrawerVisible, setIsFieldDrawerVisible] = useState(false);
-    const [isCalcDrawerVisible, setIsCalcDrawerVisible] = useState(false);
+    const [isCalcVisible, setIsCalcVisible] = useState(false);
     const [globalForm, setGlobalForm] = useState({
         row: {field: 'player_name'},
-        col1: {}
+        columns: []
     });
+    // const exampleState = {
+    //     row: {field: 'player_name'},
+    //     columns: [{field: 'sum_att_pass', colIndex: 'col1', filtersPass: {blitzed: '1'}, filtersOther: {year: '2020'}}]
+    // }
 
     async function onSubmit() {
         console.log(globalForm)
@@ -27,9 +31,9 @@ function App() {
         try {
             const requestBody = buildRequestBody(globalForm)
             console.log(requestBody)    
-            // const tableData = await makeRequest(requestBody)
-            // setTableData(tableData)
-            // setIsFieldDrawerVisible(false)
+            const tableData = await makeRequest(requestBody)
+            setTableData(tableData)
+            setIsFieldDrawerVisible(false)
             hide() 
         } catch(err) {
             console.log(err)
@@ -40,7 +44,7 @@ function App() {
 
     function handleShowCalc() {
         if (tableData.columns && tableData.columns.length > 0) {
-            setIsCalcDrawerVisible(true)
+            setIsCalcVisible(true)
         } else {
             message.error({content: 'Please select fields first', duration: 2.5, style: {fontSize: '1rem'} })
         }
@@ -67,15 +71,6 @@ function App() {
         bodyStyle: { paddingBottom: 80 }
     }
 
-    const calcDrawerProps = {
-        title: 'Edit Custom Calculations',
-        width: '60%',
-        visible: isCalcDrawerVisible,
-        placement: 'left',
-        onClose: () => setIsCalcDrawerVisible(false),
-        bodyStyle: { paddingBottom: 80 }
-    }
-
     return (
     <>
     <Layout hasSider={false} className="site-layout-background" style={{ minHeight: '100vh' }}>
@@ -94,9 +89,7 @@ function App() {
                 <ColumnTabs setGlobalForm={setGlobalForm} />
             </Drawer>
 
-            <Drawer {...calcDrawerProps} >
-                <CustomCalc setTableData={setTableData} tableData={tableData}/>
-            </Drawer>
+            <CustomCalc isVisible={isCalcVisible} setVisible={setIsCalcVisible}  setTableData={setTableData} tableData={tableData}/>
         </Content>
 
         <Footer style={{ textAlign: 'center', padding: '12px'}}>NFL Plays Table ©2020 Created by Jon Baird</Footer>

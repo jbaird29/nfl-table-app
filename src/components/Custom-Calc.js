@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {Collapse, Form, Input, Button, Radio, Slider, Modal, Select, InputNumber, Divider} from 'antd';
+import {Collapse, Form, Input, Button, Radio, Slider, Modal, Select, InputNumber, Divider, message} from 'antd';
 import {addRender, addSorter, buildRequestBody, makeRequest} from './submit-functions'
 import CustomCalcTabs from './Custom-Calc-Tabs'
 const { Option, OptGroup } = Select;
@@ -9,7 +9,17 @@ const {Panel} = Collapse;
 export default function CustomCalc(props) {
     const [customCalcs, setCustomCalcs] = useState([]);
 
+    const modalProps = {
+        title: "Edit Custom Calculations",
+        visible: props.isVisible,
+        onOk: onSubmit,
+        onCancel: () => props.setVisible(false),
+        width: 750,
+        style: {top: 150}
+    }
+
     function onSubmit () {
+        const hide = message.loading({content: 'Loading the data', style: {fontSize: '1rem'}}, 0)
         // remove the custom calcs from table data
         props.setTableData(prev => {
             const newColumns = prev.columns.filter(column => !column.title.startsWith('Calculation'))
@@ -20,9 +30,11 @@ export default function CustomCalc(props) {
             return {columns: newColumns, dataSource: newDataSource}
         })
         // add the custom calcs to table data
-        customCalcs.forEach(customCalc => {
+        customCalcs.sort((a, b) => a.calcIndex.slice(4) - b.calcIndex.slice(4)).forEach(customCalc => {
             addTableCalc(customCalc)
         })
+        props.setVisible(false)
+        hide()
         // form.resetFields();
         // console.log(customCalcs)
     }
@@ -62,11 +74,12 @@ export default function CustomCalc(props) {
 
 
     return (<>
-    {props.tableData.columns && props.tableData.columns.length > 0 ?
         <>
-        <Button type="primary" onClick={onSubmit}>Submit</Button>
-        <CustomCalcTabs setCustomCalcs={setCustomCalcs} tableData={props.tableData} />
+        <Modal {...modalProps}>
+            {props.tableData.columns && props.tableData.columns.length > 0 ?
+            <CustomCalcTabs setCustomCalcs={setCustomCalcs} tableData={props.tableData} />
+            : <p>Please select fields first</p>}
+        </Modal>
         </>
-        : <p>Please select fields first</p>}
     </>);
 };

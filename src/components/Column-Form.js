@@ -12,11 +12,11 @@ export default function ColumnForm(props) {
     const [form] = Form.useForm()
     const [statType, setStatType] = useState()
 
-    function onValuesChange(e) {
-        const colName = `col${props.index}`
+    function onValuesChange() {
+        const colIndex = `col${props.index}`
         props.setGlobalForm(prior => ({
             ...prior,
-            [colName]: form.getFieldsValue()
+            columns: [...prior.columns.filter(column => column.colIndex !== colIndex), {colIndex: colIndex, ...form.getFieldsValue()}],
         }))
     }
 
@@ -42,8 +42,11 @@ export default function ColumnForm(props) {
         if (value.includes('pass'))      { setStatType('pass'); form.resetFields(['filtersRush']); form.resetFields(['filtersRecv']) }
         else if (value.includes('rush')) { setStatType('rush'); form.resetFields(['filtersPass']); form.resetFields(['filtersRecv']) }
         else if (value.includes('recv')) { setStatType('recv'); form.resetFields(['filtersPass']); form.resetFields(['filtersRush']) }
-        const colName = `col${props.index}`
-        props.setGlobalForm(prior => ({ ...prior, [colName]: form.getFieldsValue() }))
+        const colIndex = `col${props.index}`
+        props.setGlobalForm(prior => ({
+            ...prior,
+            columns: [...prior.columns.filter(column => column.colIndex !== colIndex), {colIndex: colIndex, ...form.getFieldsValue()}],
+        }))
     }
 
     const selectProps = {

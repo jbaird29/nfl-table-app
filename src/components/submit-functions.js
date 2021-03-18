@@ -18,53 +18,55 @@ export function addRender(column) {
     } else if (column.format === 'dec_2') {
         column.render = (text, row, index) => (!text ? text : <span>{`${text.toLocaleString(undefined,{minimumFractionDigits: 2, maximumFractionDigits: 2})}`}</span>)
     } else if (column.format === 'percent') {
-        column.render = (text, row, index) => (!text ? text : <span>{`${(text*100).toLocaleString(undefined,{minimumFractionDigits: 2, maximumFractionDigits: 2})}%`}</span>)
+        column.render = (text, row, index) => (!text ? text : <span>{`${(text*100).toLocaleString(undefined,{minimumFractionDigits: 1, maximumFractionDigits: 1})}%`}</span>)
     } else if (column.format === 'index') {
         column.render = (text, row, index) => (!text ? text : <span>{`${index + 1}`}</span>)
     }
 }
 
 export function buildRequestBody(body) {
-    const output = {}
-    output.row = body.row
-    output.columns = []
-    output.where = []
-    output.having = []
-    const years = []
-    const statTypes = []
-    for (const key in body) {
-        if (key.startsWith('col')) {
-            const column = {}
-            const columnID = key.slice(3) // extracts '10' from 'col10'
-            column.id = columnID
-            column.field = body[key].field
-            if (body[key].field.includes('pass')) { statTypes.push(`'pass'`) }
-            if (body[key].field.includes('rush')) { statTypes.push(`'rush'`) }
-            if (body[key].field.includes('recv')) { statTypes.push(`'receive'`) }
-            // for each column, loop through its filters
-            column.filters = []
-            for (const colEntry in body[key]) {
-                if (colEntry.startsWith('filter')) {
-                    for (const filterName in body[key][colEntry]) {
-                        if (filterName === 'year') { years.push(body[key][colEntry][filterName])}
-                        let value = body[key][colEntry][filterName]
-                        if (typeof(value) !== "undefined" && value !== null) {
-                            value = Array.isArray(value) ? value : [value]
-                            column.filters.push({field: filterName, values: value})    
-                        }
-                    }
-                } else if (colEntry === 'having') {
-                    const value = body[key][colEntry]
-                    if (typeof(value) !== "undefined" && value !== null) {
-                        output.having.push({id: columnID, value: value})
-                    }
-                }
-            }
-            output.columns.push(column)
-        }
+    const output = {
+        row: body.row,
+        columns: [],
+        where: [],
+        having: []
     }
+    const statTypes = []    
+
+    // modify the column into appropriate formate for API request
+    body.columns.forEach(column => {
+        // append the appropriate statType filter based on the field
+        if (column.field.includes('pass')) { statTypes.push(`'pass'`) }
+        if (column.field.includes('rush')) { statTypes.push(`'rush'`) }
+        if (column.field.includes('recv')) { statTypes.push(`'receive'`) }
+        // create the column filters
+        const filters = []
+        // this gets an array like ['filtersPass', 'filtersRush', 'filtersOther']
+        const filterKeys =  Object.keys(column).filter(key => key.startsWith('filter'))
+        filterKeys.forEach(filterKey => {
+            // turn the object like {blitzed: 1, on_target: 0} -> into {field: blitzed, value: [1]...}
+            for (const filterName in column[filterKey]) {
+                let values = column[filterKey][filterName]
+                values = Array.isArray(values) ? values : [values]
+                filters.push({field: filterName, values: values})
+            }
+        })
+        output.columns.push({
+            id: column.colIndex.slice(3),  // extracts '10' from 'col10'
+            field: column.field,           // the name like 'sum_pass_att'
+            filters: filters               // the filter array created above [{field: year, values: ['2020']}, {field: ...}]
+        })
+        // append the 'having' portion
+        if (column.having && typeof(column.having) !== 'undefined') {
+            output.having.push({id: column.colIndex.slice(3), value: column.having})
+        }
+    })
+    // push the required years and stat type filters
+    const years = Array.from(new Set(body.columns.map(column => column.filtersOther.year)))
     output.where.push({field: 'year', values: years})
     output.where.push({field: 'stat_type', values: statTypes})
+    // sort the columns by id
+    output.columns.sort((a, b) => a.id - b.id)
     return output
 }
 
