@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import {Collapse, Form, Input, Button, Radio, Slider, Select, InputNumber, Divider} from 'antd';
+import {Form, Slider, Select, InputNumber, Divider} from 'antd';
 import { InfoCircleOutlined } from '@ant-design/icons';
 import statsInputs from '../inputs/statsInputs.json'
 import filtersPass from '../inputs/filtersPass.json'
