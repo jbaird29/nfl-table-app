@@ -1,8 +1,9 @@
 import React, {useState, useEffect} from "react";
-import {Form, Slider, Select, InputNumber, Divider, Input, Button} from 'antd';
+import {Form, Slider, Select, InputNumber, Divider, Input, Button, Row, Col} from 'antd';
 import { InfoCircleOutlined } from '@ant-design/icons';
 import statsInputs from '../../inputs/statsInputs.json'
 import filtersStats from '../../inputs/filtersStats.json'
+import filtersGeneral from '../../inputs/filtersGeneral.json'
 
 
 export default function ColumnForm(props) {
@@ -98,7 +99,11 @@ export default function ColumnForm(props) {
             <Form.Item required name={['filters_general', 'season_year']} label="Select Year">
                 <Select {...yearProps}/>
             </Form.Item>
+        
 
+            <Row gutter={24}>
+
+            <Col span={12}>
             <Divider orientation="center" plain>General Filters (Optional)</Divider>
 
             <Form.Item name='having' label="Minimum Value" 
@@ -107,8 +112,20 @@ export default function ColumnForm(props) {
                 <InputNumber {...minInputProps}/>
             </Form.Item>
 
+            {filtersGeneral.map(filter => (
+                <Form.Item {...filter.formProps}>
+                {filter.ui.type === 'select' ? <Select {...filter.ui.props} /> : 
+                    filter.ui.type === 'slider' ? <Slider {...filter.ui.props} /> : 
+                    filter.ui.type === 'inputNumber' ? <InputNumber {...filter.ui.props} /> : null
+                    }
+                </Form.Item>
+            ))}
+            </Col>
+            
+            <Col span={12}>
             <Divider orientation="center" plain>Stat-Specific Filters (Optional)</Divider>
 
+            {shownFilters.length === 0 && <p>Please select a stat type.</p>}
             {shownFilters.map(filter => (
                 <Form.Item {...filter.formProps}>
                 {filter.ui.type === 'select' ? <Select {...filter.ui.props} /> : 
@@ -117,7 +134,9 @@ export default function ColumnForm(props) {
                     }
                 </Form.Item>
             ))}
-
+            </Col>
+            
+            </Row>
         </Form>
     </>
     );

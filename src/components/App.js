@@ -89,7 +89,7 @@ function App() {
 
     const fieldDrawerProps = {
         title: 'Edit Fields',
-        width: '60%',
+        width: '70%',
         visible: isFieldDrawerVisible,
         placement: 'left',
         onClose: () => setIsFieldDrawerVisible(false),

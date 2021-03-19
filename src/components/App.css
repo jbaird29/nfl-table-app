@@ -7,19 +7,6 @@
   background: #fff;
 }
 
-.custom-calc {
-  background-color: #f3faf2 !important;
-}
-
-/*[data-theme='compact'] .site-collapse-custom-collapse .site-collapse-custom-panel,*/
-/*.site-collapse-custom-collapse .site-collapse-custom-panel {*/
-/*  margin-bottom: 24px;*/
-/*  overflow: hidden;*/
-/*  background: #f7f7f7;*/
-/*  border: 0px;*/
-/*  border-radius: 2px;*/
-/*}*/
-
 /* this sets the padding for the "Collapse Panels" */
 .ant-collapse-header {
   padding-top: 7px !important;
@@ -44,4 +31,9 @@
 
 .ant-table-cell {
   padding: 3px 8px !important;
+}
+
+/* this sets the format for the custom calculations in the table */
+.custom-calc {
+  background-color: #f3faf2 !important;
 }
