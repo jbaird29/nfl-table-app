@@ -65,6 +65,7 @@ export function buildRequestBody(queryFields) {
         output.columns.push({
             id: column.colIndex.slice(3),  // extracts '10' from 'col10'
             field: column.field,           // the name like 'sum_pass_att'
+            title: column.title || null,   // the user-entered column title, if any
             filters: filters               // the filter array created above [{field: season_year, values: ['2020']}, {field: ...}]
         })
         // append the 'having' portion

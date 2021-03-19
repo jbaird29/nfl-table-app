@@ -1,8 +1,10 @@
 import React, {useState} from "react";
-import {Form, Slider, Select, InputNumber, Divider} from 'antd';
+import {Form, Slider, Select, InputNumber, Divider, Input} from 'antd';
 import { InfoCircleOutlined } from '@ant-design/icons';
-import statsInputs from '../inputs/statsInputs.json'
-import filtersPass from '../inputs/filtersPass.json'
+import statsInputs from '../../inputs/statsInputs.json'
+import filtersPass from '../../inputs/filtersPass.json'
+import filtersRush from '../../inputs/filtersRush.json'
+import filtersRecv from '../../inputs/filtersRecv.json'
 
 
 export default function ColumnForm(props) {
@@ -49,7 +51,6 @@ export default function ColumnForm(props) {
     const selectProps = {
         placeholder: "Please select",
         align: 'center',
-        allowClear: true,
         showSearch: true,
         optionFilterProp: "label",
         maxTagCount: 'responsive',
@@ -60,7 +61,6 @@ export default function ColumnForm(props) {
     const yearProps = {
         placeholder: "Please select",
         align: 'center',
-        allowClear: true,
         maxTagCount: 'responsive',
         style: {width: '50%', marginLeft: '50%'},
         options: [{value: '2020'}, {value: '2019'}, {value: '2018'}, {value: '2017'}, {value: '2016'}]
@@ -73,15 +73,21 @@ export default function ColumnForm(props) {
 
     return (
         <Form {...formProps}>
-            <Form.Item name='field' label="Select Stat Type">
+            <Form.Item name='title' label='Enter a Column Title'
+                tooltip={{ title: 'This title will appear in the table above this column. If no title is entred, it will be titled based on the Stat Type & Year.', 
+                icon: <InfoCircleOutlined /> }}>
+                <Input autoComplete="off" placeholder="Title (Optional)" style={{textAlign: "center"}} />
+            </Form.Item>
+
+            <Form.Item required name='field' label="Select Stat Type">
                 <Select {...selectProps}/>
             </Form.Item>
             
-            <Form.Item name={['filtersOther', 'season_year']} label="Select Year">
+            <Form.Item required name={['filtersOther', 'season_year']} label="Select Year">
                 <Select {...yearProps}/>
             </Form.Item>
 
-            <Divider orientation="center" plain>General Filters</Divider>
+            <Divider orientation="center" plain>General Filters (Optional)</Divider>
 
             <Form.Item name='having' label="Minimum Value" 
                 tooltip={{ title: 'E.g. if you selected "Pass Attempts" as the Stat Type, entering "100" in this box would filter to rows with at least 100 pass attempts', 
@@ -89,7 +95,8 @@ export default function ColumnForm(props) {
                 <InputNumber {...minInputProps}/>
             </Form.Item>
 
-            <Divider orientation="center" plain>Stat-Specific Filters</Divider>
+            <Divider orientation="center" plain>Stat-Specific Filters (Optional)</Divider>
+            {!statType && <p>No stat type selected</p>}
             {statType === 'pass' && <Form.List name="filtersPass">
                 {() => (
                     <div>

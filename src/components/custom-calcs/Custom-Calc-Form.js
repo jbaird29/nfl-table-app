@@ -20,8 +20,8 @@ export default function CustomCalcForm(props) {
     // }
 
     const formProps = {
-        labelCol: { span: 14, },
-        wrapperCol: { span: 10 },
+        labelCol: { span: 12, },
+        wrapperCol: { span: 12 },
         labelAlign: 'left',
         colon: false,
         form: form,
@@ -31,7 +31,7 @@ export default function CustomCalcForm(props) {
 
     const colsInTable = props.tableData.columns && props.tableData.columns.length > 0 ? 
                         props.tableData.columns.filter(column => column.title.startsWith('Column'))
-                        .map(column => ({label: column.title, value: column.children[0].dataIndex}))
+                        .map(column => ({label: `${column.title}: ${column.children[0].title}`, value: column.children[0].dataIndex}))
                         : null
 
     const colSelectProps = {
