@@ -2,9 +2,6 @@ import React, {useState, useEffect} from "react";
 import {Form, Slider, Select, InputNumber, Divider, Input, Button} from 'antd';
 import { InfoCircleOutlined } from '@ant-design/icons';
 import statsInputs from '../../inputs/statsInputs.json'
-import filtersPass from '../../inputs/filtersPass.json'
-import filtersRush from '../../inputs/filtersRush.json'
-import filtersRecv from '../../inputs/filtersRecv.json'
 import filtersStats from '../../inputs/filtersStats.json'
 
 
@@ -84,8 +81,10 @@ export default function ColumnForm(props) {
     return (
     <>
         <Form {...formProps}>
+            <Button onClick={() => {form.resetFields(); onValuesChange(null, form.getFieldsValue()) }}>Reset</Button>
+            
             <Button type="danger" onClick={() => {console.log(form.getFieldsValue())}}>Debug: Form</Button>
-            <Button onClick={() => form.resetFields()}>Reset</Button>
+
             <Form.Item name='title' label='Enter a Column Title'
                 tooltip={{ title: 'This title will appear in the table above this column. If no title is entred, it will be titled based on the Stat Type & Year.', 
                 icon: <InfoCircleOutlined /> }}>
@@ -103,7 +102,7 @@ export default function ColumnForm(props) {
             <Divider orientation="center" plain>General Filters (Optional)</Divider>
 
             <Form.Item name='having' label="Minimum Value" 
-                tooltip={{ title: 'E.g. if you selected "Pass Attempts" as the Stat Type, entering "100" in this box would filter to rows with at least 100 pass attempts', 
+                tooltip={{ title: 'Example: if you selected "Pass Attempts" as the Stat Type, entering 100 in this box would filter to rows with at least 100 pass attempts', 
                 icon: <InfoCircleOutlined /> }}>
                 <InputNumber {...minInputProps}/>
             </Form.Item>

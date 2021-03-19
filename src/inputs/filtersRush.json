@@ -1,1 +1,0 @@
-[{"formProps":{"label":"Yards Gained on Rush Attempt","labelCol":{"span":10},"wrapperCol":{"span":14},"name":["filters_rush","rush_yards"],"key":"rush_yards"},"ui":{"type":"slider","props":{"range":true,"max":100,"min":-20,"step":1,"marks":{"0":"-20","10":"100"},"included":true,"style":{"margin":"0 25px"}}}}]
