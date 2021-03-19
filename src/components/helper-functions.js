@@ -65,7 +65,7 @@ export function buildRequestBody(queryFields) {
         output.columns.push({
             id: column.colIndex.slice(3),  // extracts '10' from 'col10'
             field: column.field,           // the name like 'sum_pass_att'
-            filters: filters               // the filter array created above [{field: year, values: ['2020']}, {field: ...}]
+            filters: filters               // the filter array created above [{field: season_year, values: ['2020']}, {field: ...}]
         })
         // append the 'having' portion
         if (column.having && typeof(column.having) !== 'undefined') {
@@ -73,8 +73,8 @@ export function buildRequestBody(queryFields) {
         }
     })
     // push the required years and stat type filters
-    const years = Array.from(new Set(queryFields.columns.map(column => column.filtersOther.year)))
-    output.where.push({field: 'year', values: years})
+    const years = Array.from(new Set(queryFields.columns.map(column => column.filtersOther.season_year)))
+    output.where.push({field: 'season_year', values: years})
     output.where.push({field: 'stat_type', values: Array.from(new Set(statTypes)) })
     // sort the columns by id
     output.columns.sort((a, b) => a.id - b.id)

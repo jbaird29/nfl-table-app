@@ -22,7 +22,7 @@ function App() {
     });
     // const exampleState = {
     //     row: {field: 'player_name'},
-    //     columns: [{field: 'sum_att_pass', colIndex: 'col1', filtersPass: {blitzed: '1'}, filtersOther: {year: '2020'}}]
+    //     columns: [{field: 'sum_att_pass', colIndex: 'col1', filtersPass: {blitzed: '1'}, filtersOther: {season_year: '2020'}}]
     // }
 
     async function submitQueryFields() {
@@ -32,7 +32,7 @@ function App() {
         } else if (queryFields.columns.filter(column => typeof(column.field) === 'undefined').length > 0) {
             message.error({content: 'Ensure every column has a stat type selected.', duration: 2.5, style: {fontSize: '1rem'} })
             return
-        } else if (queryFields.columns.filter(column => typeof(column.filtersOther.year) === 'undefined').length > 0) {
+        } else if (queryFields.columns.filter(column => typeof(column.filtersOther.season_year) === 'undefined').length > 0) {
             message.error({content: 'Ensure every column has a year selected.', duration: 2.5, style: {fontSize: '1rem'} })
             return
         }

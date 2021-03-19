@@ -31,7 +31,7 @@ export default function ColumnForm(props) {
         onValuesChange: onValuesChange,
         initialValues: {
             // field: "sum_yds_pass",
-            // filters: { year: '2020' }
+            // filters: { season_year: '2020' }
         }
     }
 
@@ -77,7 +77,7 @@ export default function ColumnForm(props) {
                 <Select {...selectProps}/>
             </Form.Item>
             
-            <Form.Item name={['filtersOther', 'year']} label="Select Year">
+            <Form.Item name={['filtersOther', 'season_year']} label="Select Year">
                 <Select {...yearProps}/>
             </Form.Item>
 
