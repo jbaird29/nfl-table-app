@@ -28,7 +28,6 @@ export default function ColumnForm(props) {
 
     const formProps = {
         ...topLayout,
-        // name: "basic",
         form: form,
         onValuesChange: onValuesChange,
         initialValues: {
@@ -38,9 +37,9 @@ export default function ColumnForm(props) {
     }
 
     const onSelect = (value) => {
-        if (value.includes('pass'))      { setStatType('pass'); form.resetFields(['filtersRush']); form.resetFields(['filtersRecv']) }
-        else if (value.includes('rush')) { setStatType('rush'); form.resetFields(['filtersPass']); form.resetFields(['filtersRecv']) }
-        else if (value.includes('recv')) { setStatType('recv'); form.resetFields(['filtersPass']); form.resetFields(['filtersRush']) }
+        if (value.includes('pass'))      { setStatType('pass'); form.resetFields(['filters_rush']); form.resetFields(['filters_recv']) }
+        else if (value.includes('rush')) { setStatType('rush'); form.resetFields(['filters_pass']); form.resetFields(['filters_recv']) }
+        else if (value.includes('recv')) { setStatType('recv'); form.resetFields(['filters_pass']); form.resetFields(['filters_rush']) }
         const colIndex = `col${props.index}`
         props.setQueryFields(prior => ({
             ...prior,
@@ -49,7 +48,7 @@ export default function ColumnForm(props) {
     }
 
     const selectProps = {
-        placeholder: "Please select",
+        placeholder: "Stat Type",
         align: 'center',
         showSearch: true,
         optionFilterProp: "label",
@@ -59,7 +58,7 @@ export default function ColumnForm(props) {
     }
 
     const yearProps = {
-        placeholder: "Please select",
+        placeholder: "Year",
         align: 'center',
         maxTagCount: 'responsive',
         style: {width: '50%', marginLeft: '50%'},
@@ -72,6 +71,7 @@ export default function ColumnForm(props) {
 
 
     return (
+    <>
         <Form {...formProps}>
             <Form.Item name='title' label='Enter a Column Title'
                 tooltip={{ title: 'This title will appear in the table above this column. If no title is entred, it will be titled based on the Stat Type & Year.', 
@@ -83,7 +83,7 @@ export default function ColumnForm(props) {
                 <Select {...selectProps}/>
             </Form.Item>
             
-            <Form.Item required name={['filtersOther', 'season_year']} label="Select Year">
+            <Form.Item required name={['filters_general', 'season_year']} label="Select Year">
                 <Select {...yearProps}/>
             </Form.Item>
 
@@ -96,22 +96,28 @@ export default function ColumnForm(props) {
             </Form.Item>
 
             <Divider orientation="center" plain>Stat-Specific Filters (Optional)</Divider>
+
             {!statType && <p>No stat type selected</p>}
-            {statType === 'pass' && <Form.List name="filtersPass">
-                {() => (
-                    <div>
-                    {filtersPass.map(filter => (
-                        <Form.Item {...filter.formProps} fieldKey={[filter.formProps.name]}>
-                            {filter.ui.type === 'select' ? <Select {...filter.ui.props} /> : 
-                            filter.ui.type === 'slider' ? <Slider {...filter.ui.props} /> : 
-                            filter.ui.type === 'inputNumber' ? <InputNumber {...filter.ui.props} /> : null
-                            }
-                        </Form.Item>                        
-                    ))}
-                    </div>
-                )}
-                </Form.List>}
+
+            {statType === 'pass' && filtersPass.map(filter => (
+                <Form.Item {...filter.formProps}>
+                {filter.ui.type === 'select' ? <Select {...filter.ui.props} /> : 
+                    filter.ui.type === 'slider' ? <Slider {...filter.ui.props} /> : 
+                    filter.ui.type === 'inputNumber' ? <InputNumber {...filter.ui.props} /> : null
+                    }
+                </Form.Item>
+            ))}
+
+            {statType === 'rush' && filtersRush.map(filter => (
+                <Form.Item {...filter.formProps}>
+                {filter.ui.type === 'select' ? <Select {...filter.ui.props} /> : 
+                    filter.ui.type === 'slider' ? <Slider {...filter.ui.props} /> : 
+                    filter.ui.type === 'inputNumber' ? <InputNumber {...filter.ui.props} /> : null
+                    }
+                </Form.Item>
+            ))}
 
         </Form>
+    </>
     );
 };

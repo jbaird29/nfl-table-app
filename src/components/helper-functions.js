@@ -52,7 +52,7 @@ export function buildRequestBody(queryFields) {
         if (column.field.includes('recv')) { statTypes.push(`'receive'`) }
         // create the column filters
         const filters = []
-        // this gets an array like ['filtersPass', 'filtersRush', 'filtersOther']
+        // this gets an array like ['filters_pass', 'filters_rush', 'filters_general']
         const filterKeys =  Object.keys(column).filter(key => key.startsWith('filter'))
         filterKeys.forEach(filterKey => {
             // turn the object like {blitzed: 1, on_target: 0} -> into {field: blitzed, value: [1]...}
@@ -74,7 +74,7 @@ export function buildRequestBody(queryFields) {
         }
     })
     // push the required years and stat type filters
-    const years = Array.from(new Set(queryFields.columns.map(column => column.filtersOther.season_year)))
+    const years = Array.from(new Set(queryFields.columns.map(column => column.filters_general.season_year)))
     output.where.push({field: 'season_year', values: years})
     output.where.push({field: 'stat_type', values: Array.from(new Set(statTypes)) })
     // sort the columns by id
