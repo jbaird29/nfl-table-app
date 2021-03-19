@@ -58,8 +58,10 @@ export function buildRequestBody(queryFields) {
             // turn the object like {blitzed: 1, on_target: 0} -> into {field: blitzed, value: [1]...}
             for (const filterName in column[filterKey]) {
                 let values = column[filterKey][filterName]
-                values = Array.isArray(values) ? values : [values]
-                filters.push({field: filterName, values: values})
+                if (typeof(values) !== 'undefined' && values !== 'either') {
+                    values = Array.isArray(values) ? values : [values]
+                    filters.push({field: filterName, values: values})
+                }
             }
         })
         output.columns.push({

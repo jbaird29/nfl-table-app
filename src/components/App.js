@@ -42,7 +42,7 @@ function App() {
             // saveState(stateID, queryFields, customCalcs)
             // console.log(queryFields)
             const apiRequestBody = buildRequestBody(queryFields)
-            // console.log(requestBody)    
+            console.log(apiRequestBody)    
             const tableData = await makeRequest(apiRequestBody)
             setTableData(tableData)
             setIsFieldDrawerVisible(false)
@@ -77,7 +77,6 @@ function App() {
         })
         setIsCalcVisible(false)
         hide()
-        // form.resetFields();
     }
 
     function handleShowCalc() {
@@ -104,7 +103,8 @@ function App() {
 
             <Button type="primary" onClick={() => setIsFieldDrawerVisible(true)}>Edit Fields</Button>
             <Button type="secondary" onClick={handleShowCalc}>Edit Custom Calcs</Button>
-            <Button type="secondary" onClick={() => console.log(tableData)}>See Table Data</Button>
+            <Button type="danger" onClick={() => console.log(tableData)}>Debug: Table Data</Button>
+            <Button type="danger" onClick={() => console.log(queryFields)}>Debug: QueryFields</Button>
 
             <Table tableData={tableData} />
 
