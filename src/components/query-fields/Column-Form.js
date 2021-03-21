@@ -34,7 +34,7 @@ export default function ColumnForm(props) {
     //    because there are no pass yards in incompletion (i.e. pass_yards_sum would always equal 0)
     const renderFilters = (filters) => (
         filters.map(filter => (
-            <Form.Item noStyle key={`wrapper_${filter.formProps.name}`} shouldUpdate={(prevValues, currentValues) =>
+            <Form.Item noStyle key={`wrapper_${props.colIndex}_${filter.name}`} shouldUpdate={(prevValues, currentValues) =>
                 (!currentValues[props.colIndex] || !prevValues[props.colIndex] || 
                 !currentValues[props.colIndex].field || !prevValues[props.colIndex].field ) ? true :
                 (prevValues[props.colIndex].field !== currentValues[props.colIndex].field)}
@@ -53,7 +53,8 @@ export default function ColumnForm(props) {
                                    // else if filter has linkedAggs: if field is in linkedAggs; 
                                    // else: if filter's stat type matches field's stat type
                 
-                return (showFilter ? <Form.Item {...filter.formProps} name={[props.colIndex, ...filter.formProps.name]} key={filter.formProps.name}>
+                return (showFilter ? <Form.Item {...filter.formProps} name={[props.colIndex, 'filters', filter.name]} 
+                                      key={`${props.colIndex}_${filter.name}`}>
                     {filter.ui.type === 'select' ? <Select {...filter.ui.props} /> : 
                         filter.ui.type === 'slider' ? <Slider {...filter.ui.props} /> : 
                         filter.ui.type === 'inputNumber' ? <InputNumber {...filter.ui.props} /> : null
@@ -83,7 +84,7 @@ export default function ColumnForm(props) {
                 <Select {...selectProps}/>
             </Form.Item>
             
-            <Form.Item required name={[props.colIndex, 'filters_general', 'season_year']} label="Select Year"
+            <Form.Item required name={[props.colIndex, 'filters', 'season_year']} label="Select Year"
                         rules={[ { required: true, message: 'Please select a year.', }, ]}
             >
                 <Select {...yearProps}/>
@@ -102,7 +103,9 @@ export default function ColumnForm(props) {
             </Form.Item>
 
             {filtersGeneral.map(filter => (
-                <Form.Item {...filter.formProps} name={[props.colIndex, ...filter.formProps.name]}>
+                <Form.Item {...filter.formProps} name={[props.colIndex, 'filters', filter.name]}
+                            key={`${props.colIndex}_${filter.name}`}
+                >
                 {filter.ui.type === 'select' ? <Select {...filter.ui.props} /> : 
                     filter.ui.type === 'slider' ? <Slider {...filter.ui.props} /> : 
                     filter.ui.type === 'inputNumber' ? <InputNumber {...filter.ui.props} /> : null

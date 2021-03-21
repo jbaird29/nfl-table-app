@@ -12,7 +12,7 @@ export default function WhereForm(props) {
             </Form.Item> */}
 
             {filtersWhere.map(filter => (
-                <Form.Item {...filter.formProps} name={['where', ...filter.formProps.name]}>
+                <Form.Item {...filter.formProps} name={['where', filter.name]} key={filter.name} >
                 {filter.ui.type === 'select' ? <Select {...filter.ui.props} /> : 
                     filter.ui.type === 'slider' ? <Slider {...filter.ui.props} /> : 
                     filter.ui.type === 'inputNumber' ? <InputNumber {...filter.ui.props} /> : null

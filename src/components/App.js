@@ -88,7 +88,7 @@ function App() {
     function submitQuery() {
         queryForm.validateFields()
         .then(values => {
-            console.log(values)
+            console.log(queryForm.getFieldsValue())
             // enter form submission here
         })
         .catch(errorInfo => {
@@ -138,7 +138,7 @@ function App() {
                 </div>
             }>
                 
-                <Form {...queryFormProps} key={resetCount}>
+                <Form {...queryFormProps} key={`queryForm_reset_${resetCount}`}>
                     <RowForm />
                     <Divider orientation="center" plain>Row Filters (Optional)</Divider>
                     <WhereForm />
