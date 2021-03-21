@@ -44,7 +44,7 @@ export function buildRequestBody(queryFields) {
     }
     const statTypes = []    
 
-    // modify the column into appropriate formate for API request
+    // modify the COLUMNS into appropriate format for API request
     queryFields.columns.forEach(column => {
         // append the appropriate statType filter based on the field
         if (column.field.includes('pass')) { statTypes.push(`'pass'`) }
@@ -75,6 +75,16 @@ export function buildRequestBody(queryFields) {
             output.having.push({id: column.colIndex.slice(3), value: column.having})
         }
     })
+    
+    // modify the WHERE into appropriate format for API request
+    Object.entries(queryFields.where).forEach(([filterName, value]) => {
+        let values = value
+        if (typeof(values) !== 'undefined' && values.length > 0) {
+            values = Array.isArray(values) ? values : [values]
+            output.where.push({field: filterName, values: values})
+        }
+    })
+
     // push the required years and stat type filters
     const years = Array.from(new Set(queryFields.columns.map(column => column.filters_general.season_year)))
     output.where.push({field: 'season_year', values: years})
