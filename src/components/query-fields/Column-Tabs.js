@@ -88,7 +88,7 @@ class ColumnTabs extends React.Component {
             
             {panes.map(pane => (
                 <TabPane tab={pane.title} key={pane.key}>
-                    <ColumnForm colIndex={`col${pane.key}`}/>
+                    <ColumnForm queryForm={this.props.queryForm} colIndex={`col${pane.key}`}/>
                 </TabPane>
             ))}
             

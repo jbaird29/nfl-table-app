@@ -34,13 +34,14 @@ export default function ColumnForm(props) {
     //    because there are no pass yards in incompletion (i.e. pass_yards_sum would always equal 0)
     const renderFilters = (filters) => (
         filters.map(filter => (
-            <Form.Item noStyle key={`wrapper_${props.colIndex}_${filter.name}`} shouldUpdate={(prevValues, currentValues) =>
-                (!currentValues[props.colIndex] || !prevValues[props.colIndex] || 
-                !currentValues[props.colIndex].field || !prevValues[props.colIndex].field ) ? true :
-                (prevValues[props.colIndex].field !== currentValues[props.colIndex].field)}
+            <Form.Item noStyle key={`wrapper_${props.colIndex}_${filter.name}`} shouldUpdate={(prev, current) =>
+                (!current.columns || !prev.columns || 
+                !current.columns[props.colIndex] || !prev.columns[props.colIndex] || 
+                !current.columns[props.colIndex].field || !prev.columns[props.colIndex].field ) ? true :
+                (current.columns[props.colIndex].field !== prev.columns[props.colIndex].field)}
             >
             { ({getFieldValue}) => {
-                const field = getFieldValue( [props.colIndex, 'field'])   // pass_yards_sum || undefined
+                const field = getFieldValue( ['columns', props.colIndex, 'field'])   // pass_yards_sum || undefined
 
                 const statType = !field ? null : 
                                 (field.includes('pass') ? 'pass' :
@@ -53,7 +54,7 @@ export default function ColumnForm(props) {
                                    // else if filter has linkedAggs: if field is in linkedAggs; 
                                    // else: if filter's stat type matches field's stat type
                 
-                return (showFilter ? <Form.Item {...filter.formProps} name={[props.colIndex, 'filters', filter.name]} 
+                return (showFilter ? <Form.Item {...filter.formProps} name={['columns', props.colIndex, 'filters', filter.name]} 
                                       key={`${props.colIndex}_${filter.name}`}>
                     {filter.ui.type === 'select' ? <Select {...filter.ui.props} /> : 
                         filter.ui.type === 'slider' ? <Slider {...filter.ui.props} /> : 
@@ -72,19 +73,19 @@ export default function ColumnForm(props) {
             
             <Button type="danger" onClick={() => {console.log(form.getFieldsValue())}}>Debug: Form</Button> */}
 
-            <Form.Item name={[props.colIndex, 'title']} label='Enter a Column Title'
+            <Form.Item name={['columns', props.colIndex, 'title']} label='Enter a Column Title'
                 tooltip={{ title: 'This title will appear in the table above this column. If no title is entred, it will be titled based on the Stat Type & Year.', 
                 icon: <InfoCircleOutlined /> }}>
                 <Input autoComplete="off" placeholder="Title (Optional)" style={{textAlign: "center"}} />
             </Form.Item>
 
-            <Form.Item required name={[props.colIndex, 'field']} label="Select Stat Type"
+            <Form.Item required name={['columns', props.colIndex, 'field']} label="Select Stat Type"
                         rules={[{ required: true, message: 'Please select a stat type.', }, ]}
             >
                 <Select {...selectProps}/>
             </Form.Item>
             
-            <Form.Item required name={[props.colIndex, 'filters', 'season_year']} label="Select Year"
+            <Form.Item required name={['columns', props.colIndex, 'filters', 'season_year']} label="Select Year"
                         rules={[ { required: true, message: 'Please select a year.', }, ]}
             >
                 <Select {...yearProps}/>
@@ -96,14 +97,14 @@ export default function ColumnForm(props) {
             <Col span={12}>
             <Divider orientation="center" plain>General Filters (Optional)</Divider>
 
-            <Form.Item name={[props.colIndex, 'having']} label="Minimum Value" 
+            <Form.Item name={['columns', props.colIndex, 'having']} label="Minimum Value" 
                 tooltip={{ title: 'Example: if you selected "Pass Attempts" as the Stat Type, entering 100 in this box would filter to rows with at least 100 pass attempts', 
                 icon: <InfoCircleOutlined /> }}>
                 <InputNumber {...minInputProps}/>
             </Form.Item>
 
             {filtersGeneral.map(filter => (
-                <Form.Item {...filter.formProps} name={[props.colIndex, 'filters', filter.name]}
+                <Form.Item {...filter.formProps} name={['columns', props.colIndex, 'filters', filter.name]}
                             key={`${props.colIndex}_${filter.name}`}
                 >
                 {filter.ui.type === 'select' ? <Select {...filter.ui.props} /> : 
