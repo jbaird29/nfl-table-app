@@ -23,9 +23,9 @@ class ColumnTabs extends React.Component {
 
     onDuplicate = () => {
         const currentKey = this.state.activeKey
-        const fieldsToDuplicate = this.props.queryForm.getFieldsValue([`col${currentKey}`])[`col${currentKey}`]
+        const fieldsToDuplicate = this.props.queryForm.getFieldsValue().columns[`col${currentKey}`]
         const newKey = this.add()
-        this.props.queryForm.setFieldsValue({[`col${newKey}`]: fieldsToDuplicate}) 
+        this.props.queryForm.setFieldsValue({columns: {[`col${newKey}`]: fieldsToDuplicate }}) 
     }
   
     onChange = activeKey => {
