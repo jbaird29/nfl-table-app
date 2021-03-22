@@ -3,10 +3,6 @@ import {Tabs, } from 'antd';
 import CustomCalcForm from './Custom-Calc-Form'
 const { TabPane } = Tabs;
 
-/*
-    TBU - goal will be to change the 'Custom Calculations' UI to incorporate tabbing, similar
-    to the Edit Fields UI
-*/
 
 const initialPanes = [
     { title: 'Calculation 1', key: '1' },
@@ -63,10 +59,6 @@ export default class CustomCalcTabs extends React.Component {
             panes: newPanes,
             activeKey: newActiveKey,
         });
-
-        // removes the calculation from the global state
-        const calcIndex = `calc${targetKey}`
-        this.props.setCustomCalcs(prior => prior.filter(form => form.calcIndex !== calcIndex))
     };
   
     render() {
@@ -80,7 +72,7 @@ export default class CustomCalcTabs extends React.Component {
         >
         {panes.map(pane => (
             <TabPane tab={pane.title} key={pane.key}>
-              <CustomCalcForm setCustomCalcs={this.props.setCustomCalcs} tableData={this.props.tableData} index={pane.key} />
+              <CustomCalcForm setCustomCalcs={this.props.setCustomCalcs} tableData={this.props.tableData} calcIndex={`calc${pane.key}`} />
             </TabPane>
         ))}
         </Tabs>

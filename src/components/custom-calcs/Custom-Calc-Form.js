@@ -3,13 +3,7 @@ import {Form, Input, Select, } from 'antd';
 
 
 export default function CustomCalcForm(props) {
-    const [form] = Form.useForm()
 
-    function onValuesChange() {
-        const calcIndex = `calc${props.index}`
-        const formData = {...form.getFieldsValue(), calcIndex: calcIndex}
-        props.setCustomCalcs(prior => [...prior.filter(form => form.calcIndex !== calcIndex), formData])
-    }
     // const exampleState = {
     //     calcIndex: 'calc1',
     //     colIndex1: 'col1',
@@ -19,20 +13,12 @@ export default function CustomCalcForm(props) {
     //     title: 'Total Pass Yards 2019+2020'
     // }
 
-    const formProps = {
-        labelCol: { span: 12, },
-        wrapperCol: { span: 12 },
-        labelAlign: 'left',
-        colon: false,
-        form: form,
-        onValuesChange: onValuesChange,
-        initialValues: { }
-    }
 
     const colsInTable = props.tableData.columns && props.tableData.columns.length > 0 ? 
                         props.tableData.columns.filter(column => column.title.startsWith('Column'))
                         .map(column => ({label: `${column.title}: ${column.children[0].title}`, value: column.children[0].dataIndex}))
                         : null
+                        // this makes the label "Column 1: Pass Yards 2020, value: "col1"
 
     const colSelectProps = {
         placeholder: "column",
@@ -55,28 +41,26 @@ export default function CustomCalcForm(props) {
     }
 
     return (<>
-        <Form {...formProps}>
 
-            <Form.Item required name='colIndex1' label="Select First Column">
+            <Form.Item required name={[props.calcIndex, 'colIndex1']} label="Select First Column">
                 <Select {...colSelectProps}/>
             </Form.Item>
 
-            <Form.Item required name='operation' label="Select Operation type">
+            <Form.Item required name={[props.calcIndex, 'operation']} label="Select Operation type">
                 <Select {...operationSelectProps}/>
             </Form.Item>
 
-            <Form.Item required name='colIndex2' label="Select Second Column">
+            <Form.Item required name={[props.calcIndex, 'colIndex2']} label="Select Second Column">
                 <Select {...colSelectProps}/>
             </Form.Item>
 
-            <Form.Item required name='format' label="Select Formatting Type">
+            <Form.Item required name={[props.calcIndex, 'format']} label="Select Formatting Type">
                 <Select {...formatSelectProps}/>
             </Form.Item>
 
-            <Form.Item required name='title' label="Input a Name">
+            <Form.Item required name={[props.calcIndex, 'title']} label="Input a Name">
                 <Input autoComplete="off" placeholder="column title" style={{textAlign: "center"}} />
             </Form.Item>
 
-        </Form>
     </>);
 };

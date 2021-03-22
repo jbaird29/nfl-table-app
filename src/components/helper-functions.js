@@ -30,70 +30,6 @@ export function addRender(column) {
     }
 }
 
-/**
- * Given a queryFields state object, formats the state into a manner necessary for the API request
- * @param {Object} queryFields 
- * @returns {Object} apiRequestBody 
- */
-export function buildRequestBody(queryFields) {
-    const output = {
-        row: queryFields.row,
-        columns: [],
-        where: [],
-        having: []
-    }
-    const statTypes = []    
-
-    // modify the COLUMNS into appropriate format for API request
-    queryFields.columns.forEach(column => {
-        // append the appropriate statType filter based on the field
-        if (column.field.includes('pass')) { statTypes.push(`'pass'`) }
-        if (column.field.includes('rush')) { statTypes.push(`'rush'`) }
-        if (column.field.includes('recv')) { statTypes.push(`'receive'`) }
-        // create the column filters
-        const filters = []
-        // this gets an array like ['filters_pass', 'filters_rush', 'filters_general']
-        const filterKeys =  Object.keys(column).filter(key => key.startsWith('filter'))
-        filterKeys.forEach(filterKey => {
-            // turn the object like {blitzed: 1, on_target: 0} -> into {field: blitzed, value: [1]...}
-            for (const filterName in column[filterKey]) {
-                let values = column[filterKey][filterName]
-                if (typeof(values) !== 'undefined' && values.length > 0) {
-                    values = Array.isArray(values) ? values : [values]
-                    filters.push({field: filterName, values: values})
-                }
-            }
-        })
-        output.columns.push({
-            id: column.colIndex.slice(3),  // extracts '10' from 'col10'
-            field: column.field,           // the name like 'sum_pass_att'
-            title: column.title || null,   // the user-entered column title, if any
-            filters: filters               // the filter array created above [{field: season_year, values: ['2020']}, {field: ...}]
-        })
-        // append the 'having' portion
-        if (column.having && typeof(column.having) !== 'undefined') {
-            output.having.push({id: column.colIndex.slice(3), value: column.having})
-        }
-    })
-    
-    // modify the WHERE into appropriate format for API request
-    Object.entries(queryFields.where).forEach(([filterName, value]) => {
-        let values = value
-        if (typeof(values) !== 'undefined' && values.length > 0) {
-            values = Array.isArray(values) ? values : [values]
-            output.where.push({field: filterName, values: values})
-        }
-    })
-
-    // push the required years and stat type filters
-    const years = Array.from(new Set(queryFields.columns.map(column => column.filters_general.season_year)))
-    output.where.push({field: 'season_year', values: years})
-    output.where.push({field: 'stat_type', values: Array.from(new Set(statTypes)) })
-    // sort the columns by id
-    output.columns.sort((a, b) => a.id - b.id)
-    return output
-}
-
 
 /**
  * Given an apiRequestBody, makes the request and returns the tableData
@@ -130,14 +66,13 @@ export async function makeRequest(apiRequestBody) {
  * @param {*} prevColumns 
  * @returns tableData.columns
  */
-export function buildTableCalcColumn(customCalc, prevColumns) {
-    const {calcIndex, colIndex1, operation, colIndex2, format, title} = customCalc
-    const newColumnIndex = calcIndex
+export function buildTableCalcColumn(calcIndex, customCalc, prevColumns) {
+    const {colIndex1, operation, colIndex2, format, title} = customCalc
     const newColumn = {
         title: `Calculation ${calcIndex.slice(4)}`,  // extracts '10' from 'calc10'
         align: 'center',
         children: [{
-            dataIndex: newColumnIndex, 
+            dataIndex: calcIndex, 
             title: title,
             align: "right",
             width: "75px",
@@ -158,14 +93,14 @@ export function buildTableCalcColumn(customCalc, prevColumns) {
  * @param {*} prevDataSource 
  * @returns tableData.dataSource
  */
-export function buildTableCalcDataSource(customCalc, prevDataSource) {
-    const {calcIndex, colIndex1, operation, colIndex2, format, title} = customCalc
+export function buildTableCalcDataSource(calcIndex, customCalc, prevDataSource) {
+    const {colIndex1, operation, colIndex2, format, title} = customCalc
     return prevDataSource.map(dataSource => {
-        const newDataSource = (operation === '/' ? dataSource[colIndex1] / dataSource[colIndex2] :
-        operation === '*' ? dataSource[colIndex1] * dataSource[colIndex2] :
-        operation === '+' ? dataSource[colIndex1] + dataSource[colIndex2] :
-        operation === '-' ? dataSource[colIndex1] - dataSource[colIndex2] :
-        null)
+        const newDataSource =  (operation === '/' ? dataSource[colIndex1] / dataSource[colIndex2] :
+                                operation === '*' ? dataSource[colIndex1] * dataSource[colIndex2] :
+                                operation === '+' ? dataSource[colIndex1] + dataSource[colIndex2] :
+                                operation === '-' ? dataSource[colIndex1] - dataSource[colIndex2] :
+                                null)
         return {...dataSource, [calcIndex]: newDataSource}
     })
 }

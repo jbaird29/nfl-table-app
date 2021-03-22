@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import './App.css';
 import 'antd/dist/antd.css';
-import {Layout, Button, Drawer, message, Divider, Row, Col, Form, } from 'antd';
+import {Layout, Button, Drawer, message, Divider, Row, Col, Form, Modal, } from 'antd';
 import Table from './Table'
 import ColumnTabs from './query-fields/Column-Tabs'
 import RowForm from './query-fields/Row-Form'
 import WhereForm from './query-fields/Where-Form'
-import CustomCalc from './custom-calcs/Custom-Calc'
-import {buildRequestBody, makeRequest, buildTableCalcColumn, buildTableCalcDataSource} from './helper-functions'
+import CustomCalcTabs from './custom-calcs/Custom-Calc-Tabs'
+import {makeRequest, buildTableCalcColumn, buildTableCalcDataSource} from './helper-functions'
 
 const { Content, Footer } = Layout;
 
@@ -16,9 +16,9 @@ function App() {
     const [tableData, setTableData] = useState({});
     const [isFieldDrawerVisible, setIsFieldDrawerVisible] = useState(false);
     const [isCalcVisible, setIsCalcVisible] = useState(false);
-    const [customCalcs, setCustomCalcs] = useState([]);
     const [resetCount, setResetCount] = useState(1);
     const [queryForm] = Form.useForm()
+    const [calcsForm] = Form.useForm()
 
     function submitCustomCalcs () {
         // setStateID('NEW VALUE')
@@ -34,10 +34,12 @@ function App() {
             return {columns: newColumns, dataSource: newDataSource}
         })
         // add the custom calcs to table data
-        customCalcs.sort((a, b) => a.calcIndex.slice(4) - b.calcIndex.slice(4)).forEach(customCalc => {
+        Object.entries(calcsForm.getFieldsValue())
+        .sort((a, b) => a[0].slice(4) - b[0].slice(4))   // sort based on the number in calcIndex (e.g. calc1 before calc2)
+        .forEach(([calcIndex, calc]) => {
             setTableData(prev => {
-                const newColumns = buildTableCalcColumn(customCalc, prev.columns)
-                const newDataSource = buildTableCalcDataSource(customCalc, prev.dataSource)
+                const newColumns = buildTableCalcColumn(calcIndex, calc, prev.columns)
+                const newDataSource = buildTableCalcDataSource(calcIndex, calc, prev.dataSource)
                 return {columns: newColumns, dataSource: newDataSource}
             })
         })
@@ -104,6 +106,26 @@ function App() {
         initialValues: { row: { field: 'player_name_with_position'} }
     }
 
+    const calcsFormProps = {
+        form: calcsForm,
+        name: 'calcs',
+        initialValues: { },
+        labelCol: { span: 12, },
+        wrapperCol: { span: 12 },
+        labelAlign: 'left',
+        colon: false,
+
+    }
+
+    const calcModalProps = {
+        title: "Edit Custom Calculations",
+        visible: isCalcVisible,
+        onOk: submitCustomCalcs,
+        onCancel: () => setIsCalcVisible(false),
+        width: 750,
+        style: {top: 150}
+    }
+
     return (
     <>
     <Layout hasSider={false} className="site-layout-background" style={{ minHeight: '100vh' }}>
@@ -112,13 +134,13 @@ function App() {
             <Button type="primary" onClick={() => setIsFieldDrawerVisible(true)}>Edit Fields</Button>
             <Button type="secondary" onClick={handleShowCalc}>Edit Custom Calcs</Button>
             <Button type="danger" onClick={() => console.log(tableData)}>Debug: Table Data</Button>
-            {/* <Button type="danger" onClick={() => console.log(queryFields)}>Debug: QueryFields</Button> */}
+            <Button type="danger" onClick={() => console.log(queryForm.getFieldsValue())}>Debug: Form getFieldsValue</Button>
+            <Button type="danger" onClick={() => console.log(calcsForm.getFieldsValue())}>Debug: Calc getFieldsValue</Button>
 
             <Table tableData={tableData} />
 
             <Drawer {...fieldDrawerProps} footer={
                 <div style={{textAlign: 'right',}}>
-                <Button type="danger" onClick={() => console.log(queryForm.getFieldsValue())}>Debug</Button>
                 <Button type="danger" onClick={resetQueryForm}>Reset Form</Button>
                 <Button onClick={() => setIsFieldDrawerVisible(false)} style={{ marginRight: 8 }}> Close </Button>
                 <Button  type="primary" onClick={() => onSubmit()}> Submit </Button> {/*onClick={submitQueryFields}*/}
@@ -133,9 +155,13 @@ function App() {
                 </Form>
             </Drawer>
 
-            <CustomCalc isVisible={isCalcVisible} setVisible={setIsCalcVisible} setTableData={setTableData} tableData={tableData}
-                customCalcs={customCalcs} setCustomCalcs={setCustomCalcs} submitCustomCalcs={submitCustomCalcs}
-            />
+            <Modal {...calcModalProps}>
+                <Form  {...calcsFormProps} >
+                    {tableData.columns && tableData.columns.length > 0 ?
+                    <CustomCalcTabs tableData={tableData} />
+                    : <p>Please select fields first</p>}
+                </Form>
+            </Modal>
         
         </Content>
 
