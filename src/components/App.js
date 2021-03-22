@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import './App.css';
 import 'antd/dist/antd.css';
-import {Layout, Button, Drawer, message, } from 'antd';
+import {Layout, Button, Drawer, message, Divider, Row, Col, Form, } from 'antd';
 import Table from './Table'
 import ColumnTabs from './query-fields/Column-Tabs'
 import RowForm from './query-fields/Row-Form'
+import WhereForm from './query-fields/Where-Form'
 import CustomCalc from './custom-calcs/Custom-Calc'
 import {buildRequestBody, makeRequest, buildTableCalcColumn, buildTableCalcDataSource} from './helper-functions'
 
@@ -16,43 +17,8 @@ function App() {
     const [isFieldDrawerVisible, setIsFieldDrawerVisible] = useState(false);
     const [isCalcVisible, setIsCalcVisible] = useState(false);
     const [customCalcs, setCustomCalcs] = useState([]);
-    const [queryFields, setQueryFields] = useState({
-        row: {field: 'player_name'},
-        columns: []
-    });
-    // const exampleState = {
-    //     row: {field: 'player_name'},
-    //     columns: [{field: 'sum_att_pass', colIndex: 'col1', filtersPass: {blitzed: '1'}, filtersOther: {season_year: '2020'}}]
-    // }
-
-    async function submitQueryFields() {
-        if (!queryFields.columns || queryFields.columns.length === 0) {
-            message.error({content: 'Please select fields', duration: 2.5, style: {fontSize: '1rem'} })
-            return
-        } else if (queryFields.columns.filter(column => typeof(column.field) === 'undefined').length > 0) {
-            message.error({content: 'Ensure every column has a stat type selected.', duration: 2.5, style: {fontSize: '1rem'} })
-            return
-        } else if (queryFields.columns.filter(column => typeof(column.filters_general.season_year) === 'undefined').length > 0) {
-            message.error({content: 'Ensure every column has a year selected.', duration: 2.5, style: {fontSize: '1rem'} })
-            return
-        }
-        const hide = message.loading({content: 'Loading the data', style: {fontSize: '1rem'}}, 0)
-        try {
-            // setStateID('NEW VALUE')
-            // saveState(stateID, queryFields, customCalcs)
-            // console.log(queryFields)
-            const apiRequestBody = buildRequestBody(queryFields)
-            console.log(apiRequestBody)    
-            const tableData = await makeRequest(apiRequestBody)
-            setTableData(tableData)
-            setIsFieldDrawerVisible(false)
-            hide() 
-        } catch(err) {
-            console.log(err)
-            hide()
-            message.error({content: 'An error occurred. Please refresh the page and try again.', duration: 5, style: {fontSize: '1rem'} })
-        }
-    }
+    const [resetCount, setResetCount] = useState(1);
+    const [queryForm] = Form.useForm()
 
     function submitCustomCalcs () {
         // setStateID('NEW VALUE')
@@ -87,13 +53,55 @@ function App() {
         }
     }
 
+    async function submitQuery(formFields) {
+        const hide = message.loading({content: 'Loading the data', style: {fontSize: '1rem'}}, 0)
+        try { 
+            const tableData = await makeRequest(formFields)
+            hide()
+            if (tableData) {
+                setTableData(tableData)
+                setIsFieldDrawerVisible(false)
+                return true
+            } else {
+                message.error({content: 'An error occurred. Please refresh the page and try again.', duration: 5, style: {fontSize: '1rem'} })
+                return false
+            }
+        } catch(err) {
+            console.log(err)
+            hide()
+            message.error({content: 'An error occurred. Please refresh the page and try again.', duration: 5, style: {fontSize: '1rem'} })
+            return false
+        }
+        
+    }
+
+    async function onSubmit() {
+        queryForm.validateFields()
+        .then(values => submitQuery(values))
+        .catch(errorInfo => {
+            // console.log(errorInfo);
+            message.error({content: 'Ensure every column has a stat type and year selected.', duration: 2.5, style: {fontSize: '1rem'} })
+        })
+    }
+
+    function resetQueryForm() {
+        queryForm.resetFields()
+        setResetCount(resetCount+1)
+    }
+
     const fieldDrawerProps = {
         title: 'Edit Fields',
         width: '70%',
         visible: isFieldDrawerVisible,
         placement: 'left',
         onClose: () => setIsFieldDrawerVisible(false),
-        bodyStyle: { paddingBottom: 80 }
+        bodyStyle: { paddingBottom: 80 },
+    }
+
+    const queryFormProps = {
+        form: queryForm,
+        name: 'query',
+        initialValues: { row: { field: 'player_name_with_position'} }
     }
 
     return (
@@ -104,15 +112,25 @@ function App() {
             <Button type="primary" onClick={() => setIsFieldDrawerVisible(true)}>Edit Fields</Button>
             <Button type="secondary" onClick={handleShowCalc}>Edit Custom Calcs</Button>
             <Button type="danger" onClick={() => console.log(tableData)}>Debug: Table Data</Button>
-            <Button type="danger" onClick={() => console.log(queryFields)}>Debug: QueryFields</Button>
+            {/* <Button type="danger" onClick={() => console.log(queryFields)}>Debug: QueryFields</Button> */}
 
             <Table tableData={tableData} />
 
-            <Drawer {...fieldDrawerProps} >
+            <Drawer {...fieldDrawerProps} footer={
+                <div style={{textAlign: 'right',}}>
+                <Button type="danger" onClick={() => console.log(queryForm.getFieldsValue())}>Debug</Button>
+                <Button type="danger" onClick={resetQueryForm}>Reset Form</Button>
                 <Button onClick={() => setIsFieldDrawerVisible(false)} style={{ marginRight: 8 }}> Close </Button>
-                <Button onClick={submitQueryFields} type="primary"> Submit </Button>
-                <RowForm setQueryFields={setQueryFields} />
-                <ColumnTabs setQueryFields={setQueryFields} />
+                <Button  type="primary" onClick={() => onSubmit()}> Submit </Button> {/*onClick={submitQueryFields}*/}
+                </div>
+            }>
+                
+                <Form {...queryFormProps} key={`queryForm_reset_${resetCount}`}>
+                    <RowForm />
+                    <Divider orientation="center" plain>Row Filters (Optional)</Divider>
+                    <WhereForm />
+                    <ColumnTabs queryForm={queryForm} />
+                </Form>
             </Drawer>
 
             <CustomCalc isVisible={isCalcVisible} setVisible={setIsCalcVisible} setTableData={setTableData} tableData={tableData}

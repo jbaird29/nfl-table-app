@@ -1,5 +1,5 @@
 import React, {  } from "react";
-import {Tabs} from 'antd';
+import {Tabs, Button, Form } from 'antd';
 import ColumnForm from './Column-Form'
 const { TabPane } = Tabs;
 
@@ -9,12 +9,24 @@ const initialPanes = [
 ];
   
 class ColumnTabs extends React.Component {
+    
     tabIndex = 1;
   
     state = {
         activeKey: initialPanes[0].key,
         panes: initialPanes,
     };
+
+    tabButtons = {
+        right: <Button onClick={() => this.onDuplicate()}>Duplicate Column</Button>,
+    };
+
+    onDuplicate = () => {
+        const currentKey = this.state.activeKey
+        const fieldsToDuplicate = this.props.queryForm.getFieldsValue([`col${currentKey}`])[`col${currentKey}`]
+        const newKey = this.add()
+        this.props.queryForm.setFieldsValue({[`col${newKey}`]: fieldsToDuplicate}) 
+    }
   
     onChange = activeKey => {
         this.setState({ activeKey });
@@ -34,6 +46,7 @@ class ColumnTabs extends React.Component {
             panes: newPanes,
             activeKey,
         });
+        return this.tabIndex
     };
   
     remove = targetKey => {
@@ -60,34 +73,27 @@ class ColumnTabs extends React.Component {
             activeKey: newActiveKey,
         });
 
-        const colIndex = `col${targetKey}`
-        // this.props.setQueryFields(prior => (
-        //     Object.assign(...Object.keys(prior)
-        //     .filter(key => key !== colName)
-        //     .map(key => ({[key]: prior[key]}))
-        //     )
-        // ))
-        this.props.setQueryFields(prior => ({
-            ...prior,
-            columns: prior.columns.filter(column => column.colIndex !== colIndex)
-        }))
     };
   
     render() {
         const { panes, activeKey } = this.state;
         return (
-        <Tabs
-            type="editable-card"
-            onChange={this.onChange}
-            activeKey={activeKey}
-            onEdit={this.onEdit}
-        >
-        {panes.map(pane => (
-            <TabPane tab={pane.title} key={pane.key}>
-              <ColumnForm setQueryFields={this.props.setQueryFields} index={pane.key} />
-            </TabPane>
-        ))}
-        </Tabs>
+            <Tabs
+                type="editable-card"
+                onChange={this.onChange}
+                activeKey={activeKey}
+                onEdit={this.onEdit}
+                tabBarExtraContent={this.tabButtons}
+            >
+            
+            {panes.map(pane => (
+                <TabPane tab={pane.title} key={pane.key}>
+                    <ColumnForm queryForm={this.props.queryForm} colIndex={`col${pane.key}`}/>
+                </TabPane>
+            ))}
+            
+            </Tabs>
+        
         );
     }
 }
