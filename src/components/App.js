@@ -23,6 +23,20 @@ function App() {
     function submitCustomCalcs () {
         // setStateID('NEW VALUE')
         // saveState(stateID, queryFields, customCalcs)
+        // FIRST: validate that every colIndex is in tableData
+        let isValid = true
+        const allColIndexes = tableData.columns.filter(column => column.title.startsWith('Column'))
+                            .map(column => column.children[0].dataIndex)
+        Object.entries(calcsForm.getFieldsValue()).forEach(([calcIndex, calc]) => {
+            if (!allColIndexes.includes(calc.colIndex1) || !allColIndexes.includes(calc.colIndex2)) {
+                isValid = false
+            }
+        })
+        if (!isValid) {
+            message.error({content: 'Some of these fields are no longer in the table.', duration: 2.5, style: {fontSize: '1rem'} })
+            return
+        }
+        // CONTINUE: if valid
         const hide = message.loading({content: 'Loading the data', style: {fontSize: '1rem'}}, 0)
         // remove the custom calcs from table data
         setTableData(prev => {
@@ -55,6 +69,13 @@ function App() {
         }
     }
 
+    // async function tryGet(formFields) {
+    //     const params = encodeURIComponent(JSON.stringify(formFields))
+    //     const url = `http://localhost:9000?query=${params}`
+    //     const fetchOptions = { method: 'GET', headers: {} }
+    //     const response = await fetch(url, fetchOptions)    
+    // }
+
     async function submitQuery(formFields) {
         const hide = message.loading({content: 'Loading the data', style: {fontSize: '1rem'}}, 0)
         try { 
@@ -73,8 +94,7 @@ function App() {
             hide()
             message.error({content: 'An error occurred. Please refresh the page and try again.', duration: 5, style: {fontSize: '1rem'} })
             return false
-        }
-        
+        }        
     }
 
     async function onSubmit() {
@@ -103,7 +123,14 @@ function App() {
     const queryFormProps = {
         form: queryForm,
         name: 'query',
-        initialValues: { row: { field: 'player_name_with_position'} }
+        initialValues: { row: { field: 'player_name_with_position'} },
+        labelAlign: 'left',
+        labelCol: {
+            span: 10,
+        },
+        wrapperCol: {
+            span: 14,
+        },
     }
 
     const calcsFormProps = {
