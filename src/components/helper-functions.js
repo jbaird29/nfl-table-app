@@ -104,3 +104,19 @@ export function buildTableCalcDataSource(calcIndex, customCalc, prevDataSource) 
         return {...dataSource, [calcIndex]: newDataSource}
     })
 }
+
+
+export function toCSV(tableData) {
+    const {dataSource, columns} = tableData
+    const columnsWithoutRnk = columns.filter(col => col.dataIndex !== 'rnk')
+    const headerOneString = columnsWithoutRnk.map(col => !col.children ? "" : `"${col.title}"`).join(',')
+    const headerTwoString = columnsWithoutRnk.map(col => !col.children ? `"${col.title}"` : `"${col.children[0].title}"`).join(',')
+    const dataIndexes = columnsWithoutRnk.map(col => !col.children ? col.dataIndex : col.children[0].dataIndex)
+    
+    const rowStringArray = dataSource.map(dataObj => {
+        const rowArrray = dataIndexes.map(dataIndex => `"${dataObj[dataIndex]}"`)  // this ensures data is same order as the headers
+        return rowArrray.join(',')
+    })
+
+    return `${headerOneString}\n${headerTwoString}\n${rowStringArray.join('\n')}`
+}

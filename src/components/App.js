@@ -2,12 +2,13 @@ import React, { useState } from "react";
 import './App.css';
 import 'antd/dist/antd.css';
 import {Layout, Button, Drawer, message, Divider, Row, Col, Form, Modal, } from 'antd';
+import { DownloadOutlined } from '@ant-design/icons';
 import Table from './Table'
 import ColumnTabs from './query-fields/Column-Tabs'
 import RowForm from './query-fields/Row-Form'
 import WhereForm from './query-fields/Where-Form'
 import CustomCalcTabs from './custom-calcs/Custom-Calc-Tabs'
-import {makeRequest, buildTableCalcColumn, buildTableCalcDataSource} from './helper-functions'
+import {makeRequest, buildTableCalcColumn, buildTableCalcDataSource, toCSV} from './helper-functions'
 
 const { Content, Footer } = Layout;
 
@@ -111,9 +112,24 @@ function App() {
         setResetCount(resetCount+1)
     }
 
+    function onDownload() {
+        const blob = new Blob([toCSV(tableData)], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob)
+        // data:text/csv;charset=utf-8,
+        // const encodedUri = encodeURI(toCSV(tableData));
+        // console.log(encodedUri)
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", "datatable.csv");
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link); 
+        link.click(); 
+        document.body.removeChild(link);
+    }
+
     const fieldDrawerProps = {
         title: 'Edit Fields',
-        width: '70%',
+        width: '60%',
         visible: isFieldDrawerVisible,
         placement: 'left',
         onClose: () => setIsFieldDrawerVisible(false),
@@ -125,12 +141,8 @@ function App() {
         name: 'query',
         initialValues: { row: { field: 'player_name_with_position'} },
         labelAlign: 'left',
-        labelCol: {
-            span: 10,
-        },
-        wrapperCol: {
-            span: 14,
-        },
+        labelCol: { span: 10, },
+        wrapperCol: { span: 14, },
     }
 
     const calcsFormProps = {
@@ -163,12 +175,13 @@ function App() {
             <Button type="danger" onClick={() => console.log(tableData)}>Debug: Table Data</Button>
             <Button type="danger" onClick={() => console.log(queryForm.getFieldsValue())}>Debug: Form getFieldsValue</Button>
             <Button type="danger" onClick={() => console.log(calcsForm.getFieldsValue())}>Debug: Calc getFieldsValue</Button>
+            <Button type="primary" onClick={onDownload} shape="round" icon={<DownloadOutlined />}>Download</Button>
 
             <Table tableData={tableData} />
 
             <Drawer {...fieldDrawerProps} footer={
                 <div style={{textAlign: 'right',}}>
-                <Button type="danger" onClick={resetQueryForm}>Reset Form</Button>
+                <Button danger onClick={resetQueryForm} style={{ marginRight: 8 }}>Reset</Button>
                 <Button onClick={() => setIsFieldDrawerVisible(false)} style={{ marginRight: 8 }}> Close </Button>
                 <Button  type="primary" onClick={() => onSubmit()}> Submit </Button> {/*onClick={submitQueryFields}*/}
                 </div>
