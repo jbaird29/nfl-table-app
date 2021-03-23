@@ -6,7 +6,7 @@ export default function RowForm(props) {
 
     return (
 
-            <Form.Item label="Row Type" name={['row', 'field']}
+            <Form.Item label="Row Type (Display Stats by...)" name={['row', 'field']}
                         rules={[ { required: true, message: 'Please select a row type.', }, ]}
                         key="row_field"
             >

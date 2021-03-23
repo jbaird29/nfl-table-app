@@ -42,19 +42,20 @@ export async function makeRequest(apiRequestBody) {
     }
     const response = await fetch(`http://localhost:9000/run-query`, fetchOptions)
     const tableData = await response.json();
-
-    // for each column, add (1) sorter function (2) render function
-    tableData.columns.forEach(column => {
-        if ('children' in column) {
-            column.children.forEach(child => {
-                addSorter(child);
-                addRender(child);
-            })
-        } else {
-            addSorter(column);
-            addRender(column);
-        }
-    })
+    if (tableData) {
+        // for each column, add (1) sorter function (2) render function
+        tableData.columns.forEach(column => {
+            if ('children' in column) {
+                column.children.forEach(child => {
+                    addSorter(child);
+                    addRender(child);
+                })
+            } else {
+                addSorter(column);
+                addRender(column);
+            }
+        })
+    }
     // add the new response to the tableData state
     return tableData
 }

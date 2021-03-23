@@ -18,7 +18,7 @@ class ColumnTabs extends React.Component {
     };
 
     tabButtons = {
-        right: <Button onClick={() => this.onDuplicate()}>Duplicate Column</Button>,
+        right: <Button type="default" onClick={() => this.onDuplicate()}>Duplicate Column</Button>,
     };
 
     onDuplicate = () => {
@@ -84,6 +84,9 @@ class ColumnTabs extends React.Component {
                 activeKey={activeKey}
                 onEdit={this.onEdit}
                 tabBarExtraContent={this.tabButtons}
+                size='default'
+                tabBarStyle={{ }}
+                animated={{ inkBar: false, tabPane: false }}
             >
             
             {panes.map(pane => (

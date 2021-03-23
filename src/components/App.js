@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import './App.css';
 import 'antd/dist/antd.css';
-import {Layout, Button, Drawer, message, Divider, Row, Col, Form, Modal, } from 'antd';
+import {Layout, Button, Drawer, message, Divider, Row, Col, Form, Modal, Steps, Space, } from 'antd';
 import { DownloadOutlined } from '@ant-design/icons';
 import Table from './Table'
 import ColumnTabs from './query-fields/Column-Tabs'
@@ -11,12 +11,14 @@ import CustomCalcTabs from './custom-calcs/Custom-Calc-Tabs'
 import {makeRequest, buildTableCalcColumn, buildTableCalcDataSource, toCSV} from './helper-functions'
 
 const { Content, Footer } = Layout;
+const { Step } = Steps;
 
 function App() {
     const [stateID, setStateID] = useState('');
     const [tableData, setTableData] = useState({});
     const [isFieldDrawerVisible, setIsFieldDrawerVisible] = useState(false);
     const [isCalcVisible, setIsCalcVisible] = useState(false);
+    const [step, setStep] = useState(0)
     const [resetCount, setResetCount] = useState(1);
     const [queryForm] = Form.useForm()
     const [calcsForm] = Form.useForm()
@@ -138,6 +140,7 @@ function App() {
 
     const queryFormProps = {
         form: queryForm,
+        colon: false,
         name: 'query',
         initialValues: { row: { field: 'player_name_with_position'} },
         labelAlign: 'left',
@@ -169,15 +172,21 @@ function App() {
     <>
     <Layout hasSider={false} className="site-layout-background" style={{ minHeight: '100vh' }}>
         <Content style={{ margin: '20px 16px 0px', overflow: 'initial'}}>
-
-            <Button type="primary" onClick={() => setIsFieldDrawerVisible(true)}>Edit Fields</Button>
-            <Button type="secondary" onClick={handleShowCalc}>Edit Custom Calcs</Button>
-            <Button type="danger" onClick={() => console.log(tableData)}>Debug: Table Data</Button>
-            <Button type="danger" onClick={() => console.log(queryForm.getFieldsValue())}>Debug: Form getFieldsValue</Button>
-            <Button type="danger" onClick={() => console.log(calcsForm.getFieldsValue())}>Debug: Calc getFieldsValue</Button>
-            <Button type="primary" onClick={onDownload} shape="round" icon={<DownloadOutlined />}>Download</Button>
-
-            <Table tableData={tableData} />
+            <Row>
+            <Col span={20}>
+                <Button type="primary" onClick={() => setIsFieldDrawerVisible(true)}>Edit Fields</Button>
+                <Button type="secondary" onClick={handleShowCalc}>Edit Custom Calcs</Button>
+                <Button type="danger" onClick={() => console.log(tableData)}>Debug: Table Data</Button>
+                <Button type="danger" onClick={() => console.log(queryForm.getFieldsValue())}>Debug: Form getFieldsValue</Button>
+                <Button type="danger" onClick={() => console.log(calcsForm.getFieldsValue())}>Debug: Calc getFieldsValue</Button>
+            </Col>
+            <Col span={4} style={{textAlign: 'right'}}>
+                <Button type="primary" onClick={onDownload} shape="round" icon={<DownloadOutlined />}>Download</Button>
+            </Col>
+            </Row>
+            <Row style={{marginTop: 12}}>
+                <Table tableData={tableData} />
+            </Row>
 
             <Drawer {...fieldDrawerProps} footer={
                 <div style={{textAlign: 'right',}}>
@@ -186,13 +195,25 @@ function App() {
                 <Button  type="primary" onClick={() => onSubmit()}> Submit </Button> {/*onClick={submitQueryFields}*/}
                 </div>
             }>
-                
+
+                <Steps type="navigation" current={step} onChange={(current) => setStep(current)}
+                            size="small" className="site-navigation-steps" >
+                    <Step status={step === 0 ? "process" : "wait"} title="Add Columns"/>
+                    <Step status={step === 1 ? "process" : "wait"}  title="Select Row Type" />
+                </Steps>
+
                 <Form {...queryFormProps} key={`queryForm_reset_${resetCount}`}>
-                    <RowForm />
-                    <Divider orientation="center" plain>Row Filters (Optional)</Divider>
-                    <WhereForm />
-                    <ColumnTabs queryForm={queryForm} />
+                    <div style={step === 0 ? {} : { display: 'none'  } } >
+                        <ColumnTabs queryForm={queryForm} />
+                    </div>
+                    <div style={step === 1 ? {} : { display: 'none'  } } >
+                        <RowForm />
+                        <div className="spacing" style={{marginTop: 36}}></div>
+                        <Divider orientation="center" plain>Row Filters (Optional)</Divider>
+                        <WhereForm /> 
+                    </div>
                 </Form>
+
             </Drawer>
 
             <Modal {...calcModalProps}>
