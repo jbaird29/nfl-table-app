@@ -41,8 +41,8 @@ export async function makeRequest(apiRequestBody) {
         body: JSON.stringify(apiRequestBody)
     }
     const response = await fetch(`http://localhost:9000/run-query`, fetchOptions)
-    const tableData = await response.json();
-    if (tableData) {
+    if (response.status === 200) {
+        const tableData = await response.json();
         // for each column, add (1) sorter function (2) render function
         tableData.columns.forEach(column => {
             if ('children' in column) {
@@ -55,9 +55,12 @@ export async function makeRequest(apiRequestBody) {
                 addRender(column);
             }
         })
+        return tableData
+    } else {
+        const error = await response.json()
+        console.log(error)
+        return null
     }
-    // add the new response to the tableData state
-    return tableData
 }
 
 
