@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { v4 as uuidv4 } from 'uuid';
 import './App.css';
 import 'antd/dist/antd.css';
 import {Layout, Button, Drawer, message, Divider, Row, Col, Form, Modal, Steps, Space, } from 'antd';
-import { DownloadOutlined } from '@ant-design/icons';
+import { DownloadOutlined, ShareAltOutlined, CloudUploadOutlined } from '@ant-design/icons';
 import Table from './Table'
 import ColumnTabs from './query-fields/Column-Tabs'
 import RowForm from './query-fields/Row-Form'
@@ -12,9 +13,10 @@ import {makeRequest, buildTableCalcColumn, buildTableCalcDataSource, toCSV} from
 
 const { Content, Footer } = Layout;
 const { Step } = Steps;
+const queryFormV = 1
+const calcsFormV = 1
 
 function App() {
-    const [stateID, setStateID] = useState('');
     const [tableData, setTableData] = useState({});
     const [isFieldDrawerVisible, setIsFieldDrawerVisible] = useState(false);
     const [isCalcVisible, setIsCalcVisible] = useState(false);
@@ -22,6 +24,22 @@ function App() {
     const [resetCount, setResetCount] = useState(1);
     const [queryForm] = Form.useForm()
     const [calcsForm] = Form.useForm()
+    const [queryFormModified, setQueryFormModified] = useState(false)  // ensures ShareableURL matches what the user sees in table
+    const [calcsFormModified, setCalcsFormModified] = useState(false)  // ensures ShareableURL matches what the user sees in table
+
+    useEffect(() => {
+        // load-state will go here
+        const url = new URL(window.location)
+        const sid = url.searchParams.get('sid')
+        if(sid) {
+            url.searchParams.delete('sid')
+            window.history.pushState({}, '', url);
+        } else {
+            console.log('no sid')
+        }
+
+      }, []);
+    
 
     function submitCustomCalcs () {
         // setStateID('NEW VALUE')
@@ -61,6 +79,7 @@ function App() {
             })
         })
         setIsCalcVisible(false)
+        setCalcsFormModified(false)
         hide()
     }
 
@@ -72,13 +91,6 @@ function App() {
         }
     }
 
-    // async function tryGet(formFields) {
-    //     const params = encodeURIComponent(JSON.stringify(formFields))
-    //     const url = `http://localhost:9000?query=${params}`
-    //     const fetchOptions = { method: 'GET', headers: {} }
-    //     const response = await fetch(url, fetchOptions)    
-    // }
-
     async function submitQuery(formFields) {
         const hide = message.loading({content: 'Loading the data', style: {fontSize: '1rem'}}, 0)
         try { 
@@ -87,6 +99,18 @@ function App() {
             if (tableData) {
                 setTableData(tableData)
                 setIsFieldDrawerVisible(false)
+                setQueryFormModified(false)
+                // CASE: queryForm changed, queryForm submit => tableData matches queryForm, but calcsForm has 'stale' values
+                // OPTION: reset calcsForm upon queryForm submit 
+                // OPTION: add another variable for calcsFormMatchesTable? User would need to:
+                //         (a) submit calcsForm => in which case set calcsFormMatchesTable = true;
+                //         (b) reset calcsForm => in that reset function I would need to set calcsFormMatchesTable = true;
+                // OPTION: the user only really cares about what is in the table; therefore, if they did queryForm submit and
+                //         the table is only displaying queryForm fields, I could save state using a blank calcsForm
+                //         so basically upon save-state, do the following:
+                //         (a) ensure queryForm matches tableData (based on a state variable, modified by queryForm changed)
+                //         (b) if tableData contains calcs, ensure calcForm matches tableData (based on a state variable?)
+                //             else, pass an empty queryFields object into save-state
                 return true
             } else {
                 message.error({content: 'An error occurred. Please refresh the page and try again.', duration: 5, style: {fontSize: '1rem'} })
@@ -129,6 +153,22 @@ function App() {
         document.body.removeChild(link);
     }
 
+    function onShareURL() {
+        // display modal
+        // display loading icon
+        const stateID = uuidv4()
+        const body = {stateID, queryFormV, calcsFormV, queryForm: queryForm.getFieldsValue(), calcsForm: calcsForm.getFieldsValue()}
+        console.log(JSON.stringify(body))
+        // const response = await fetch('/save-state', POST, stateID, queryForm, calcsForm, queryFormV, calcsFormV))
+        const response = 201
+        if(response.status === 201) {
+            // remove loading icon
+            // const url = window.origin?sid=`${stateID}`
+            // show the URL in some type of copyable interface
+        }
+
+    }
+
     const fieldDrawerProps = {
         title: 'Edit Fields',
         width: '60%',
@@ -140,8 +180,9 @@ function App() {
 
     const queryFormProps = {
         form: queryForm,
-        colon: false,
+        onFieldsChange: () => !queryFormModified ? setQueryFormModified(true) : null,
         name: 'query',
+        colon: false,
         initialValues: { row: { field: 'player_name_with_position'} },
         labelAlign: 'left',
         labelCol: { span: 10, },
@@ -150,6 +191,7 @@ function App() {
 
     const calcsFormProps = {
         form: calcsForm,
+        onFieldsChange: () => !calcsFormModified ? setCalcsFormModified(true) : null,
         name: 'calcs',
         initialValues: { },
         labelCol: { span: 12, },
@@ -172,15 +214,16 @@ function App() {
     <>
     <Layout hasSider={false} className="site-layout-background" style={{ minHeight: '100vh' }}>
         <Content style={{ margin: '20px 16px 0px', overflow: 'initial'}}>
-            <Row>
-            <Col span={20}>
+            <Row gutter={0}>
+            <Col span={12}>
                 <Button type="primary" onClick={() => setIsFieldDrawerVisible(true)}>Edit Fields</Button>
                 <Button type="secondary" onClick={handleShowCalc}>Edit Custom Calcs</Button>
                 <Button type="danger" onClick={() => console.log(tableData)}>Debug: Table Data</Button>
                 <Button type="danger" onClick={() => console.log(queryForm.getFieldsValue())}>Debug: Form getFieldsValue</Button>
                 <Button type="danger" onClick={() => console.log(calcsForm.getFieldsValue())}>Debug: Calc getFieldsValue</Button>
             </Col>
-            <Col span={4} style={{textAlign: 'right'}}>
+            <Col span={12} style={{textAlign: 'right'}}>
+                <Button type="primary" onClick={onShareURL} shape="round" icon={<CloudUploadOutlined />}>Shareable URL</Button>
                 <Button type="primary" onClick={onDownload} shape="round" icon={<DownloadOutlined />}>Download</Button>
             </Col>
             </Row>
