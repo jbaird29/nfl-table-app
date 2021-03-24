@@ -3,7 +3,7 @@ import { v5 as uuidv5 } from 'uuid';
 import './App.css';
 import 'antd/dist/antd.css';
 import {Layout, Button, Drawer, message, Divider, Row, Col, Form, Modal, Steps, Space, Spin, Alert, } from 'antd';
-import { DownloadOutlined, ShareAltOutlined, CloudUploadOutlined } from '@ant-design/icons';
+import { DownloadOutlined, ShareAltOutlined, CloudUploadOutlined, CopyOutlined } from '@ant-design/icons';
 import Table from './Table'
 import ColumnTabs from './query-fields/Column-Tabs'
 import RowForm from './query-fields/Row-Form'
@@ -34,6 +34,7 @@ function App() {
         const url = new URL(window.location)
         const sid = url.searchParams.get('sid')
         if(sid) {
+            console.log(sid)
             url.searchParams.delete('sid')
             window.history.pushState({}, '', url);
         } else {
@@ -131,9 +132,6 @@ function App() {
     function onDownload() {
         const blob = new Blob([toCSV(tableData)], { type: 'text/csv;charset=utf-8;' });
         const url = URL.createObjectURL(blob)
-        // data:text/csv;charset=utf-8,
-        // const encodedUri = encodeURI(toCSV(tableData));
-        // console.log(encodedUri)
         const link = document.createElement("a");
         link.setAttribute("href", url);
         link.setAttribute("download", "datatable.csv");
@@ -171,6 +169,8 @@ function App() {
         }
         // pop up modal
         // loading logo in modal
+        const urlDOM = document.getElementById('shareable-url')
+        urlDOM.innerText = ''
         setLoadingURL(true)
         setIsURLVisible(true)
         const queryFields = queryForm.getFieldsValue()
@@ -180,10 +180,12 @@ function App() {
         const response = await fetch(`http://localhost:9000/save-state`, { method: 'POST', headers: {'Content-Type': 'application/json'},body: JSON.stringify(saveData)})
         if(response.status === 201) {
             setLoadingURL(false)
-            // remove loading icon
-            // const url = `window.origin?sid=${stateID}`
-            // show the URL in some type of copy-able interface
-            document.getElementById('shareable-url').innerText = `${window.origin}?sid=${saveData.stateID}`
+            urlDOM.innerText = `${window.origin}?sid=${saveData.stateID}`
+            // navigator.clipboard.writeText(newClipText)
+        } else {
+            message.error({content: `There was an error. Please refresh the page and try again.`, duration: 2.5, style: {fontSize: '1rem'} })
+            setLoadingURL(false)
+            setIsURLVisible(false)
         }
     }
 
@@ -232,9 +234,10 @@ function App() {
         title: "Shareable URL",
         visible: isURLVisible,
         footer: null,
+        forceRender: true,  // need this so that the querySelect can target the DOM before it is loaded
         onCancel: () => setIsURLVisible(false),
         onOk: () => setIsURLVisible(false),
-        width: 500,
+        width: 650,
         style: {top: 150}
     }
 
@@ -300,9 +303,17 @@ function App() {
                 <Spin spinning={loadingURL}>
                 <Alert
                     message="Copy the Shareable URL below"
-                    description={<div id='shareable-url'>URL goes here</div>}
+                    size="large"
+                    description={<Row>
+                            <Col span={20} style={{textAlign: 'center', backgroundColor: '#ccc'}}><div id='shareable-url'></div></Col>
+                            <Col span={4}><Button type="default" size="small" icon={<CopyOutlined/>} 
+                                 onClick={() => navigator.clipboard.writeText(document.getElementById('shareable-url').innerText)                                 }
+                            >
+                                Copy</Button></Col>
+                            </Row>
+                    }
                     type="info"
-                    showIcon
+                    
                     />
                 </Spin>
             </Modal>
