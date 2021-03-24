@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { v4 as uuidv4 } from 'uuid';
+import { v5 as uuidv5 } from 'uuid';
 import './App.css';
 import 'antd/dist/antd.css';
-import {Layout, Button, Drawer, message, Divider, Row, Col, Form, Modal, Steps, Space, } from 'antd';
+import {Layout, Button, Drawer, message, Divider, Row, Col, Form, Modal, Steps, Space, Spin, Alert, } from 'antd';
 import { DownloadOutlined, ShareAltOutlined, CloudUploadOutlined } from '@ant-design/icons';
 import Table from './Table'
 import ColumnTabs from './query-fields/Column-Tabs'
@@ -26,6 +26,8 @@ function App() {
     const [calcsForm] = Form.useForm()
     const [queryFormModified, setQueryFormModified] = useState(false)  // ensures ShareableURL matches what the user sees in table
     const [calcsFormModified, setCalcsFormModified] = useState(false)  // ensures ShareableURL matches what the user sees in table
+    const [loadingURL, setLoadingURL] = useState(false)
+    const [isURLVisible, setIsURLVisible] = useState(false)
 
     useEffect(() => {
         // load-state will go here
@@ -37,8 +39,7 @@ function App() {
         } else {
             console.log('no sid')
         }
-
-      }, []);
+    }, []);
     
 
     function submitCustomCalcs () {
@@ -100,17 +101,6 @@ function App() {
                 setTableData(tableData)
                 setIsFieldDrawerVisible(false)
                 setQueryFormModified(false)
-                // CASE: queryForm changed, queryForm submit => tableData matches queryForm, but calcsForm has 'stale' values
-                // OPTION: reset calcsForm upon queryForm submit 
-                // OPTION: add another variable for calcsFormMatchesTable? User would need to:
-                //         (a) submit calcsForm => in which case set calcsFormMatchesTable = true;
-                //         (b) reset calcsForm => in that reset function I would need to set calcsFormMatchesTable = true;
-                // OPTION: the user only really cares about what is in the table; therefore, if they did queryForm submit and
-                //         the table is only displaying queryForm fields, I could save state using a blank calcsForm
-                //         so basically upon save-state, do the following:
-                //         (a) ensure queryForm matches tableData (based on a state variable, modified by queryForm changed)
-                //         (b) if tableData contains calcs, ensure calcForm matches tableData (based on a state variable?)
-                //             else, pass an empty queryFields object into save-state
                 return true
             } else {
                 message.error({content: 'An error occurred. Please refresh the page and try again.', duration: 5, style: {fontSize: '1rem'} })
@@ -153,20 +143,48 @@ function App() {
         document.body.removeChild(link);
     }
 
-    function onShareURL() {
-        // display modal
-        // display loading icon
-        const stateID = uuidv4()
-        const body = {stateID, queryFormV, calcsFormV, queryForm: queryForm.getFieldsValue(), calcsForm: calcsForm.getFieldsValue()}
-        console.log(JSON.stringify(body))
-        // const response = await fetch('/save-state', POST, stateID, queryForm, calcsForm, queryFormV, calcsFormV))
-        const response = 201
-        if(response.status === 201) {
-            // remove loading icon
-            // const url = window.origin?sid=`${stateID}`
-            // show the URL in some type of copyable interface
-        }
+    function tableContainsCalcs() {
+        return tableData.columns && tableData.columns.length > 0 
+                && tableData.columns.filter(column => column.title.startsWith('Calculation')).length > 0
+    }
 
+    function createSID(saveDataJSON) {
+        const unique = '51d37bbb-b62c-4f24-a1e6-d0778d7d7deb';
+        const hexID = uuidv5(saveDataJSON, unique).replaceAll('-', '')
+        const base64 = btoa(hexID.slice(0,30).match(/\w{2}/g).map(a => String.fromCharCode(parseInt(a, 16))).join(""))
+        const urlEncode = base64.replaceAll('+', '-').replaceAll('/', '~')
+        return urlEncode
+    }
+
+    async function onShareURL() {
+        // ensure that forms match the tableData
+        const containsCalcs = tableContainsCalcs()
+        if (!tableData.columns) {
+            message.error({content: `Please select fields and load data first.`, duration: 2.5, style: {fontSize: '1rem'} })
+            return
+        } else if (queryFormModified) {
+            message.error({content: `Please ensure the Edit Fields modal matches the data displayed in the table; if it does, then re-press the submit button.`, duration: 2.5, style: {fontSize: '1rem'} })
+            return
+        } else if (containsCalcs && calcsFormModified) {
+            message.error({content: `Please ensure the Edit Custom Calculations modal matches the data displayed in the table; if it does, then re-press the submit button.`, duration: 2.5, style: {fontSize: '1rem'} })
+            return   
+        }
+        // pop up modal
+        // loading logo in modal
+        setLoadingURL(true)
+        setIsURLVisible(true)
+        const queryFields = queryForm.getFieldsValue()
+        const calcsFields = containsCalcs ? calcsForm.getFieldsValue() : {}  // TODO - ensure that doing form.setFields({}) is valid
+        const saveData = {queryFormV, calcsFormV, queryForm: queryFields, calcsForm: calcsFields}
+        saveData.stateID = createSID(JSON.stringify(saveData))
+        const response = await fetch(`http://localhost:9000/save-state`, { method: 'POST', headers: {'Content-Type': 'application/json'},body: JSON.stringify(saveData)})
+        if(response.status === 201) {
+            setLoadingURL(false)
+            // remove loading icon
+            // const url = `window.origin?sid=${stateID}`
+            // show the URL in some type of copy-able interface
+            document.getElementById('shareable-url').innerText = `${window.origin}?sid=${saveData.stateID}`
+        }
     }
 
     const fieldDrawerProps = {
@@ -209,6 +227,17 @@ function App() {
         width: 750,
         style: {top: 150}
     }
+
+    const urlModalProps = {
+        title: "Shareable URL",
+        visible: isURLVisible,
+        footer: null,
+        onCancel: () => setIsURLVisible(false),
+        onOk: () => setIsURLVisible(false),
+        width: 500,
+        style: {top: 150}
+    }
+
 
     return (
     <>
@@ -265,6 +294,17 @@ function App() {
                     <CustomCalcTabs tableData={tableData} />
                     : <p>Please select fields first</p>}
                 </Form>
+            </Modal>
+
+            <Modal {...urlModalProps}>
+                <Spin spinning={loadingURL}>
+                <Alert
+                    message="Copy the Shareable URL below"
+                    description={<div id='shareable-url'>URL goes here</div>}
+                    type="info"
+                    showIcon
+                    />
+                </Spin>
             </Modal>
         
         </Content>
