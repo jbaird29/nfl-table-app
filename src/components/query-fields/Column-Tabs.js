@@ -7,7 +7,7 @@ const { TabPane } = Tabs;
   
 class ColumnTabs extends React.Component {
     
-    tabIndex = this.props.initialQueryPanes.length;
+    tabIndex = Math.max(...this.props.initialQueryPanes.map(pane => pane.key));
   
     state = {
         activeKey: this.props.initialQueryPanes[0].key,

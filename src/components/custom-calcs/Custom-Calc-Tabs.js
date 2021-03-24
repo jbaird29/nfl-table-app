@@ -6,7 +6,8 @@ const { TabPane } = Tabs;
 
   
 export default class CustomCalcTabs extends React.Component {
-    tabIndex = this.props.initialCalcsPanes;
+
+    tabIndex = Math.max(...this.props.initialCalcsPanes.map(pane => pane.key));
   
     state = {
         activeKey: this.props.initialCalcsPanes[0].key,

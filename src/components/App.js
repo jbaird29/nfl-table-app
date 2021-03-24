@@ -49,13 +49,7 @@ function App() {
 
     // ?sid=a~j-X0qNUJmB9SjtujjB        = working correctly
     // ?sid=1Q1yy-YLX8ijesPJepLK        = working correctly
-    // ?sid=erR4RDlPXKielMpWBYzn        = deletes Col1 and Calc1; shows Col2 and Calc2 in table
-    //                                    KIND OF working; shows the tableData correctly; shows Col2 and Calc2 panes
-    //                                      but you have to click on the tab in order to render the form
-    //                                      ** also clicking on new tab adds Col2 instead of Col3 ** = refactor with newIndex = max indexes + 1 ?
-    
-    
-    
+    // ?sid=erR4RDlPXKielMpWBYzn        = seems to work!
 
     async function loadState() {
         const url = new URL(window.location)
