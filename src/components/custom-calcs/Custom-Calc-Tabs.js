@@ -4,16 +4,13 @@ import CustomCalcForm from './Custom-Calc-Form'
 const { TabPane } = Tabs;
 
 
-const initialPanes = [
-    { title: 'Calculation 1', key: '1' },
-];
   
 export default class CustomCalcTabs extends React.Component {
-    tabIndex = 1;
+    tabIndex = this.props.initialCalcsPanes;
   
     state = {
-        activeKey: initialPanes[0].key,
-        panes: initialPanes,
+        activeKey: this.props.initialCalcsPanes[0].key,
+        panes: this.props.initialCalcsPanes,
     };
   
     onChange = activeKey => {

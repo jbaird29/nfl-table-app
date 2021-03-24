@@ -4,17 +4,14 @@ import ColumnForm from './Column-Form'
 const { TabPane } = Tabs;
 
 
-const initialPanes = [
-    { title: 'Column 1', key: '1' },
-];
   
 class ColumnTabs extends React.Component {
     
-    tabIndex = 1;
+    tabIndex = this.props.initialQueryPanes.length;
   
     state = {
-        activeKey: initialPanes[0].key,
-        panes: initialPanes,
+        activeKey: this.props.initialQueryPanes[0].key,
+        panes: this.props.initialQueryPanes,
     };
 
     tabButtons = {

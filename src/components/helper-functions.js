@@ -43,18 +43,6 @@ export async function makeRequest(apiRequestBody) {
     const response = await fetch(`http://localhost:9000/run-query`, fetchOptions)
     if (response.status === 200) {
         const tableData = await response.json();
-        // for each column, add (1) sorter function (2) render function
-        tableData.columns.forEach(column => {
-            if ('children' in column) {
-                column.children.forEach(child => {
-                    addSorter(child);
-                    addRender(child);
-                })
-            } else {
-                addSorter(column);
-                addRender(column);
-            }
-        })
         return tableData
     } else {
         const error = await response.json()
@@ -63,15 +51,34 @@ export async function makeRequest(apiRequestBody) {
     }
 }
 
+/**
+ * Given a tableData object, adds render and sorter functions to each of the columns
+ * @param {Object} tableData 
+ */
+export function addRenderSorterToTable(tableData) {
+    tableData.columns.forEach(column => {
+        if ('children' in column) {
+            column.children.forEach(child => {
+                addSorter(child);
+                addRender(child);
+            })
+        } else {
+            addSorter(column);
+            addRender(column);
+        }
+    })
+    return tableData
+}
+
 
 /**
- * Given a customCalc Object and the array of previous tableData.columns, creates the new array of tableData.columns
+ * Given a calcIndex and customCalc Object, creates the 'column' entry for tableProps
+ * @param {*} calcIndex 
  * @param {*} customCalc 
- * @param {*} prevColumns 
- * @returns tableData.columns
+ * @returns tableData.columns object
  */
-export function buildTableCalcColumn(calcIndex, customCalc, prevColumns) {
-    const {colIndex1, operation, colIndex2, format, title} = customCalc
+export function buildTableCalcColumn(calcIndex, calc) {
+    const {colIndex1, operation, colIndex2, format, title} = calc
     const newColumn = {
         title: `Calculation ${calcIndex.slice(4)}`,  // extracts '10' from 'calc10'
         align: 'center',
@@ -87,26 +94,52 @@ export function buildTableCalcColumn(calcIndex, customCalc, prevColumns) {
     }
     addRender(newColumn.children[0])
     addSorter(newColumn.children[0])
-    return [...prevColumns, newColumn]
+    return newColumn
 }
 
 
 /**
- * Given a customCalc Object and the array of previous tableData.dataSource, creates the new array of tableData.dataSource
+ * Given a customCalc (Object) and the row of values (Object), performs the calculation
  * @param {*} customCalc 
  * @param {*} prevDataSource 
- * @returns tableData.dataSource
+ * @returns number
  */
-export function buildTableCalcDataSource(calcIndex, customCalc, prevDataSource) {
-    const {colIndex1, operation, colIndex2, format, title} = customCalc
-    return prevDataSource.map(dataSource => {
-        const newDataSource =  (operation === '/' ? dataSource[colIndex1] / dataSource[colIndex2] :
-                                operation === '*' ? dataSource[colIndex1] * dataSource[colIndex2] :
-                                operation === '+' ? dataSource[colIndex1] + dataSource[colIndex2] :
-                                operation === '-' ? dataSource[colIndex1] - dataSource[colIndex2] :
-                                null)
-        return {...dataSource, [calcIndex]: newDataSource}
+export function performCustomCalc(calc, row) {
+    const {colIndex1, operation, colIndex2, format, title} = calc
+    return (operation === '/' ? row[colIndex1] / row[colIndex2] :
+                            operation === '*' ? row[colIndex1] * row[colIndex2] :
+                            operation === '+' ? row[colIndex1] + row[colIndex2] :
+                            operation === '-' ? row[colIndex1] - row[colIndex2] :
+                            null)
+}
+
+/**
+ * Given a tableData object and calcFields object, adds the calcFields to the tableData
+ * @param {*} tableData 
+ * @param {*} calcsFields
+ */
+export function addCalcsToTable(tableData, calcsFields) {
+    Object.entries(calcsFields)
+    .sort((a, b) => a[0].slice(4) - b[0].slice(4))   // sort based on the number in calcIndex (e.g. calc1 before calc2)
+    .forEach(([calcIndex, calc]) => {
+        tableData.columns.push(buildTableCalcColumn(calcIndex, calc))
+        tableData.dataSource.forEach(row => row[calcIndex] = performCustomCalc(calc, row))
     })
+    return tableData
+}
+
+/**
+ * Given a tableData object, returns a NEW COPY of the tableData without custom calculations
+ * @param {Object} tableData 
+ * @returns tableData
+ */
+export function copyTableWithoutCalcs(tableData) {
+    const newColumns = tableData.columns.filter(column => !column.title.startsWith('Calculation'))
+    const newDataSource = tableData.dataSource.map(row => (
+        Object.assign(...Object.keys(row)
+        .filter(key => !key.startsWith('calc'))
+        .map(key => ({[key]: row[key]})) )))
+    return {columns: newColumns, dataSource: newDataSource}   
 }
 
 
