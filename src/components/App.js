@@ -47,9 +47,12 @@ function App() {
         loadState()
     }, []);
 
-    // ?sid=a~j-X0qNUJmB9SjtujjB        = working correctly
-    // ?sid=1Q1yy-YLX8ijesPJepLK        = working correctly
-    // ?sid=erR4RDlPXKielMpWBYzn        = seems to work!
+    // ?sid=a~j-X0qNUJmB9SjtujjB        = basic test with cols and calcs
+    // ?sid=1Q1yy-YLX8ijesPJepLK        = basic test with cols anc calcs
+    // ?sid=erR4RDlPXKielMpWBYzn        = deletes Col1 and Calc1; shows only Col2 and Calc2 in table
+    //                                    ASSERT that adding new tab is index of 3
+    // ?sid=5nqfxVMpXUen5bQ5Jf6o        = adds Col1 and Col2; adds Calc1; then changes Col2 (so Calc1 disappears)
+    //                                    ASSERT that Calcs form is empty
 
     async function loadState() {
         const url = new URL(window.location)
@@ -62,16 +65,18 @@ function App() {
             if (response.status === 200) {
                 const data = await response.json()
                 const {queryFields, calcsFields, tableData } = data
-                // set the inital query panes based on what is in form response
                 setInitialQueryPanes(Object.keys(queryFields.columns).map(colIndex => ({ title: `Column ${colIndex.slice(3)}`, key: `${colIndex.slice(3)}` })))
-                setInitialCalcsPanes(Object.keys(calcsFields).map(calcIndex => ({ title: `Calculation ${calcIndex.slice(4)}`, key: `${calcIndex.slice(4)}` })))
-                // set the forms
                 queryForm.setFieldsValue(queryFields)
-                calcsForm.setFieldsValue(calcsFields)   
-                // add render/sorter and calculations to the tableData
+                setSavedQueryFields(queryFields)
                 addRenderSorterToTable(tableData)
-                addCalcsToTable(tableData, calcsFields)
-                // set the tableData
+                if (calcsFields) {
+                    setInitialCalcsPanes(Object.keys(calcsFields).map(calcIndex => ({ title: `Calculation ${calcIndex.slice(4)}`, key: `${calcIndex.slice(4)}` })))
+                    addCalcsToTable(tableData, calcsFields)
+                    setSavedCalcsFields(calcsFields)
+                    calcsForm.setFieldsValue(calcsFields)   
+                } else {
+                    setInitialCalcsPanes([{ title: 'Calculation 1', key: '1' }])
+                }
                 setTableData(tableData)             
             } else {
                 console.log('An error occurred')
@@ -326,7 +331,8 @@ function App() {
                     message="Copy the Shareable URL below"
                     size="large"
                     description={<Row>
-                            <Col span={20} style={{textAlign: 'center', backgroundColor: '#ccc'}}><div id='shareable-url'></div></Col>
+                            <Col span={20} style={{textAlign: 'center', backgroundColor: '#fff', borderColor: 'd9d9d9', border: 5}}>
+                                <div id='shareable-url'></div></Col>
                             <Col span={4}><Button type="default" size="small" icon={<CopyOutlined/>} 
                                  onClick={() => navigator.clipboard.writeText(document.getElementById('shareable-url').innerText)                                 }
                             >
