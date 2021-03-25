@@ -70,7 +70,7 @@ export default class CustomCalcTabs extends React.Component {
         >
         {panes.map(pane => (
             <TabPane tab={pane.title} key={pane.key}>
-              <CustomCalcForm setCustomCalcs={this.props.setCustomCalcs} tableData={this.props.tableData} calcIndex={`calc${pane.key}`} />
+              <CustomCalcForm calcsForm={this.props.calcsForm} tableData={this.props.tableData} calcIndex={`calc${pane.key}`} />
             </TabPane>
         ))}
         </Tabs>

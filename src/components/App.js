@@ -21,7 +21,8 @@ function App() {
     const [isFieldDrawerVisible, setIsFieldDrawerVisible] = useState(false);
     const [isCalcVisible, setIsCalcVisible] = useState(false);
     const [step, setStep] = useState(0)
-    const [resetCount, setResetCount] = useState(1);
+    const [resetQuery, setResetQuery] = useState(1);
+    const [resetCalcs, setResetCalcs] = useState(1);
     const [queryForm] = Form.useForm()
     const [calcsForm] = Form.useForm()
     const [savedQueryFields, setSavedQueryFields] = useState(null)  // ensures ShareableURL matches what the user sees in table
@@ -53,6 +54,7 @@ function App() {
     //                                    ASSERT that adding new tab is index of 3
     // ?sid=5nqfxVMpXUen5bQ5Jf6o        = adds Col1 and Col2; adds Calc1; then changes Col2 (so Calc1 disappears)
     //                                    ASSERT that Calcs form is empty
+    // ?sid=5TjRMklHXcivbsQYzJSf        = 8 columns & 4 calcs
 
     async function loadState() {
         const url = new URL(window.location)
@@ -80,6 +82,7 @@ function App() {
                 setTableData(tableData)             
             } else {
                 console.log('An error occurred')
+                message.error({content: `There was an error loading that page. Unfortunately the link is no longer valid.`, duration: 2.5, style: {fontSize: '1rem'} })
             }
         } else {
             console.log('no sid')
@@ -120,26 +123,22 @@ function App() {
 
     function submitCustomCalcs () {
         // FIRST: validate that every colIndex is in tableData
-        let isValid = true
-        // const allColIndexes = tableData.columns.filter(column => column.title.startsWith('Column'))
-        //                     .map(column => column.children[0].dataIndex)
-        // Object.entries(calcsForm.getFieldsValue()).forEach(([calcIndex, calc]) => {
-        //     if (!allColIndexes.includes(calc.colIndex1) || !allColIndexes.includes(calc.colIndex2)) {
-        //         isValid = false
-        //     }
-        // })
-        if (!isValid) {
+        const allColIndexes = tableData.columns.filter(column => column.title.startsWith('Column'))
+                            .map(column => column.children[0].dataIndex)
+        const hasInvalidCol = Object.entries(calcsForm.getFieldsValue())
+                            .some(([calcIndex, calc]) => (
+                            (calc.colIndex1.startsWith('col') && !allColIndexes.includes(calc.colIndex1))
+                            || (calc.colIndex2.startsWith('col') && !allColIndexes.includes(calc.colIndex2)) ))        
+        if (hasInvalidCol) {
             message.error({content: 'Some of these fields are no longer in the table.', duration: 2.5, style: {fontSize: '1rem'} })
             return
         }
         // CONTINUE: if valid
-        const hide = message.loading({content: 'Loading the data', style: {fontSize: '1rem'}}, 0)
         const newTableData = copyTableWithoutCalcs(tableData)
         addCalcsToTable(newTableData, calcsForm.getFieldsValue())
         setTableData(newTableData)
         setIsCalcVisible(false)
         setSavedCalcsFields(calcsForm.getFieldsValue())
-        hide()
     }
 
     function handleShowCalc() {
@@ -183,10 +182,8 @@ function App() {
         })
     }
 
-    function resetQueryForm() {
-        queryForm.resetFields()
-        setResetCount(resetCount+1)
-    }
+    function resetQueryForm() { queryForm.resetFields(); setResetQuery(resetQuery+1) }
+    function resetCalcsForm() { calcsForm.resetFields(); setResetCalcs(resetCalcs+1) }
 
     function onDownload() {
         const blob = new Blob([toCSV(tableData)], { type: 'text/csv;charset=utf-8;' });
@@ -274,11 +271,9 @@ function App() {
             <Col span={12}>
                 <Button type="primary" onClick={() => setIsFieldDrawerVisible(true)}>Edit Fields</Button>
                 <Button type="secondary" onClick={handleShowCalc}>Edit Custom Calcs</Button>
-                <Button type="danger" onClick={() => console.log(tableData)}>Debug: Table Data</Button>
+                {/* <Button type="danger" onClick={() => console.log(tableData)}>Debug: Table Data</Button>
                 <Button type="danger" onClick={() => console.log(queryForm.getFieldsValue())}>Debug: Form getFieldsValue</Button>
-                <Button type="danger" onClick={() => console.log(calcsForm.getFieldsValue())}>Debug: Calc getFieldsValue</Button>
-                <Button type="danger" onClick={() => console.log(calcsForm.getFieldValue(['calc1']))}>Debug: calc1 Value</Button>
-                <Button type="danger" onClick={() => console.log(calcsForm.getFieldValue(['calc1']))}>Debug: reset calc1</Button>
+                <Button type="danger" onClick={() => console.log(calcsForm.getFieldsValue())}>Debug: Calc getFieldsValue</Button> */}
             </Col>
             <Col span={12} style={{textAlign: 'right'}}>
                 <Button type="primary" onClick={onShareURL} shape="round" icon={<CloudUploadOutlined />}>Shareable URL</Button>
@@ -303,7 +298,7 @@ function App() {
                     <Step status={step === 1 ? "process" : "wait"}  title="Select Row Type" />
                 </Steps>
 
-                <Form {...queryFormProps} key={`queryForm_reset_${resetCount}`}>
+                <Form {...queryFormProps} key={`queryForm_reset_${resetQuery}`}>
                     <div style={step === 0 ? {} : { display: 'none'  } } >
                         <ColumnTabs initialQueryPanes={initialQueryPanes}  queryForm={queryForm} />
                     </div>
@@ -317,10 +312,16 @@ function App() {
 
             </Drawer>
 
-            <Modal {...calcModalProps}>
-                <Form  {...calcsFormProps} >
+            <Modal {...calcModalProps} footer={
+                <div style={{textAlign: 'right',}}>
+                <Button danger onClick={resetCalcsForm} style={{ marginRight: 2 }}>Reset</Button>
+                <Button onClick={() => setIsCalcVisible(false)} style={{ marginRight: 2 }}> Close </Button>
+                <Button  type="primary" onClick={submitCustomCalcs}>Submit</Button> {/*onClick={submitQueryFields}*/}
+                </div>
+            }>
+                <Form  {...calcsFormProps} key={`calcsForm_reset_${resetCalcs}`}>
                     {tableData.columns && tableData.columns.length > 0 ?
-                    <CustomCalcTabs initialCalcsPanes={initialCalcsPanes} tableData={tableData} />
+                    <CustomCalcTabs initialCalcsPanes={initialCalcsPanes} tableData={tableData} calcsForm={calcsForm} />
                     : <p>Please select fields first</p>}
                 </Form>
             </Modal>
