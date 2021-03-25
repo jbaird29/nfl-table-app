@@ -32,13 +32,6 @@ function App() {
     const [isURLVisible, setIsURLVisible] = useState(false)
     const [initialQueryPanes, setInitialQueryPanes] = useState([])
     const [initialCalcsPanes, setInitialCalcsPanes] = useState([])
-    // TODO - refactor form fields modification approach
-    // upon queryForm submit => savedQueryFields = queryForm.getFieldsValue(); savedCalcsFields = {}
-    // upon calcsForm submit => savedCalcsFields = calcsForm.getFieldsValue()
-    // upon save-state => use whatever values are held in savedQueryFields and savedCalcsFields
-    // idea = this will maintain the save of whatever is displayed in the table; it allows the user to modify some fields but
-    //    still be able to share the URL corresponding to what is shown in the table
-
     // TODO - when a tab is deleted form a form, its value is not return via getFieldsValue() but it IS
     //        still included in the form state and it is returnable via getFieldValue(['name'])
     //        this is ok right now because when a user deletes a tab, there 
@@ -61,8 +54,6 @@ function App() {
         const sid = url.searchParams.get('sid')
         if(sid) {
             console.log(sid)
-            url.searchParams.delete('sid')
-            window.history.pushState({}, '', url);
             const response = await fetch(`/api/load-state?sid=${sid}`, { method: 'GET'})
             if (response.status === 200) {
                 const data = await response.json()
@@ -84,6 +75,8 @@ function App() {
                 console.log('An error occurred')
                 message.error({content: `There was an error loading that page. Unfortunately the link is no longer valid.`, duration: 2.5, style: {fontSize: '1rem'} })
             }
+            url.searchParams.delete('sid')
+            window.history.pushState({}, '', url);
         } else {
             console.log('no sid')
             setInitialQueryPanes([{ title: 'Column 1', key: '1' }])
@@ -94,9 +87,9 @@ function App() {
 
     async function saveState() {
         const saveData = {queryFormV, calcsFormV, queryFields: savedQueryFields, calcsFields: savedCalscFields}
-        saveData.stateID = createSID(JSON.stringify(saveData))
         const response = await fetch(`/api/save-state`, { method: 'POST', headers: {'Content-Type': 'application/json'},body: JSON.stringify(saveData)})
-        return response.status === 201 ? {success: true, stateID: saveData.stateID} : {success: false, error: response.statusText}
+        const data = await response.json()
+        return response.status === 201 ? {success: true, stateID: data.stateID} : {success: false, error: response.statusText}
     }
     
     async function onShareURL() {
@@ -208,15 +201,6 @@ function App() {
         link.click(); 
         document.body.removeChild(link);
     }
-
-    function createSID(saveDataJSON) {
-        const unique = '51d37bbb-b62c-4f24-a1e6-d0778d7d7deb';
-        const hexID = uuidv5(saveDataJSON, unique).replaceAll('-', '')
-        const base64 = btoa(hexID.slice(0,30).match(/\w{2}/g).map(a => String.fromCharCode(parseInt(a, 16))).join(""))
-        const urlEncode = base64.replaceAll('+', '-').replaceAll('/', '~')
-        return urlEncode
-    }
-
 
     const fieldDrawerProps = {
         title: 'Edit Fields',
