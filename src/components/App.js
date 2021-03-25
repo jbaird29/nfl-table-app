@@ -182,8 +182,9 @@ function App() {
         })
     }
 
-    function resetQueryForm() { queryForm.resetFields(); setResetQuery(resetQuery+1) }
-    function resetCalcsForm() { calcsForm.resetFields(); setResetCalcs(resetCalcs+1) }
+    
+    function resetQueryForm() { setInitialQueryPanes([{ title: 'Column 1', key: '1' }]); queryForm.resetFields(); setResetQuery(resetQuery+1) }
+    function resetCalcsForm() { setInitialCalcsPanes([{ title: 'Calculation 1', key: '1' }]); calcsForm.resetFields(); setResetCalcs(resetCalcs+1) }
 
     function onDownload() {
         const blob = new Blob([toCSV(tableData)], { type: 'text/csv;charset=utf-8;' });
