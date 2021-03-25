@@ -32,26 +32,6 @@ export function addRender(column) {
 
 
 /**
- * Given an apiRequestBody, makes the request and returns the tableData
- * @param {Object} params 
- * @returns {Object} tableData
- */
-export async function makeRequest(apiRequestBody) {
-    const fetchOptions = { method: 'POST', headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(apiRequestBody)
-    }
-    const response = await fetch(`http://localhost:9000/run-query`, fetchOptions)
-    if (response.status === 200) {
-        const tableData = await response.json();
-        return tableData
-    } else {
-        const error = await response.json()
-        console.log(error)
-        return null
-    }
-}
-
-/**
  * Given a tableData object, adds render and sorter functions to each of the columns
  * @param {Object} tableData 
  */

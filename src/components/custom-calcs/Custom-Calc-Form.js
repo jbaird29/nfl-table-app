@@ -22,6 +22,7 @@ export default function CustomCalcForm(props) {
                         .concat(
                             Object.entries(props.calcsForm.getFieldsValue())
                             .filter(([calcIndex, calc]) => calcIndex.slice(4) < props.calcIndex.slice(4))
+                            .sort((a, b) => a[0].slice(4) - b[0].slice(4)) 
                             .map(([calcIndex, calc]) => ({label: `Calculation ${calcIndex.slice(4)}: ${calc.title}`, value: calcIndex}))
                         )
                         : null

@@ -9,7 +9,7 @@ import ColumnTabs from './query-fields/Column-Tabs'
 import RowForm from './query-fields/Row-Form'
 import WhereForm from './query-fields/Where-Form'
 import CustomCalcTabs from './custom-calcs/Custom-Calc-Tabs'
-import {makeRequest, toCSV, copyTableWithoutCalcs, addCalcsToTable, addRenderSorterToTable} from './helper-functions'
+import {toCSV, copyTableWithoutCalcs, addCalcsToTable, addRenderSorterToTable} from './helper-functions'
 
 const { Content, Footer } = Layout;
 const { Step } = Steps;
@@ -63,7 +63,7 @@ function App() {
             console.log(sid)
             url.searchParams.delete('sid')
             window.history.pushState({}, '', url);
-            const response = await fetch(`http://localhost:9000/load-state?sid=${sid}`, { method: 'GET'})
+            const response = await fetch(`/api/load-state?sid=${sid}`, { method: 'GET'})
             if (response.status === 200) {
                 const data = await response.json()
                 const {queryFields, calcsFields, tableData } = data
@@ -95,7 +95,7 @@ function App() {
     async function saveState() {
         const saveData = {queryFormV, calcsFormV, queryFields: savedQueryFields, calcsFields: savedCalscFields}
         saveData.stateID = createSID(JSON.stringify(saveData))
-        const response = await fetch(`http://localhost:9000/save-state`, { method: 'POST', headers: {'Content-Type': 'application/json'},body: JSON.stringify(saveData)})
+        const response = await fetch(`/api/save-state`, { method: 'POST', headers: {'Content-Type': 'application/json'},body: JSON.stringify(saveData)})
         return response.status === 201 ? {success: true, stateID: saveData.stateID} : {success: false, error: response.statusText}
     }
     
@@ -141,29 +141,31 @@ function App() {
         setSavedCalcsFields(calcsForm.getFieldsValue())
     }
 
-    function handleShowCalc() {
-        if (tableData.columns && tableData.columns.length > 0) {
-            setIsCalcVisible(true)
-        } else {
-            message.error({content: 'Please select fields first', duration: 2.5, style: {fontSize: '1rem'} })
-        }
-    }
-
     async function submitQuery(formFields) {
         const hide = message.loading({content: 'Loading the data', style: {fontSize: '1rem'}}, 0)
-        try { 
-            const tableData = await makeRequest(formFields)
-            hide()
-            if (tableData) {
-                addRenderSorterToTable(tableData)
-                setTableData(tableData)
-                setIsFieldDrawerVisible(false)
-                setSavedCalcsFields(null)
-                setSavedQueryFields(formFields)
-                return true
-            } else {
+        try {
+            const fetchOptions = { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(formFields) } 
+            const response = await fetch(`/api/run-query`, fetchOptions)
+            if (response.status !== 200) {
+                hide()
+                const error = await response.json()
                 message.error({content: 'An error occurred. Please refresh the page and try again.', duration: 5, style: {fontSize: '1rem'} })
+                console.log(error)
                 return false
+            } else {
+                hide()
+                const tableData = await response.json();
+                if (tableData) {
+                    addRenderSorterToTable(tableData)
+                    setTableData(tableData)
+                    setIsFieldDrawerVisible(false)
+                    setSavedCalcsFields(null)
+                    setSavedQueryFields(formFields)
+                    return true
+                } else {
+                    message.error({content: 'An error occurred. Please refresh the page and try again.', duration: 5, style: {fontSize: '1rem'} })
+                    return false
+                }
             }
         } catch(err) {
             console.log(err)
@@ -172,6 +174,15 @@ function App() {
             return false
         }        
     }
+
+    function handleShowCalc() {
+        if (tableData.columns && tableData.columns.length > 0) {
+            setIsCalcVisible(true)
+        } else {
+            message.error({content: 'Please select fields first', duration: 2.5, style: {fontSize: '1rem'} })
+        }
+    }
+
 
     async function onSubmit() {
         queryForm.validateFields()
@@ -196,11 +207,6 @@ function App() {
         document.body.appendChild(link); 
         link.click(); 
         document.body.removeChild(link);
-    }
-
-    function tableContainsCalcs() {
-        return tableData.columns && tableData.columns.length > 0 
-                && tableData.columns.filter(column => column.title.startsWith('Calculation')).length > 0
     }
 
     function createSID(saveDataJSON) {
