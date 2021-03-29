@@ -1,5 +1,5 @@
 import React, {  } from "react";
-import {Tabs, Button, Form } from 'antd';
+import {Tabs, Button,  } from 'antd';
 import ColumnForm from './Column-Form'
 const { TabPane } = Tabs;
 

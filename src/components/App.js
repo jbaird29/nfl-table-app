@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { v5 as uuidv5 } from 'uuid';
 import './App.css';
 import 'antd/dist/antd.css';
-import {Layout, Button, Drawer, message, Divider, Row, Col, Form, Modal, Steps, Space, Spin, Alert, } from 'antd';
-import { DownloadOutlined, ShareAltOutlined, CloudUploadOutlined, CopyOutlined } from '@ant-design/icons';
+import {Layout, Button, Drawer, message, Divider, Row, Col, Form, Modal, Steps, Spin, Alert, } from 'antd';
+import { DownloadOutlined, CloudUploadOutlined, CopyOutlined } from '@ant-design/icons';
 import Table from './Table'
 import ColumnTabs from './query-fields/Column-Tabs'
 import RowForm from './query-fields/Row-Form'
