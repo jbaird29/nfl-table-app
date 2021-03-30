@@ -2,7 +2,6 @@
   "name": "nfl-table-react-app",
   "version": "0.1.0",
   "private": true,
-  "proxy": "http://localhost:9000",
   "dependencies": {
     "@testing-library/jest-dom": "^5.11.9",
     "@testing-library/react": "^11.2.3",
@@ -10,6 +9,7 @@
     "antd": "^4.11.2",
     "babel-plugin-import": "^1.13.3",
     "firebase": "^8.3.1",
+    "firebase-admin": "^9.6.0",
     "json-loader": "^0.5.7",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",

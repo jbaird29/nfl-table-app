@@ -53,7 +53,7 @@ function App() {
         const sid = url.searchParams.get('sid')
         if(sid) {
             console.log(sid)
-            const response = await fetch(`/api/load-state?sid=${sid}`, { method: 'GET'})
+            const response = await fetch(`/loadState?sid=${sid}`, { method: 'GET'})
             if (response.status === 200) {
                 const data = await response.json()
                 const {queryFields, calcsFields, tableData } = data
@@ -86,7 +86,7 @@ function App() {
 
     async function saveState() {
         const saveData = {queryFormV, calcsFormV, queryFields: savedQueryFields, calcsFields: savedCalscFields}
-        const response = await fetch(`/api/save-state`, { method: 'POST', headers: {'Content-Type': 'application/json'},body: JSON.stringify(saveData)})
+        const response = await fetch(`/saveState`, { method: 'POST', headers: {'Content-Type': 'application/json'},body: JSON.stringify(saveData)})
         const data = await response.json()
         return response.status === 201 ? {success: true, stateID: data.stateID} : {success: false, error: response.statusText}
     }
@@ -137,7 +137,7 @@ function App() {
         const hide = message.loading({content: 'Loading the data', style: {fontSize: '1rem'}}, 0)
         try {
             const fetchOptions = { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(formFields) } 
-            const response = await fetch(`/api/run-query`, fetchOptions)
+            const response = await fetch(`/runQuery`, fetchOptions)
             if (response.status !== 200) {
                 hide()
                 const error = await response.json()
