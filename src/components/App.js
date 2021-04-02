@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import './App.css';
 import 'antd/dist/antd.css';
-import {Layout, Button, Drawer, message, Divider, Row, Col, Form, Modal, Steps, Spin, Alert, } from 'antd';
+import {Layout, Button, Drawer, message, Divider, Row, Col, Form, Modal, Steps, Spin, Alert, Image, Tabs } from 'antd';
 import { DownloadOutlined, CloudUploadOutlined, CopyOutlined } from '@ant-design/icons';
 import Table from './Table'
 import ColumnTabs from './query-fields/Column-Tabs'
@@ -9,9 +9,11 @@ import RowForm from './query-fields/Row-Form'
 import WhereForm from './query-fields/Where-Form'
 import CustomCalcTabs from './custom-calcs/Custom-Calc-Tabs'
 import {toCSV, copyTableWithoutCalcs, addCalcsToTable, addRenderSorterToTable} from './helper-functions'
+import logo from '../images/logo.png'
 
-const { Content, Footer } = Layout;
+const { Header, Sider, Content, Footer } = Layout;
 const { Step } = Steps;
+const { TabPane } = Tabs
 const queryFormV = 1
 const calcsFormV = 1
 
@@ -255,94 +257,116 @@ function App() {
         style: {top: 150}
     }
 
+    const siderWidth = 300
+
 
     return (
     <>
-    <Layout hasSider={false} className="site-layout-background" style={{ minHeight: '100vh' }}>
-        <Content style={{ margin: '20px 16px 0px', overflow: 'initial'}}>
+    <Layout style={{ minHeight: '100vh' }}>
+    
+        <Sider width={300} style={{backgroundColor: '#FFF', textAlign: 'center'}}>
+            <Tabs centered defaultActiveKey="1" onChange={(key) => console.log(key)}>
+                <TabPane tab="Custom Query" key="1">
+                    <Row style={{padding: '6px 12px'}}><Button block={true} type="primary" onClick={() => setIsFieldDrawerVisible(true)}>Edit Fields</Button></Row>
+                    <Row style={{padding: '6px 12px'}}><Button block={true} type="secondary" onClick={handleShowCalc}>Edit Custom Calcs</Button></Row>
+                </TabPane>
+                <TabPane tab="Standard Stats" key="2">
+                </TabPane>
+            </Tabs>
+        </Sider>
+
+        <Layout >
         <Spin spinning={loadingPage}>
-            <Row gutter={0}>
-            <Col span={12}>
-                <Button type="primary" onClick={() => setIsFieldDrawerVisible(true)}>Edit Fields</Button>
-                <Button type="secondary" onClick={handleShowCalc}>Edit Custom Calcs</Button>
-                {/* <Button type="danger" onClick={() => console.log(tableData)}>Debug: Table Data</Button>
-                <Button type="danger" onClick={() => console.log(queryForm.getFieldsValue())}>Debug: Form getFieldsValue</Button>
-                <Button type="danger" onClick={() => console.log(calcsForm.getFieldsValue())}>Debug: Calc getFieldsValue</Button> */}
-            </Col>
-            <Col span={12} style={{textAlign: 'right'}}>
-                <Button type="primary" onClick={onShareURL} shape="round" icon={<CloudUploadOutlined />}>Shareable URL</Button>
-                <Button type="primary" onClick={onDownload} shape="round" icon={<DownloadOutlined />}>Download</Button>
-            </Col>
-            </Row>
-            <Row style={{marginTop: 12}}>
-                <Table tableData={tableData} />
-            </Row>
 
-            <Drawer {...fieldDrawerProps} footer={
-                <div style={{textAlign: 'right',}}>
-                <Button danger onClick={resetQueryForm} style={{ marginRight: 8 }}>Reset</Button>
-                <Button onClick={() => setIsFieldDrawerVisible(false)} style={{ marginRight: 8 }}> Close </Button>
-                <Button  type="primary" onClick={() => onSubmit()}> Submit </Button> {/*onClick={submitQueryFields}*/}
-                </div>
-            }>
+            <Header style={{backgroundColor: '#FFF', margin: '0 5px'}}>
+                <Row>
+                <Col span={12}>
+                    <Image style={{padding: '8px 0px', }} width={200} src={logo} alt='logo' />
+                </Col>
+                <Col span={12} style={{ textAlign: 'right'}}>
+                    {/* <Button type="danger" onClick={() => console.log(tableData)}>Debug: Table Data</Button>
+                    <Button type="danger" onClick={() => console.log(queryForm.getFieldsValue())}>Debug: Form getFieldsValue</Button>
+                    <Button type="danger" onClick={() => console.log(calcsForm.getFieldsValue())}>Debug: Calc getFieldsValue</Button> */}
+                    <Button type="primary" onClick={onShareURL} shape="round" icon={<CloudUploadOutlined />}>Shareable URL</Button>
+                    <Button type="primary" onClick={onDownload} shape="round" icon={<DownloadOutlined />}>Download</Button>
+                </Col>
+                </Row>
+            </Header>
 
-                <Steps type="navigation" current={step} onChange={(current) => setStep(current)}
-                            size="small" className="site-navigation-steps" >
-                    <Step status={step === 0 ? "process" : "wait"} title="Add Columns"/>
-                    <Step status={step === 1 ? "process" : "wait"}  title="Select Row Type" />
-                </Steps>
+            <Content style={{margin: '0 5px'}}>
+                {!tableData.columns 
+                ? <Footer style={{ textAlign: 'center', height: '22', padding: '0'}}>NFL Plays Table ©{new Date().getFullYear()} Created by Jon Baird</Footer>
+                : <Table tableData={tableData} />
+                }
+                
 
-                <Form {...queryFormProps} key={`queryForm_reset_${resetQuery}`}>
-                    <div style={step === 0 ? {} : { display: 'none'  } } >
-                        <ColumnTabs initialQueryPanes={initialQueryPanes}  queryForm={queryForm} />
+                <Drawer {...fieldDrawerProps} footer={
+                    <div style={{textAlign: 'right',}}>
+                    <Button danger onClick={resetQueryForm} style={{ marginRight: 8 }}>Reset</Button>
+                    <Button onClick={() => setIsFieldDrawerVisible(false)} style={{ marginRight: 8 }}> Close </Button>
+                    <Button  type="primary" onClick={() => onSubmit()}> Submit </Button> {/*onClick={submitQueryFields}*/}
                     </div>
-                    <div style={step === 1 ? {} : { display: 'none'  } } >
-                        <RowForm />
-                        <div className="spacing" style={{marginTop: 36}}></div>
-                        <Divider orientation="center" plain>Row Filters (Optional)</Divider>
-                        <WhereForm /> 
+                }>
+
+                    <Steps type="navigation" current={step} onChange={(current) => setStep(current)}
+                                size="small" className="site-navigation-steps" >
+                        <Step status={step === 0 ? "process" : "wait"} title="Add Columns"/>
+                        <Step status={step === 1 ? "process" : "wait"}  title="Select Row Type" />
+                    </Steps>
+
+                    <Form {...queryFormProps} key={`queryForm_reset_${resetQuery}`}>
+                        <div style={step === 0 ? {} : { display: 'none'  } } >
+                            <ColumnTabs initialQueryPanes={initialQueryPanes}  queryForm={queryForm} />
+                        </div>
+                        <div style={step === 1 ? {} : { display: 'none'  } } >
+                            <RowForm />
+                            <div className="spacing" style={{marginTop: 36}}></div>
+                            <Divider orientation="center" plain>Row Filters (Optional)</Divider>
+                            <WhereForm /> 
+                        </div>
+                    </Form>
+
+                </Drawer>
+
+                <Modal {...calcModalProps} footer={
+                    <div style={{textAlign: 'right',}}>
+                    <Button danger onClick={resetCalcsForm} style={{ marginRight: 2 }}>Reset</Button>
+                    <Button onClick={() => setIsCalcVisible(false)} style={{ marginRight: 2 }}> Close </Button>
+                    <Button  type="primary" onClick={submitCustomCalcs}>Submit</Button> {/*onClick={submitQueryFields}*/}
                     </div>
-                </Form>
+                }>
+                    <Form  {...calcsFormProps} key={`calcsForm_reset_${resetCalcs}`}>
+                        {tableData.columns && tableData.columns.length > 0 ?
+                        <CustomCalcTabs initialCalcsPanes={initialCalcsPanes} tableData={tableData} calcsForm={calcsForm} />
+                        : <p>Please select fields first</p>}
+                    </Form>
+                </Modal>
 
-            </Drawer>
+                <Modal {...urlModalProps}>
+                    <Spin spinning={loadingURL}>
+                    <Alert
+                        message="Copy the Shareable URL below"
+                        size="large"
+                        description={<Row>
+                                <Col span={20} style={{textAlign: 'center', backgroundColor: '#fff', borderColor: 'd9d9d9', border: 5}}>
+                                    <div id='shareable-url'></div></Col>
+                                <Col span={4}><Button type="default" size="small" icon={<CopyOutlined/>} 
+                                    onClick={() => navigator.clipboard.writeText(document.getElementById('shareable-url').innerText)                                 }
+                                >
+                                    Copy</Button></Col>
+                                </Row>
+                        }
+                        type="info"
+                        />
+                    </Spin>
 
-            <Modal {...calcModalProps} footer={
-                <div style={{textAlign: 'right',}}>
-                <Button danger onClick={resetCalcsForm} style={{ marginRight: 2 }}>Reset</Button>
-                <Button onClick={() => setIsCalcVisible(false)} style={{ marginRight: 2 }}> Close </Button>
-                <Button  type="primary" onClick={submitCustomCalcs}>Submit</Button> {/*onClick={submitQueryFields}*/}
-                </div>
-            }>
-                <Form  {...calcsFormProps} key={`calcsForm_reset_${resetCalcs}`}>
-                    {tableData.columns && tableData.columns.length > 0 ?
-                    <CustomCalcTabs initialCalcsPanes={initialCalcsPanes} tableData={tableData} calcsForm={calcsForm} />
-                    : <p>Please select fields first</p>}
-                </Form>
-            </Modal>
-
-            <Modal {...urlModalProps}>
-                <Spin spinning={loadingURL}>
-                <Alert
-                    message="Copy the Shareable URL below"
-                    size="large"
-                    description={<Row>
-                            <Col span={20} style={{textAlign: 'center', backgroundColor: '#fff', borderColor: 'd9d9d9', border: 5}}>
-                                <div id='shareable-url'></div></Col>
-                            <Col span={4}><Button type="default" size="small" icon={<CopyOutlined/>} 
-                                 onClick={() => navigator.clipboard.writeText(document.getElementById('shareable-url').innerText)                                 }
-                            >
-                                Copy</Button></Col>
-                            </Row>
-                    }
-                    type="info"
-                    />
-                </Spin>
-
-            </Modal>
-        </Spin>
-        </Content>
-
-        <Footer style={{ textAlign: 'center', padding: '12px'}}>NFL Plays Table ©2020 Created by Jon Baird</Footer>
+                </Modal>
+            
+            </Content>
+            
+            </Spin>
+        </Layout>
+    
     </Layout>
     </>
     );

@@ -19,7 +19,9 @@ function Table(props) {
         size: "small"
       }} 
       bordered
-      scroll={{ x: 230, y: '75vh' }}
+      scroll={{ x: 230,
+        y: '75vh'   // 64px for header + 22px for footer
+      }}
       size="small"
       showSorterTooltip={true}
       sortDirections={['descend', 'ascend', 'descend']}
