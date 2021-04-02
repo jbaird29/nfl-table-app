@@ -262,6 +262,7 @@ function App() {
 
     return (
     <>
+    <Spin spinning={loadingPage}>
     <Layout style={{ minHeight: '100vh' }}>
     
         <Sider width={300} style={{backgroundColor: '#FFF', textAlign: 'center'}}>
@@ -276,9 +277,9 @@ function App() {
         </Sider>
 
         <Layout >
-        <Spin spinning={loadingPage}>
+        
 
-            <Header style={{backgroundColor: '#FFF', margin: '0 5px'}}>
+            <Header style={{backgroundColor: '#FFF', margin: '0 5px', padding: '0 10px'}}>
                 <Row>
                 <Col span={12}>
                     <Image style={{padding: '8px 0px', }} width={200} src={logo} alt='logo' />
@@ -364,10 +365,11 @@ function App() {
             
             </Content>
             
-            </Spin>
+            
         </Layout>
     
     </Layout>
+    </Spin>
     </>
     );
 }
