@@ -214,7 +214,7 @@ function App() {
         visible: isFieldDrawerVisible,
         placement: 'left',
         onClose: () => setIsFieldDrawerVisible(false),
-        bodyStyle: { paddingBottom: 80, paddingLeft: 12, paddingRight: 12,  },
+        bodyStyle: { paddingBottom: 24, paddingLeft: 12, paddingRight: 12,  },
     }
 
     const queryFormProps = {

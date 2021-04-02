@@ -6,6 +6,7 @@ import filtersStats from '../../inputs/filtersStats.json'
 import filtersGeneral from '../../inputs/filtersGeneral.json'
 import teamList from '../../inputs/teamList.json'
 import playerList from '../../inputs/playerList.json'
+import {renderFilterObject} from './render-filter'
 
 const yearsList = [{value: '2020'}, {value: '2019'}, {value: '2018'}, {value: '2017'}, {value: '2016'}]
 
@@ -29,42 +30,32 @@ export default function ColumnForm(props) {
         style: {width: '50%', marginLeft: '50%'}
     }
 
+    // renderFilterObject takes filter, name, key as parameters
+    const renderColFilterObject = (filter) => (
+        renderFilterObject(filter, ['columns', props.colIndex, 'filters', filter.name], `${props.colIndex}_${filter.name}`)    
+    )
+
     // this function will render the filtersStats based on what field is selected by the user
     // Example: the filter pass_incompletion_type should not be displayed if {field: 'pass_yards_sum'},
     //    because there are no pass yards in incompletion (i.e. pass_yards_sum would always equal 0)
-    const renderFilters = (filters) => (
-        filters.map(filter => (
-            <Form.Item noStyle key={`wrapper_${props.colIndex}_${filter.name}`} shouldUpdate={(prev, current) =>
-                (!current.columns || !prev.columns || 
-                !current.columns[props.colIndex] || !prev.columns[props.colIndex] || 
-                !current.columns[props.colIndex].field || !prev.columns[props.colIndex].field ) ? true :
-                (current.columns[props.colIndex].field !== prev.columns[props.colIndex].field)}
-            >
-            { ({getFieldValue}) => {
-                const field = getFieldValue(['columns', props.colIndex, 'field'])   // pass_yards_sum || undefined
-
-                const statType = !field ? null : 
-                                (field.includes('pass') ? 'pass' :
-                                field.includes('rush') ? 'rush' :
-                                field.includes('recv') ? 'recv' : null)  // pass || null
-
-                const showFilter = !field ? false : 
-                                   (filter.linkedAggs ? filter.linkedAggs.includes(field) : filter.statType === statType)
-                                   // if no field selected: false; 
-                                   // else if filter has linkedAggs: if field is in linkedAggs; 
-                                   // else: if filter's stat type matches field's stat type
-                
-                return (showFilter ? <Form.Item {...filter.formProps} name={['columns', props.colIndex, 'filters', filter.name]} 
-                                      key={`${props.colIndex}_${filter.name}`}>
-                    {filter.ui.type === 'select' ? <Select {...filter.ui.props} /> : 
-                        filter.ui.type === 'slider' ? <Slider {...filter.ui.props} /> : 
-                        filter.ui.type === 'inputNumber' ? <InputNumber {...filter.ui.props} /> : null
-                        }
-                    </Form.Item>
-                 : null)
-            } }
-            </Form.Item>
-        ))
+    const renderStatTypeFilter = (filter) => (
+        <Form.Item noStyle key={`wrapper_${props.colIndex}_${filter.name}`} shouldUpdate={(prev, current) =>
+            (!current.columns || !prev.columns || 
+            !current.columns[props.colIndex] || !prev.columns[props.colIndex] || 
+            !current.columns[props.colIndex].field || !prev.columns[props.colIndex].field ) ? true :
+            (current.columns[props.colIndex].field !== prev.columns[props.colIndex].field)}
+        >
+        { ({getFieldValue}) => {
+            const field = getFieldValue(['columns', props.colIndex, 'field'])   // pass_yards_sum || undefined
+            const statType = !field ? null : field.slice(0, 4)                  // pass || null
+            const showFilter = !field ? false : 
+                                (filter.linkedAggs ? filter.linkedAggs.includes(field) : filter.statType === statType)
+                                // if no field selected: false; 
+                                // else if filter has linkedAggs: show if field is in linkedAggs; 
+                                // else: if filter's stat type matches field's stat type
+            return (showFilter ? renderColFilterObject(filter) : null)
+        } }
+        </Form.Item>
     )
 
     const renderRowTypeFilter = (fieldName, fieldLabel, fieldOptions) => (
@@ -110,21 +101,11 @@ export default function ColumnForm(props) {
                 <InputNumber {...minInputProps}/>
             </Form.Item>
 
-            {filtersGeneral.map(filter => (
-                <Form.Item {...filter.formProps} name={['columns', props.colIndex, 'filters', filter.name]}
-                            key={`${props.colIndex}_${filter.name}`}
-                >
-                {filter.ui.type === 'select' ? <Select {...filter.ui.props} /> : 
-                    filter.ui.type === 'slider' ? <Slider {...filter.ui.props} /> : 
-                    filter.ui.type === 'inputNumber' ? <InputNumber {...filter.ui.props} /> : null
-                    }
-                </Form.Item>
-            ))}
-            <Divider orientation="center" plain>Stat-Specific Filters (Optional)</Divider>
-            
-            {renderFilters(filtersStats)}
+            {filtersGeneral.map(filter => renderColFilterObject(filter) )}
 
-            
+            <Divider orientation="center" plain>Stat-Specific Filters (Optional)</Divider>
+            {filtersStats.map(filter => renderStatTypeFilter(filter))}
+
     </>
     );
 };
