@@ -1,5 +1,28 @@
 const fs = require('fs')
 const {dims, aggs, tbls, fltrs} = require('../queries/metadata')
+const bq = require('../queries/bigquery');
+
+const relativePath = '../../../src/inputs/'
+
+async function writePlayerList() {
+    const sqlPlayerList = `SELECT  DISTINCT ${dims.player_name_with_position.sql}
+        FROM ${tbls.prod.sqlName} WHERE ${dims.player_position.sql} in ('QB', 'RB', 'WR', 'TE') ORDER BY 1 ASC`
+    const playerResult = await bq.runQuery(sqlPlayerList)
+    const playerList = playerResult.map(row => ({value: `'${row.player_name_with_position}'`, label: row.player_name_with_position}) )
+    fs.writeFile(relativePath + 'playerList.json', JSON.stringify(playerList), function (err) {
+        if (err) return console.log(err);
+    })
+}
+
+async function writeTeamList() {
+    const sqlTeamList = `SELECT DISTINCT ${dims.team_name.sql} FROM ${tbls.prod.sqlName} ORDER BY 1 ASC`
+    const teamResult = await bq.runQuery(sqlTeamList)
+    const teamList = teamResult.map(row => ({value: `'${row.team_name}'`, label: row.team_name}) )
+    fs.writeFile(relativePath + 'teamList.json', JSON.stringify(teamList), function (err) {
+        if (err) return console.log(err);
+    })
+}
+
 
 function writeStatList(aggs) {
     const statList = [
@@ -23,7 +46,7 @@ function writeStatList(aggs) {
             .options.push({title: aggs[field].title, label: aggs[field].title, value: field, key: field, align:'left'})
         }
     }
-    fs.writeFile('../../../src/inputs/statsInputs.json', JSON.stringify(statList), function (err) {
+    fs.writeFile(relativePath + 'statsInputs.json', JSON.stringify(statList), function (err) {
         if (err) return console.log(err);
     })
 }
@@ -39,18 +62,19 @@ function writeFilters(fltrs) {
     const where = Object.entries(fltrs).filter(([key, value]) => value.placement === 'where' && value.expose).map(([key, value]) => 
         ({name: value.name, formProps: value.formProps, ui: value.ui }) )
 
-    fs.writeFile('../../../src/inputs/filtersGeneral.json', JSON.stringify(general), function (err) {
+    fs.writeFile(relativePath + 'filtersGeneral.json', JSON.stringify(general), function (err) {
         if (err) return console.log(err);
     });
-    fs.writeFile('../../../src/inputs/filtersStats.json', JSON.stringify(stats), function (err) {
+    fs.writeFile(relativePath + 'filtersStats.json', JSON.stringify(stats), function (err) {
         if (err) return console.log(err);
     });
-    fs.writeFile('../../../src/inputs/filtersWhere.json', JSON.stringify(where), function (err) {
+    fs.writeFile(relativePath + 'filtersWhere.json', JSON.stringify(where), function (err) {
         if (err) return console.log(err);
     });
 }
 
-
+writePlayerList();
+writeTeamList();
 writeStatList(aggs);
 writeFilters(fltrs);
 

@@ -22,6 +22,7 @@ exports.runQuery = functions.https.onRequest(async function(req, res){
         const query = new Query(meta, req.body)
         const sql = query.buildSQL()
         functions.logger.log(sql)
+        console.log(sql)
         const queryResult = await bq.runQuery(sql)
         const tableProps = query.buildTableProps()
         queryResult ? res.status(200).send({dataSource: queryResult, columns: tableProps}) : res.res.status(400).send({error: "Query invalid."})

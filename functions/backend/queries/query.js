@@ -69,9 +69,25 @@ module.exports.Query = class Query {
                         .map(([name, values]) => this.buildFilterSQL(name, values))
 
         // append season_year filter based on what is in the columns
-        const yearsWithDuplicates = Object.entries(this.columns).map(([colIndex, column]) => column.filters.season_year)
+        const yearsWithDuplicates = Object.entries(this.columns)
+            .filter(([colIndex, column]) => column.filters.season_year)
+            .map(([colIndex, column]) => column.filters.season_year)
         const years = Array.from(new Set(yearsWithDuplicates))
-        whereArr.push(this.buildFilterSQL('season_year', years))
+        years.length > 0 ? whereArr.push(this.buildFilterSQL('season_year', years)) : null
+
+        // append player_name filter based on what is in the columns
+        const playersWithDuplicates = Object.entries(this.columns)
+            .filter(([colIndex, column]) => column.filters.player_name_with_position)
+            .map(([colIndex, column]) => column.filters.player_name_with_position)
+        const players = Array.from(new Set(playersWithDuplicates))
+        players.length > 0 ? whereArr.push(this.buildFilterSQL('player_name_with_position', players)) : null
+    
+        // append team_name filter based on what is in the columns
+        const teamsWithDuplicates = Object.entries(this.columns)
+            .filter(([colIndex, column]) => column.filters.team_name)
+            .map(([colIndex, column]) => column.filters.team_name)
+        const teams = Array.from(new Set(teamsWithDuplicates))
+        teams.length > 0 ? whereArr.push(this.buildFilterSQL('team_name', teams)) : null
 
         // append stat_type filter based on what is in the columns
         //   if the stat field is an "info" type, then no stat_type filter is appended
@@ -107,6 +123,7 @@ module.exports.Query = class Query {
         const columnArr = this.buildSelectColumns()
         const whereArr = this.buildWhere()
         const havingArr = this.buildHaving()
+        const orderBy = rowSQL === `${this.dims.season_year.sql}` ? '2 ASC' : '3 DESC'
 
         let sql = ''
         sql += `SELECT ' ' AS rnk,\n`
@@ -116,7 +133,7 @@ module.exports.Query = class Query {
         sql += whereArr.length > 0 ? `\nWHERE ${whereArr.join(' AND \n')}` : ''
         sql += '\nGROUP BY 1, 2'
         sql += havingArr.length > 0 ? `\nHAVING ${havingArr.join(' AND \n')}` : ''
-        sql += '\nORDER BY 3 DESC'
+        sql += `\nORDER BY ${orderBy}`
 
         return sql
     }
@@ -133,6 +150,8 @@ module.exports.Query = class Query {
     buildColumnTableProps(colIndex, column) {
         const {field, title, filters} = column
         const {shortTitle, width, dataType, format, } = this.aggs[field]
+        // default title will include year if year is selected
+        const defaultTitle = `${shortTitle}` + (!filters.season_year ? '' : ` (${filters.season_year})`)
         return ({
             title: `Column ${colIndex.slice(3)}`, 
             align: 'center', 
@@ -140,7 +159,7 @@ module.exports.Query = class Query {
             children: [{
                 dataIndex: colIndex
                 , key: colIndex
-                , title: title || `${shortTitle} (${filters.season_year})`   // user-entered title || default one
+                , title: title || defaultTitle  // use provided title or default title if none provided
                 , width: width
                 , dataType: dataType
                 , format: format

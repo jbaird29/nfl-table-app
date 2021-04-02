@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import './App.css';
 import 'antd/dist/antd.css';
-import {Layout, Button, Drawer, message, Divider, Row, Col, Form, Modal, Steps, Spin, Alert, Image, Tabs } from 'antd';
+import {Layout, Button, Drawer, message, Divider, Row, Col, Form, Modal, Steps, Spin, Alert, Image, Tabs, Typography } from 'antd';
 import { DownloadOutlined, CloudUploadOutlined, CopyOutlined } from '@ant-design/icons';
 import Table from './Table'
 import ColumnTabs from './query-fields/Column-Tabs'
@@ -14,6 +14,7 @@ import logo from '../images/logo.png'
 const { Header, Sider, Content, Footer } = Layout;
 const { Step } = Steps;
 const { TabPane } = Tabs
+const { Title, Paragraph } = Typography
 const queryFormV = 1
 const calcsFormV = 1
 
@@ -209,11 +210,11 @@ function App() {
 
     const fieldDrawerProps = {
         title: 'Edit Fields',
-        width: '60%',
+        width: '50%',
         visible: isFieldDrawerVisible,
         placement: 'left',
         onClose: () => setIsFieldDrawerVisible(false),
-        bodyStyle: { paddingBottom: 80 },
+        bodyStyle: { paddingBottom: 80, paddingLeft: 12, paddingRight: 12,  },
     }
 
     const queryFormProps = {
@@ -296,7 +297,7 @@ function App() {
 
             <Content style={{margin: '0 5px'}}>
                 {!tableData.columns 
-                ? <Footer style={{ textAlign: 'center', height: '22', padding: '0'}}>NFL Plays Table ©{new Date().getFullYear()} Created by Jon Baird</Footer>
+                ? <Footer style={{ textAlign: 'center', height: '22', padding: '20px 0px'}}>NFL Plays Table ©{new Date().getFullYear()} Created by Jon Baird</Footer>
                 : <Table tableData={tableData} />
                 }
                 
@@ -311,19 +312,20 @@ function App() {
 
                     <Steps type="navigation" current={step} onChange={(current) => setStep(current)}
                                 size="small" className="site-navigation-steps" >
-                        <Step status={step === 0 ? "process" : "wait"} title="Add Columns"/>
-                        <Step status={step === 1 ? "process" : "wait"}  title="Select Row Type" />
+                        <Step status={step === 0 ? "process" : "wait"}  title="Select Row Type" />
+                        <Step status={step === 1 ? "process" : "wait"} title="Add Columns"/>
+                        <Step status={step === 2 ? "process" : "wait"} title="Global Filters"/>
                     </Steps>
 
                     <Form {...queryFormProps} key={`queryForm_reset_${resetQuery}`}>
-                        <div style={step === 0 ? {} : { display: 'none'  } } >
+                        <div style={step === 0 ? {} : { display: 'none' } } >
+                            <RowForm />
+                        </div>
+                        <div style={step === 1 ? {} : { display: 'none' } } >
                             <ColumnTabs initialQueryPanes={initialQueryPanes}  queryForm={queryForm} />
                         </div>
-                        <div style={step === 1 ? {} : { display: 'none'  } } >
-                            <RowForm />
-                            <div className="spacing" style={{marginTop: 36}}></div>
-                            <Divider orientation="center" plain>Row Filters (Optional)</Divider>
-                            <WhereForm /> 
+                        <div style={step === 2 ? {} : { display: 'none' } } >
+                            <WhereForm />
                         </div>
                     </Form>
 
@@ -359,6 +361,7 @@ function App() {
                         }
                         type="info"
                         />
+                        {/* TODO - replace with Paragraph element https://ant.design/components/typography/?theme=compact */}
                     </Spin>
 
                 </Modal>

@@ -9,6 +9,7 @@ import FirebaseContext from './firebase/context'
 
 // https://www.robinwieruch.de/complete-firebase-authentication-react-tutorial
 // https://www.freecodecamp.org/news/how-to-build-a-todo-application-using-reactjs-and-firebase/
+// https://codesource.io/building-a-serverless-web-app-using-firebase/
 ReactDOM.render(
   <React.StrictMode>
     <FirebaseContext.Provider value={new Firebase()}>

@@ -4,6 +4,8 @@ import { InfoCircleOutlined } from '@ant-design/icons';
 import statsInputs from '../../inputs/statsInputs.json'
 import filtersStats from '../../inputs/filtersStats.json'
 import filtersGeneral from '../../inputs/filtersGeneral.json'
+import teamList from '../../inputs/teamList.json'
+import playerList from '../../inputs/playerList.json'
 
 
 export default function ColumnForm(props) {
@@ -19,9 +21,6 @@ export default function ColumnForm(props) {
 
     const yearProps = {
         placeholder: "Year",
-        align: 'center',
-        maxTagCount: 'responsive',
-        style: {width: '50%', marginLeft: '50%'},
         options: [{value: '2020'}, {value: '2019'}, {value: '2018'}, {value: '2017'}, {value: '2016'}]
     }
 
@@ -69,9 +68,6 @@ export default function ColumnForm(props) {
 
     return (
     <>
-            {/* <Button onClick={() => {form.resetFields(); onValuesChange(null, form.getFieldsValue()) }}>Reset</Button>
-            
-            <Button type="danger" onClick={() => {console.log(form.getFieldsValue())}}>Debug: Form</Button> */}
 
             <Form.Item name={['columns', props.colIndex, 'title']} label='Enter a Column Title'
                 tooltip={{ title: 'This title will appear in the table above this column. If no title is entred, it will be titled based on the Stat Type & Year.', 
@@ -80,21 +76,27 @@ export default function ColumnForm(props) {
             </Form.Item>
 
             <Form.Item required name={['columns', props.colIndex, 'field']} label="Select Stat Type"
-                        rules={[{ required: true, message: 'Please select a stat type.', }, ]}
-            >
+                        rules={[{ required: true, message: 'Please select a stat type.', }, ]} >
                 <Select {...selectProps}/>
             </Form.Item>
+
+            <Divider orientation="center" plain>Recommended Filters (Optional)</Divider>
             
-            <Form.Item required name={['columns', props.colIndex, 'filters', 'season_year']} label="Select Year"
-                        rules={[ { required: true, message: 'Please select a year.', }, ]}
-            >
-                <Select {...yearProps}/>
+            <Form.Item name={['columns', props.colIndex, 'filters', 'season_year']} label="Select Year"
+                labelCol={{span: 16}} wrapperCol={{span: 8}} >
+                <Select placeholder="Year" options={[{value: '2020'}, {value: '2019'}, {value: '2018'}, {value: '2017'}, {value: '2016'}]}/>
             </Form.Item>
-        
 
-            <Row gutter={24}>
+            <Form.Item name={['columns', props.colIndex, 'filters', 'team_name']} label="Select Team"
+                labelCol={{span: 16}} wrapperCol={{span: 8}} >
+                <Select placeholder="Team" showSearch={true} allowClear={true} options={teamList}/>
+            </Form.Item>
 
-            <Col span={12}>
+            <Form.Item name={['columns', props.colIndex, 'filters', 'player_name_with_position']} label="Select Player"
+                labelCol={{span: 16}} wrapperCol={{span: 8}} >
+                <Select placeholder="Player" showSearch={true} allowClear={true} options={playerList}/>
+            </Form.Item>
+
             <Divider orientation="center" plain>General Filters (Optional)</Divider>
 
             <Form.Item name={['columns', props.colIndex, 'having']} label="Minimum Value" 
@@ -113,16 +115,11 @@ export default function ColumnForm(props) {
                     }
                 </Form.Item>
             ))}
-            </Col>
-            
-            <Col span={12}>
             <Divider orientation="center" plain>Stat-Specific Filters (Optional)</Divider>
             
             {renderFilters(filtersStats)}
 
-            </Col>
             
-            </Row>
     </>
     );
 };
