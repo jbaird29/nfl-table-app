@@ -16,24 +16,26 @@ const queryFormV = 1
 const calcsFormV = 1
 
 function App() {
+    // application state
     const [tableData, setTableData] = useState({});
+    const [queryForm] = Form.useForm()
+    const [calcsForm] = Form.useForm()
+    const [savedQueryFields, setSavedQueryFields] = useState(null)  // ensures ShareableURL matches what the user sees in table
+    const [savedCalscFields, setSavedCalcsFields] = useState(null)  // ensures ShareableURL matches what the user sees in table
+    const [initialQueryPanes, setInitialQueryPanes] = useState([])
+    const [initialCalcsPanes, setInitialCalcsPanes] = useState([])
+    // UI rendering state
     const [isFieldDrawerVisible, setIsFieldDrawerVisible] = useState(false);
     const [isCalcVisible, setIsCalcVisible] = useState(false);
     const [step, setStep] = useState(0)
     const [resetQuery, setResetQuery] = useState(1);
     const [resetCalcs, setResetCalcs] = useState(1);
-    const [queryForm] = Form.useForm()
-    const [calcsForm] = Form.useForm()
-    const [savedQueryFields, setSavedQueryFields] = useState(null)  // ensures ShareableURL matches what the user sees in table
-    const [savedCalscFields, setSavedCalcsFields] = useState(null)  // ensures ShareableURL matches what the user sees in table
     const [loadingURL, setLoadingURL] = useState(false)
     const [loadingPage, setLoadingPage] = useState(false)
     const [isURLVisible, setIsURLVisible] = useState(false)
-    const [initialQueryPanes, setInitialQueryPanes] = useState([])
-    const [initialCalcsPanes, setInitialCalcsPanes] = useState([])
-    // TODO - when a tab is deleted form a form, its value is not return via getFieldsValue() but it IS
+    // TODO - when a tab is deleted from a form, its value is not returned via getFieldsValue() but it IS
     //        still included in the form state and it is returnable via getFieldValue(['name'])
-    //        this is ok right now because when a user deletes a tab, there 
+    //        this is ok right now because I am only useing getFieldsValue
 
     useEffect(() => {
         setLoadingPage(true)
@@ -52,20 +54,23 @@ function App() {
         const url = new URL(window.location)
         const sid = url.searchParams.get('sid')
         if(sid) {
-            console.log(sid)
             const response = await fetch(`/loadState?sid=${sid}`, { method: 'GET'})
             if (response.status === 200) {
                 const data = await response.json()
                 const {queryFields, calcsFields, tableData } = data
-                setInitialQueryPanes(Object.keys(queryFields.columns).map(colIndex => ({ title: `Column ${colIndex.slice(3)}`, key: `${colIndex.slice(3)}` })))
-                queryForm.setFieldsValue(queryFields)
-                setSavedQueryFields(queryFields)
-                addRenderSorterToTable(tableData)
+                if (queryFields) {
+                    setInitialQueryPanes(Object.keys(queryFields.columns).map(colIndex => ({ title: `Column ${colIndex.slice(3)}`, key: `${colIndex.slice(3)}` })))
+                    queryForm.setFieldsValue(queryFields)
+                    setSavedQueryFields(queryFields)
+                    addRenderSorterToTable(tableData)
+                } else {
+                    setInitialQueryPanes([{ title: 'Column 1', key: '1' }])
+                }
                 if (calcsFields) {
                     setInitialCalcsPanes(Object.keys(calcsFields).map(calcIndex => ({ title: `Calculation ${calcIndex.slice(4)}`, key: `${calcIndex.slice(4)}` })))
+                    calcsForm.setFieldsValue(calcsFields)   
                     addCalcsToTable(tableData, calcsFields)
                     setSavedCalcsFields(calcsFields)
-                    calcsForm.setFieldsValue(calcsFields)   
                 } else {
                     setInitialCalcsPanes([{ title: 'Calculation 1', key: '1' }])
                 }
@@ -77,7 +82,6 @@ function App() {
             url.searchParams.delete('sid')
             window.history.pushState({}, '', url);
         } else {
-            console.log('no sid')
             setInitialQueryPanes([{ title: 'Column 1', key: '1' }])
             setInitialCalcsPanes([{ title: 'Calculation 1', key: '1' }])
         }
