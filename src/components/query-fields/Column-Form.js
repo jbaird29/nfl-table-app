@@ -7,6 +7,7 @@ import filtersGeneral from '../../inputs/filtersGeneral.json'
 import teamList from '../../inputs/teamList.json'
 import playerList from '../../inputs/playerList.json'
 
+const yearsList = [{value: '2020'}, {value: '2019'}, {value: '2018'}, {value: '2017'}, {value: '2016'}]
 
 export default function ColumnForm(props) {
 
@@ -40,7 +41,7 @@ export default function ColumnForm(props) {
                 (current.columns[props.colIndex].field !== prev.columns[props.colIndex].field)}
             >
             { ({getFieldValue}) => {
-                const field = getFieldValue( ['columns', props.colIndex, 'field'])   // pass_yards_sum || undefined
+                const field = getFieldValue(['columns', props.colIndex, 'field'])   // pass_yards_sum || undefined
 
                 const statType = !field ? null : 
                                 (field.includes('pass') ? 'pass' :
@@ -66,11 +67,26 @@ export default function ColumnForm(props) {
         ))
     )
 
+    const renderRowTypeFilter = (fieldName, fieldLabel, fieldOptions) => (
+        <Form.Item noStyle shouldUpdate={(prev, current) =>
+            (!current.row || !prev.row) ? true :
+            (current.row.field !== prev.row.field)}>
+            {({ getFieldValue }) =>
+                getFieldValue(['row', 'field']) !== fieldName ? (
+                <Form.Item name={['columns', props.colIndex, 'filters', fieldName]} label={`Select ${fieldLabel}`}
+                    labelCol={{span: 16}} wrapperCol={{span: 8}} >
+                    <Select showSearch={true} allowClear={true} placeholder={fieldLabel} options={fieldOptions}/>
+                </Form.Item>
+                ) : null
+            }
+        </Form.Item>
+    )
+
     return (
     <>
 
             <Form.Item name={['columns', props.colIndex, 'title']} label='Enter a Column Title'
-                tooltip={{ title: 'This title will appear in the table above this column. If no title is entred, it will be titled based on the Stat Type & Year.', 
+                tooltip={{ title: 'This title will appear in the table above this column. If no title is entred, it will be titled based on the Stat Type.', 
                 icon: <InfoCircleOutlined /> }}>
                 <Input autoComplete="off" placeholder="Title (Optional)" style={{textAlign: "center"}} />
             </Form.Item>
@@ -80,22 +96,11 @@ export default function ColumnForm(props) {
                 <Select {...selectProps}/>
             </Form.Item>
 
-            <Divider orientation="center" plain>Recommended Filters (Optional)</Divider>
-            
-            <Form.Item name={['columns', props.colIndex, 'filters', 'season_year']} label="Select Year"
-                labelCol={{span: 16}} wrapperCol={{span: 8}} >
-                <Select placeholder="Year" options={[{value: '2020'}, {value: '2019'}, {value: '2018'}, {value: '2017'}, {value: '2016'}]}/>
-            </Form.Item>
+            <Divider orientation="center" plain>Recommended Filters</Divider>
 
-            <Form.Item name={['columns', props.colIndex, 'filters', 'team_name']} label="Select Team"
-                labelCol={{span: 16}} wrapperCol={{span: 8}} >
-                <Select placeholder="Team" showSearch={true} allowClear={true} options={teamList}/>
-            </Form.Item>
-
-            <Form.Item name={['columns', props.colIndex, 'filters', 'player_name_with_position']} label="Select Player"
-                labelCol={{span: 16}} wrapperCol={{span: 8}} >
-                <Select placeholder="Player" showSearch={true} allowClear={true} options={playerList}/>
-            </Form.Item>
+            {renderRowTypeFilter('season_year', 'Year', yearsList)}
+            {renderRowTypeFilter('team_name', 'Team', teamList)}
+            {renderRowTypeFilter('player_name_with_position', 'Player', playerList)}
 
             <Divider orientation="center" plain>General Filters (Optional)</Divider>
 

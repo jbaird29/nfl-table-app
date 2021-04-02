@@ -188,7 +188,7 @@ function App() {
         .then(values => submitQuery(values))
         .catch(errorInfo => {
             // console.log(errorInfo);
-            message.error({content: 'Ensure every column has a stat type and year selected.', duration: 2.5, style: {fontSize: '1rem'} })
+            message.error({content: 'Ensure every column has a stat type selected.', duration: 2.5, style: {fontSize: '1rem'} })
         })
     }
 
@@ -280,7 +280,7 @@ function App() {
         <Layout >
         
 
-            <Header style={{backgroundColor: '#FFF', margin: '0 5px', padding: '0 10px'}}>
+            <Header style={{backgroundColor: '#FFF', margin: '5px', padding: '0 10px'}}>
                 <Row>
                 <Col span={12}>
                     <Image style={{padding: '8px 0px', }} width={200} src={logo} alt='logo' />
