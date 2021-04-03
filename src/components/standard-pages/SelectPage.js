@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import {Radio, Row, Col, Typography, Select, Divider, message, } from 'antd';
 import teamList from '../../inputs/teamList.json'
 import playerList from '../../inputs/playerList.json'
-import {addRenderSorterToTable} from '../helper-functions'
+import {loadStandardPage, } from '../helper-functions'
 
 export default function SelectPage(props) {
     const [pageType, setPageType] = useState('player')
@@ -11,24 +11,8 @@ export default function SelectPage(props) {
     // todo - add logic for toggling between Pass / Rush / Recv stats
     // todo - add a 'position' filter before player?
 
-    const onPlayerSelect = (player) => getData('player', player) 
-    const onTeamSelect = (team) => getData('team', team) 
-
-    const getData = async (rowType, row) => {
-        const hide = message.loading({content: 'Loading the data', style: {fontSize: '1rem'}}, 0)
-        const response = await fetch(`/loadStandardPage?rowType=${rowType}&row=${row}`, { method: 'GET'})
-        if (response.status === 200) {
-            const tableData = await response.json();
-            addRenderSorterToTable(tableData)
-            props.setTableData(tableData)
-            props.setSavedCalcsFields(null)
-            props.setSavedQueryFields(null)
-            hide()
-        } else {
-            message.error({content: 'An error occurred. Please refresh the page and try again.', duration: 5, style: {fontSize: '1rem'} })
-            hide()
-        }
-    }
+    const onPlayerSelect = (player) => props.loadStandardPage('player', player) 
+    const onTeamSelect = (team) => props.loadStandardPage('team', team) 
 
     const selectStyle = {
         width: '85%'

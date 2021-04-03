@@ -9,7 +9,7 @@ import RowForm from './query-fields/Row-Form'
 import WhereForm from './query-fields/Where-Form'
 import CustomCalcTabs from './custom-calcs/Custom-Calc-Tabs'
 import SelectPage from './standard-pages/SelectPage'
-import {toCSV, copyTableWithoutCalcs, addCalcsToTable, addRenderSorterToTable} from './helper-functions'
+import {loadStandardPage, toCSV, copyTableWithoutCalcs, addCalcsToTable, addRenderSorterToTable} from './helper-functions'
 import logo from '../images/logo.png'
 
 const { Header, Sider, Content, Footer } = Layout;
@@ -43,8 +43,45 @@ function App() {
 
     useEffect(() => {
         setLoadingPage(true)
-        loadState()
+        const url = new URL(window.location)
+        const sid = url.searchParams.get('sid')
+        const type = url.searchParams.get('type')
+        const resource = url.searchParams.get('resource')
+        if (sid) {
+            loadState(sid)
+        } else {
+            setInitialQueryPanes([{ title: 'Col 1', key: '1' }])
+            setInitialCalcsPanes([{ title: 'Calc 1', key: '1' }])
+        }
+        if (type && resource) {
+            loadStandardPage(type, resource)
+        }
+        setLoadingPage(false)
     }, []);
+
+    async function loadStandardPage(type, resource) {
+        const url = new URL(window.location)
+        const hide = message.loading({content: 'Loading the data', style: {fontSize: '1rem'}}, 0)
+        const response = await fetch(`/loadStandardPage?type=${type}&resource=${resource}`, { method: 'GET'})
+        if (response.status === 200) {
+            const tableData = await response.json();
+            addRenderSorterToTable(tableData)
+            setTableData(tableData)
+            setSavedCalcsFields(null)
+            setSavedQueryFields(null)
+            hide()
+            url.searchParams.set('type', type)
+            url.searchParams.set('resource', resource)
+            window.history.pushState({}, '', url)
+        } else {
+            message.error({content: 'An error occurred. Please refresh the page and try again.', duration: 5, style: {fontSize: '1rem'} })
+            hide()
+            url.searchParams.delete('type')
+            url.searchParams.delete('resource')
+            window.history.pushState({}, '', url)
+        }
+    }
+    
 
     // ?sid=a~j-X0qNUJmB9SjtujjB        = basic test with cols and calcs
     // ?sid=1Q1yy-YLX8ijesPJepLK        = basic test with cols anc calcs
@@ -54,43 +91,36 @@ function App() {
     //                                    ASSERT that Calcs form is empty
     // ?sid=5TjRMklHXcivbsQYzJSf        = 8 columns & 4 calcs
 
-    async function loadState() {
+    async function loadState(sid) {
         const url = new URL(window.location)
-        const sid = url.searchParams.get('sid')
-        if(sid) {
-            const response = await fetch(`/loadState?sid=${sid}`, { method: 'GET'})
-            if (response.status === 200) {
-                const data = await response.json()
-                const {queryFields, calcsFields, tableData } = data
-                if (queryFields) {
-                    setInitialQueryPanes(Object.keys(queryFields.columns).map(colIndex => ({ title: `Col ${colIndex.slice(3)}`, key: `${colIndex.slice(3)}` })))
-                    queryForm.setFieldsValue(queryFields)
-                    setSavedQueryFields(queryFields)
-                    addRenderSorterToTable(tableData)
-                } else {
-                    setInitialQueryPanes([{ title: 'Col 1', key: '1' }])
-                }
-                if (calcsFields) {
-                    setInitialCalcsPanes(Object.keys(calcsFields).map(calcIndex => ({ title: `Calc ${calcIndex.slice(4)}`, key: `${calcIndex.slice(4)}` })))
-                    calcsForm.setFieldsValue(calcsFields)   
-                    addCalcsToTable(tableData, calcsFields)
-                    setSavedCalcsFields(calcsFields)
-                } else {
-                    setInitialCalcsPanes([{ title: 'Calc 1', key: '1' }])
-                }
-                setTableData(tableData)             
+        const response = await fetch(`/loadState?sid=${sid}`, { method: 'GET'})
+        if (response.status === 200) {
+            const data = await response.json()
+            const {queryFields, calcsFields, tableData } = data
+            if (queryFields) {
+                setInitialQueryPanes(Object.keys(queryFields.columns).map(colIndex => ({ title: `Col ${colIndex.slice(3)}`, key: `${colIndex.slice(3)}` })))
+                queryForm.setFieldsValue(queryFields)
+                setSavedQueryFields(queryFields)
+                addRenderSorterToTable(tableData)
             } else {
-                console.log('An error occurred')
-                message.error({content: `There was an error loading that page. Unfortunately the link is no longer valid.`, duration: 2.5, style: {fontSize: '1rem'} })
+                setInitialQueryPanes([{ title: 'Col 1', key: '1' }])
             }
-            url.searchParams.delete('sid')
-            window.history.pushState({}, '', url);
+            if (calcsFields) {
+                setInitialCalcsPanes(Object.keys(calcsFields).map(calcIndex => ({ title: `Calc ${calcIndex.slice(4)}`, key: `${calcIndex.slice(4)}` })))
+                calcsForm.setFieldsValue(calcsFields)   
+                addCalcsToTable(tableData, calcsFields)
+                setSavedCalcsFields(calcsFields)
+            } else {
+                setInitialCalcsPanes([{ title: 'Calc 1', key: '1' }])
+            }
+            setTableData(tableData)             
         } else {
-            setInitialQueryPanes([{ title: 'Col 1', key: '1' }])
-            setInitialCalcsPanes([{ title: 'Calc 1', key: '1' }])
+            console.log('An error occurred')
+            message.error({content: `There was an error loading that page. Unfortunately the link is no longer valid.`, duration: 2.5, style: {fontSize: '1rem'} })
         }
-        setLoadingPage(false)
-    }
+        url.searchParams.delete('sid')
+        window.history.pushState({}, '', url);
+    } 
 
     async function saveState() {
         const saveData = {queryFormV, calcsFormV, queryFields: savedQueryFields, calcsFields: savedCalscFields}
@@ -143,6 +173,10 @@ function App() {
 
     async function submitQuery(formFields) {
         const hide = message.loading({content: 'Loading the data', style: {fontSize: '1rem'}}, 0)
+        const url = new URL(window.location)
+        url.searchParams.delete('type')
+        url.searchParams.delete('resource')
+        window.history.pushState({}, '', url)
         try {
             const fetchOptions = { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(formFields) } 
             const response = await fetch(`/runQuery`, fetchOptions)
@@ -274,7 +308,7 @@ function App() {
                     <Row style={{padding: '6px 12px'}}><Button block={true} type="secondary" onClick={handleShowCalc}>Edit Custom Calcs</Button></Row>
                 </TabPane>
                 <TabPane tab="Standard Pages" key="2">
-                    <SelectPage setTableData={setTableData} setSavedCalcsFields={setSavedCalcsFields} setSavedQueryFields={setSavedQueryFields} />
+                    <SelectPage loadStandardPage={loadStandardPage} />
                 </TabPane>
             </Tabs>
         </Sider>

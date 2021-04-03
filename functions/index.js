@@ -91,12 +91,12 @@ exports.loadState = functions.https.onRequest(async function(req, res){
 
 
 exports.loadStandardPage = functions.https.onRequest(async function(req, res){
-    const {rowType, row} = req.query
-    console.log(row)
-    const partitionID  = rowType === 'player' ? playerPartitionLookup[row]  : teamPartitionLookup[row]
-    const sqlParition  = rowType === 'player' ? 'partition_player_id'       : 'partition_team_id'
-    const sqlDimension = rowType === 'player' ? 'player_name_with_position' : 'team_name'
-    const sqlTableName = rowType === 'player' ? meta.tbls.player_stats.sqlName : meta.tbls.team_stats.sqlName
+    const {type, resource} = req.query
+    const partitionID  = type === 'player' ? playerPartitionLookup[resource]  : teamPartitionLookup[resource]
+    const sqlParition  = type === 'player' ? 'partition_player_id'       : 'partition_team_id'
+    const sqlDimension = type === 'player' ? 'player_name_with_position' : 'team_name'
+    const sqlTableName = type === 'player' ? meta.tbls.player_stats.sqlName : meta.tbls.team_stats.sqlName
+    if (!partitionID) {res.status(400).send({error: "Could not complete request with given parameters."}) }
 
     let sql = `SELECT * EXCEPT(${sqlParition}, ${sqlDimension}) FROM ${sqlTableName}`
     sql +=    ` WHERE ${sqlParition} = ${partitionID} ORDER BY 1 ASC`
