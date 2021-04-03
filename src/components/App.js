@@ -274,7 +274,7 @@ function App() {
                     <Row style={{padding: '6px 12px'}}><Button block={true} type="secondary" onClick={handleShowCalc}>Edit Custom Calcs</Button></Row>
                 </TabPane>
                 <TabPane tab="Standard Pages" key="2">
-                    <SelectPage />
+                    <SelectPage setTableData={setTableData} setSavedCalcsFields={setSavedCalcsFields} setSavedQueryFields={setSavedQueryFields} />
                 </TabPane>
             </Tabs>
         </Sider>
