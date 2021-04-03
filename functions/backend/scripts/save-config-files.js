@@ -5,7 +5,8 @@ const bq = require('../queries/bigquery');
 const relativePath = '../../../src/inputs/'
 
 async function writePlayerList() {
-    const sqlPlayerList = `SELECT  DISTINCT ${dims.player_name_with_position.sql}
+    // some players change positions (e.g. FS to CB) - this will take whatever the most recent position is for that player
+    const sqlPlayerList = `SELECT DISTINCT ${dims.player_name_with_position.sql}
         FROM ${tbls.prod.sqlName} WHERE ${dims.player_position.sql} in ('QB', 'RB', 'WR', 'TE') ORDER BY 1 ASC`
     const playerResult = await bq.runQuery(sqlPlayerList)
     const playerList = playerResult.map(row => ({value: `'${row.player_name_with_position}'`, label: row.player_name_with_position}) )

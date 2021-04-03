@@ -86,7 +86,15 @@ class Table {
         toTableField: 'game_id',
         fromTableField: 'id'
     }
- })
+})
+tbls.player_stats = new Table({
+    name: 'player_stats',
+    sqlName: '`nfl-table.main.player_stats`'
+})
+tbls.team_stats = new Table({
+    name: 'team_stats',
+    sqlName: '`nfl-table.main.team_stats`'
+})
 
 
 
@@ -95,8 +103,8 @@ class Table {
  * ------------------------------------------------------------------------------------------------------------
  */
 class Dimension {
-    constructor({sql, creationSQL, statType, title, 
-    shortTitle = title, description = '', expose = false, width = '75px', dataType = 'number', format = 'dec_0'}) {
+    constructor({sql, creationSQL, statType, title, expose = false,
+    shortTitle = title, description = '', width = '75px', dataType = 'number', format = 'dec_0'}) {
         assert(typeof sql !== 'undefined',  'Missing sql')
         assert(typeof creationSQL !== 'undefined',  'Missing buildSQL')
         assert(typeof statType !== 'undefined',  'Missing statType')
@@ -130,8 +138,8 @@ class Dimension {
  */
  class Aggregate {
     // statType must be 4 characters long
-    constructor({name, sql, statType, title, 
-    shortTitle = title, description = '', expose = true, width = '75px', dataType = 'number', format = 'dec_0'}) {
+    constructor({name, sql, statType, title, expose = true, includeInSummary = false,
+    shortTitle = title, description = '', width = '75px', dataType = 'number', format = 'dec_0'}) {
         assert(typeof name !== 'undefined',  'Missing name')
         assert(typeof sql !== 'undefined',  'Missing sql')
         assert(typeof statType !== 'undefined',  'Missing statType')
@@ -147,6 +155,7 @@ class Dimension {
         this.shortTitle = shortTitle
         this.description = description
         this.expose = expose
+        this.includeInSummary = includeInSummary
         this.width = width
         this.dataType = dataType
         this.format = format
@@ -226,65 +235,6 @@ dims.stat_type = new Dimension({
     format: 'string',
 })
 // ------------------------------------------------------------------------------------------------------------
-dims.player_name = new Dimension({
-    sql: 'player_name',
-    creationSQL: `${tbls.s.name}.player_name`,
-    statType: 'general',
-    title: 'Player Name',
-    shortTitle: 'Player',
-    width: '175px',
-    dataType: 'string',
-    format: 'string',
-})
-// ------------------------------------------------------------------------------------------------------------
-dims.unclean_position = new Dimension({
-    sql: 'unclean_position',
-    creationSQL: `SPLIT(s.player_position, '/')[SAFE_OFFSET(0)]`,
-    statType: 'general',
-    title: 'Player Position (Unclean)',
-    shortTitle: 'Position',
-    width: '175px',
-    dataType: 'string',
-    format: 'string',
-    description: 'In cases with multiple positions (eg TE/B) takes the first one (these are fairly rare)',
-    values: ['LB', 'WR', 'DB', 'CB', 'DE', 'RB', 'S', 'DT', 'TE', 'T', 'G', 'DL', 'QB', 'OL', 'OLB', 'C', 'K', 'ILB', 'P', 'LS', 'FB', 'NT', 'FS', 'SS', 'OT', 'HB', 'MLB', 'H', 'RT', '$LB', 'LOLB']
-})
-// ------------------------------------------------------------------------------------------------------------
-dims.player_position = new Dimension({
-    sql: 'player_position',
-    creationSQL: `CASE WHEN ${dims.unclean_position.creationSQL} = 'HB' THEN 'RB' ELSE ${dims.unclean_position.creationSQL} END`,
-    statType: 'general',
-    title: 'Player Position',
-    shortTitle: 'Position',
-    width: '175px',
-    dataType: 'string',
-    format: 'string',
-    description: 'In cases with multiple positions (eg TE/B) takes the first one (these are fairly rare); cleans HB to be RB',
-    values: ['LB', 'WR', 'DB', 'CB', 'DE', 'RB', 'S', 'DT', 'TE', 'T', 'G', 'DL', 'QB', 'OL', 'OLB', 'C', 'K', 'ILB', 'P', 'LS', 'FB', 'NT', 'FS', 'SS', 'OT', 'MLB', 'H', 'RT', '$LB', 'LOLB']
-})
-// ------------------------------------------------------------------------------------------------------------
-dims.player_name_with_position = new Dimension({
-    sql: 'player_name_with_position',
-    creationSQL: `${dims.player_name.sql} || ' (' || ${dims.player_position.sql} || ')'`,
-    statType: 'general',
-    title: 'Player Name (Position)',
-    shortTitle: 'Player',
-    width: '175px',
-    dataType: 'string',
-    format: 'string',
-})
-// ------------------------------------------------------------------------------------------------------------
-dims.team_name = new Dimension({
-    sql: 'team_name',
-    creationSQL: `CASE WHEN ${tbls.s.name}.team_name = 'Redskins' THEN 'Football Team' ELSE ${tbls.s.name}.team_name END`,
-    statType: 'general',
-    title: 'Team Name',
-    shortTitle: 'Team',
-    width: '175px',
-    dataType: 'string',
-    format: 'string',
-})
-// ------------------------------------------------------------------------------------------------------------
 dims.season_year = new Dimension({
     sql: 'season_year',
     creationSQL: `${tbls.g.name}.summary_season_year`,
@@ -316,6 +266,109 @@ dims.venue_name = new Dimension({
     width: '175px',
     dataType: 'string',
     format: 'string',
+})
+// ------------------------------------------------------------------------------------------------------------
+dims.player_id = new Dimension({
+    sql: 'player_id',
+    creationSQL: `${tbls.s.name}.player_id`,
+    statType: 'general',
+    title: 'Player ID',
+})
+// ------------------------------------------------------------------------------------------------------------
+dims.player_name = new Dimension({
+    sql: 'player_name',
+    creationSQL: `${tbls.s.name}.player_name`,
+    statType: 'general',
+    title: 'Player Name',
+    shortTitle: 'Player',
+    width: '175px',
+    dataType: 'string',
+    format: 'string',
+})
+// ------------------------------------------------------------------------------------------------------------
+dims.unclean_position = new Dimension({
+    sql: 'unclean_position',
+    creationSQL: `SPLIT(s.player_position, '/')[SAFE_OFFSET(0)]`,
+    statType: 'general',
+    title: 'Player Position (Unclean)',
+    shortTitle: 'Position',
+    width: '175px',
+    dataType: 'string',
+    format: 'string',
+    description: 'In cases with multiple positions (eg TE/B) takes the first one (these are fairly rare)',
+    values: ['LB', 'WR', 'DB', 'CB', 'DE', 'RB', 'S', 'DT', 'TE', 'T', 'G', 'DL', 'QB', 'OL', 'OLB', 'C', 'K', 'ILB', 'P', 'LS', 'FB', 'NT', 'FS', 'SS', 'OT', 'HB', 'MLB', 'H', 'RT', '$LB', 'LOLB']
+})
+// ------------------------------------------------------------------------------------------------------------
+dims.player_position_history = new Dimension({
+    sql: 'player_position_history',
+    creationSQL: `CASE WHEN ${dims.unclean_position.creationSQL} = 'HB' THEN 'RB' ELSE ${dims.unclean_position.creationSQL} END`,
+    statType: 'general',
+    title: 'Player Position',
+    shortTitle: 'Position',
+    width: '175px',
+    dataType: 'string',
+    format: 'string',
+    description: 'Cleans HB to be RB',
+    values: ['LB', 'WR', 'DB', 'CB', 'DE', 'RB', 'S', 'DT', 'TE', 'T', 'G', 'DL', 'QB', 'OL', 'OLB', 'C', 'K', 'ILB', 'P', 'LS', 'FB', 'NT', 'FS', 'SS', 'OT', 'MLB', 'H', 'RT', '$LB', 'LOLB']
+})
+// ------------------------------------------------------------------------------------------------------------
+dims.player_position = new Dimension({
+    sql: 'player_position',
+    creationSQL: `FIRST_VALUE(${dims.player_position_history.creationSQL}) OVER (PARTITION BY ${dims.player_id.creationSQL} ORDER BY ${dims.season_year.creationSQL} DESC, ${dims.season_week.creationSQL} DESC)`,
+    statType: 'general',
+    title: 'Player Position',
+    shortTitle: 'Position',
+    width: '175px',
+    dataType: 'string',
+    format: 'string',
+    description: 'In cases where a player changed positions (e.g. from FS to CB), this takes the most recent position',
+    values: ['LB', 'WR', 'DB', 'CB', 'DE', 'RB', 'S', 'DT', 'TE', 'T', 'G', 'DL', 'QB', 'OL', 'OLB', 'C', 'K', 'ILB', 'P', 'LS', 'FB', 'NT', 'FS', 'SS', 'OT', 'MLB', 'H', 'RT', '$LB', 'LOLB']
+})
+// ------------------------------------------------------------------------------------------------------------
+dims.player_name_with_position = new Dimension({
+    sql: 'player_name_with_position',
+    creationSQL: `${dims.player_name.creationSQL} || ' (' || ${dims.player_position.creationSQL} || ')'`,
+    statType: 'general',
+    title: 'Player Name (Position)',
+    shortTitle: 'Player',
+    width: '175px',
+    dataType: 'string',
+    format: 'string',
+})
+// ------------------------------------------------------------------------------------------------------------
+dims.partition_player_id = new Dimension({
+    sql: 'partition_player_id',
+    creationSQL: `DENSE_RANK() OVER (ORDER BY ${dims.player_id.creationSQL} ASC)`,
+    statType: 'general',
+    title: 'Partition Player ID',
+    description: 'This is used as the Partition Key for Materialized Views (which require an integer key).'
+})
+// ------------------------------------------------------------------------------------------------------------
+dims.team_name = new Dimension({
+    sql: 'team_name',
+    creationSQL: `CASE WHEN ${tbls.s.name}.team_name = 'Redskins' THEN 'Football Team' ELSE ${tbls.s.name}.team_name END`,
+    statType: 'general',
+    title: 'Team Name',
+    shortTitle: 'Team',
+    width: '175px',
+    dataType: 'string',
+    format: 'string',
+})
+// ------------------------------------------------------------------------------------------------------------
+dims.team_id = new Dimension({
+    sql: 'team_id',
+    creationSQL: `${tbls.s.name}.team_id`,
+    statType: 'general',
+    title: 'Team ID',
+    description: 'NOTE: Chargers and Raiders have two different IDs when they change cities.'
+})
+// ------------------------------------------------------------------------------------------------------------
+dims.partition_team_id = new Dimension({
+    sql: 'partition_team_id',
+    creationSQL: `DENSE_RANK() OVER (ORDER BY ${dims.team_name.creationSQL} ASC)`,
+    statType: 'general',
+    title: 'Partition Player ID',
+    description: 'This is used as the Partition Key for Materialized Views (which require an integer key).'
 })
 
 
@@ -606,16 +659,9 @@ dims.recv_was_touchdown = new Dimension({
 //* -----------------------------------------------------------------------------------------------------------
 //* Pass Aggregates
 //* -----------------------------------------------------------------------------------------------------------
-aggs.pass_yards_sum = new Aggregate({
-    name: 'pass_yards_sum',
-    title: 'Pass Yards',
-    shortTitle: 'Pass YDS', 
-    statType: 'pass',
-    sql: `SUM(CASE WHEN true THEN ${dims.pass_yards.sql} ELSE NULL END)`, 
-})
 aggs.pass_completions_sum = new Aggregate({
     name: 'pass_completions_sum',
-    expose: true,   // only used as helper agg in CMP % field; this can be calculated by user with a filter on pass_attempts
+    includeInSummary: true,
     title: 'Pass Completions', 
     shortTitle: 'Pass CMP',
     statType: 'pass',
@@ -623,6 +669,7 @@ aggs.pass_completions_sum = new Aggregate({
 })
 aggs.pass_attempts_sum = new Aggregate({
     name: 'pass_attempts_sum',
+    includeInSummary: true,
     title: 'Pass Attempts', 
     shortTitle: 'Pass ATT',
     statType: 'pass',
@@ -630,14 +677,24 @@ aggs.pass_attempts_sum = new Aggregate({
 })
 aggs.pass_completion_percentage = new Aggregate({
     name: 'pass_completion_percentage',
+    includeInSummary: true,
     title: 'Pass Completion %', 
     shortTitle: 'Pass CMP %',
     statType: 'pass',
     sql: `${aggs.pass_completions_sum.sql} / ${aggs.pass_attempts_sum.sql}`, 
     format: 'percent', 
 })
+aggs.pass_yards_sum = new Aggregate({
+    name: 'pass_yards_sum',
+    includeInSummary: true,
+    title: 'Pass Yards',
+    shortTitle: 'Pass YDS', 
+    statType: 'pass',
+    sql: `SUM(CASE WHEN true THEN ${dims.pass_yards.sql} ELSE NULL END)`, 
+})
 aggs.pass_touchdowns_sum = new Aggregate({
     name: 'pass_touchdowns_sum',
+    includeInSummary: true,
     title: 'Pass Touchdowns', 
     shortTitle: 'Pass TDS', 
     statType: 'pass',
@@ -645,6 +702,7 @@ aggs.pass_touchdowns_sum = new Aggregate({
 })
 aggs.pass_interceptions_sum = new Aggregate({
     name: 'pass_interceptions_sum',
+    includeInSummary: true,
     title: 'Pass Interceptions', 
     shortTitle: 'Pass INT', 
     statType: 'pass',
@@ -652,6 +710,7 @@ aggs.pass_interceptions_sum = new Aggregate({
 })
 aggs.pass_rating = new Aggregate({
     name: 'pass_rating',
+    includeInSummary: true,
     title: 'Passer Rating', 
     shortTitle: 'Pass RTG', 
     statType: 'pass',
@@ -708,34 +767,38 @@ aggs.pass_on_target_percentage = new Aggregate({
 //* -----------------------------------------------------------------------------------------------------------
 //* Rush Aggregates
 //* -----------------------------------------------------------------------------------------------------------
-aggs.rush_yards_sum = new Aggregate({
-    name: 'rush_yards_sum',
-    title: 'Rushing Yards', 
-    shortTitle: 'Rush YDS', 
-    statType: 'rush',
-    sql: `SUM(CASE WHEN true THEN ${dims.rush_yards.sql} ELSE NULL END)`, 
-})
 aggs.rush_attempts_sum = new Aggregate({
     name: 'rush_attempts_sum',
+    includeInSummary: true,
     title: 'Rushing Attempts', 
     shortTitle: 'Rush ATT', 
     statType: 'rush',
     sql: `SUM(CASE WHEN true THEN ${dims.rush_was_attempt.sql}  ELSE NULL END)`, 
 })
-aggs.rush_touchdowns_sum = new Aggregate({
-    name: 'rush_touchdowns_sum',
-    title: 'Rush Touchdowns', 
-    shortTitle: 'Rush TDS', 
+aggs.rush_yards_sum = new Aggregate({
+    name: 'rush_yards_sum',
+    includeInSummary: true,
+    title: 'Rushing Yards', 
+    shortTitle: 'Rush YDS', 
     statType: 'rush',
-    sql: `SUM(CASE WHEN true THEN ${dims.rush_was_touchdown.sql} ELSE NULL END)`, 
+    sql: `SUM(CASE WHEN true THEN ${dims.rush_yards.sql} ELSE NULL END)`, 
 })
 aggs.rush_yards_per_attempt = new Aggregate({
     name: 'rush_yards_per_attempt',
+    includeInSummary: true,
     title: 'Yards / Rush', 
     shortTitle: 'Rush Y/A', 
     statType: 'rush',
     sql: `${aggs.rush_yards_sum.sql} / ${aggs.rush_attempts_sum.sql}`, 
     format: 'dec_1', 
+})
+aggs.rush_touchdowns_sum = new Aggregate({
+    name: 'rush_touchdowns_sum',
+    includeInSummary: true,
+    title: 'Rush Touchdowns', 
+    shortTitle: 'Rush TDS', 
+    statType: 'rush',
+    sql: `SUM(CASE WHEN true THEN ${dims.rush_was_touchdown.sql} ELSE NULL END)`, 
 })
 aggs.rush_broken_tackles_sum = new Aggregate({
     name: 'rush_broken_tackles_sum',

@@ -8,6 +8,7 @@ import ColumnTabs from './query-fields/Column-Tabs'
 import RowForm from './query-fields/Row-Form'
 import WhereForm from './query-fields/Where-Form'
 import CustomCalcTabs from './custom-calcs/Custom-Calc-Tabs'
+import SelectPage from './standard-pages/SelectPage'
 import {toCSV, copyTableWithoutCalcs, addCalcsToTable, addRenderSorterToTable} from './helper-functions'
 import logo from '../images/logo.png'
 
@@ -267,12 +268,13 @@ function App() {
     <Layout style={{ minHeight: '100vh' }}>
     
         <Sider width={300} style={{backgroundColor: '#FFF', textAlign: 'center'}}>
-            <Tabs centered defaultActiveKey="1" onChange={(key) => console.log(key)}>
+            <Tabs centered defaultActiveKey="1">
                 <TabPane tab="Custom Query" key="1">
                     <Row style={{padding: '6px 12px'}}><Button block={true} type="primary" onClick={() => setIsFieldDrawerVisible(true)}>Edit Fields</Button></Row>
                     <Row style={{padding: '6px 12px'}}><Button block={true} type="secondary" onClick={handleShowCalc}>Edit Custom Calcs</Button></Row>
                 </TabPane>
-                <TabPane tab="Standard Stats" key="2">
+                <TabPane tab="Standard Pages" key="2">
+                    <SelectPage />
                 </TabPane>
             </Tabs>
         </Sider>
@@ -297,7 +299,7 @@ function App() {
 
             <Content style={{margin: '0 5px'}}>
                 {!tableData.columns 
-                ? <Footer style={{ textAlign: 'center', height: '22', padding: '20px 0px'}}>NFL Plays Table ©{new Date().getFullYear()} Created by Jon Baird</Footer>
+                ? <Footer style={{ textAlign: 'center', height: '22', padding: '20px 0px'}}>NFL Table ©{new Date().getFullYear()} Created by Jon Baird</Footer>
                 : <Table tableData={tableData} />
                 }
                 
