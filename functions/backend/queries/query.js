@@ -31,6 +31,7 @@ module.exports.Query = class Query {
 
     /** Given a column object {field: 'sum_yds_pass', filters: {pass_was_blitzed: 1, pass_pocket_time: [0, 3.5]} }
      **   returns a SQL string => `SUM(CASE WHEN pass_was_blitzed = 1 ... THEN yds_pass ELSE NULL END)`
+     **   Note: the 'AS' alias should NOT be here because I need this function for HAVING    
     */ 
     buildColumnSQL(column) {
         const {field, filters} = column
@@ -38,9 +39,12 @@ module.exports.Query = class Query {
         const filtersSQLArray = Object.entries(filters)
                                 .filter(([name, values]) => values && (Array.isArray(values) ? values.length > 0 : true))
                                 .map(([name, values]) => (this.buildFilterSQL(name, values)))
-        const filtersSQLString = filtersSQLArray.join(' AND ')
-        const queryString = sql.replace(/true/g, `true AND ${filtersSQLString}`)  //TODO- use replaceAll
-        return `${queryString}`   // Note: the 'AS' alias should NOT be here because I need this function for HAVING
+        if (filtersSQLArray.length > 1) {
+            const filtersSQLString = filtersSQLArray.join(' AND ')
+            return sql.replace(/true/g, `true AND ${filtersSQLString}`)  //TODO- use replaceAll
+        } else {
+            return sql
+        }
     }
 
     /** Given an object of columns --> {col1: {field, filters}, col2: {field, filters} }
@@ -153,7 +157,7 @@ module.exports.Query = class Query {
         // default title will include year if year is selected
         const defaultTitle = `${shortTitle}` + (!filters.season_year ? '' : ` (${filters.season_year})`)
         return ({
-            title: `Column ${colIndex.slice(3)}`, 
+            title: `Col ${colIndex.slice(3)}`, 
             align: 'center', 
             key: `wrapper_${colIndex}`,
             children: [{

@@ -814,6 +814,8 @@ fltrs.player_position = new Filter(dims.player_position, {
     placement: 'where',
     formProps: {
         label: 'Player Position',
+        labelCol: {span: 12}, 
+        wrapperCol: {span: 12}
     }, ui: {
     type: 'select',
     props: {

@@ -60,7 +60,7 @@ export function addRenderSorterToTable(tableData) {
 export function buildTableCalcColumn(calcIndex, calc) {
     const {colIndex1, operation, colIndex2, format, title} = calc
     const newColumn = {
-        title: `Calculation ${calcIndex.slice(4)}`,  // extracts '10' from 'calc10'
+        title: `Calc ${calcIndex.slice(4)}`,  // extracts '10' from 'calc10'
         align: 'center',
         children: [{
             dataIndex: calcIndex, 
@@ -114,7 +114,7 @@ export function addCalcsToTable(tableData, calcsFields) {
  * @returns tableData
  */
 export function copyTableWithoutCalcs(tableData) {
-    const newColumns = tableData.columns.filter(column => !column.title.startsWith('Calculation'))
+    const newColumns = tableData.columns.filter(column => !column.title.startsWith('Calc'))
     const newDataSource = tableData.dataSource.map(row => (
         Object.assign(...Object.keys(row)
         .filter(key => !key.startsWith('calc'))

@@ -21,15 +21,6 @@ export default function ColumnForm(props) {
         options: statsInputs
     }
 
-    const yearProps = {
-        placeholder: "Year",
-        options: [{value: '2020'}, {value: '2019'}, {value: '2018'}, {value: '2017'}, {value: '2016'}]
-    }
-
-    const minInputProps = {
-        style: {width: '50%', marginLeft: '50%'}
-    }
-
     // renderFilterObject takes filter, name, key as parameters
     const renderColFilterObject = (filter) => (
         renderFilterObject(filter, ['columns', props.colIndex, 'filters', filter.name], `${props.colIndex}_${filter.name}`)    
@@ -98,7 +89,7 @@ export default function ColumnForm(props) {
             <Form.Item name={['columns', props.colIndex, 'having']} label="Minimum Value" 
                 tooltip={{ title: 'Example: if you selected "Pass Attempts" as the Stat Type, entering 100 in this box would filter to rows with at least 100 pass attempts', 
                 icon: <InfoCircleOutlined /> }}>
-                <InputNumber {...minInputProps}/>
+                <InputNumber style={{width: '50%', marginLeft: '50%'}}/>
             </Form.Item>
 
             {filtersGeneral.map(filter => renderColFilterObject(filter) )}

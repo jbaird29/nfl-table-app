@@ -73,8 +73,8 @@ function writeFilters(fltrs) {
     });
 }
 
-writePlayerList();
-writeTeamList();
+// writePlayerList();
+// writeTeamList();
 writeStatList(aggs);
 writeFilters(fltrs);
 

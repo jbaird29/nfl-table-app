@@ -62,20 +62,20 @@ function App() {
                 const data = await response.json()
                 const {queryFields, calcsFields, tableData } = data
                 if (queryFields) {
-                    setInitialQueryPanes(Object.keys(queryFields.columns).map(colIndex => ({ title: `Column ${colIndex.slice(3)}`, key: `${colIndex.slice(3)}` })))
+                    setInitialQueryPanes(Object.keys(queryFields.columns).map(colIndex => ({ title: `Col ${colIndex.slice(3)}`, key: `${colIndex.slice(3)}` })))
                     queryForm.setFieldsValue(queryFields)
                     setSavedQueryFields(queryFields)
                     addRenderSorterToTable(tableData)
                 } else {
-                    setInitialQueryPanes([{ title: 'Column 1', key: '1' }])
+                    setInitialQueryPanes([{ title: 'Col 1', key: '1' }])
                 }
                 if (calcsFields) {
-                    setInitialCalcsPanes(Object.keys(calcsFields).map(calcIndex => ({ title: `Calculation ${calcIndex.slice(4)}`, key: `${calcIndex.slice(4)}` })))
+                    setInitialCalcsPanes(Object.keys(calcsFields).map(calcIndex => ({ title: `Calc ${calcIndex.slice(4)}`, key: `${calcIndex.slice(4)}` })))
                     calcsForm.setFieldsValue(calcsFields)   
                     addCalcsToTable(tableData, calcsFields)
                     setSavedCalcsFields(calcsFields)
                 } else {
-                    setInitialCalcsPanes([{ title: 'Calculation 1', key: '1' }])
+                    setInitialCalcsPanes([{ title: 'Calc 1', key: '1' }])
                 }
                 setTableData(tableData)             
             } else {
@@ -85,8 +85,8 @@ function App() {
             url.searchParams.delete('sid')
             window.history.pushState({}, '', url);
         } else {
-            setInitialQueryPanes([{ title: 'Column 1', key: '1' }])
-            setInitialCalcsPanes([{ title: 'Calculation 1', key: '1' }])
+            setInitialQueryPanes([{ title: 'Col 1', key: '1' }])
+            setInitialCalcsPanes([{ title: 'Calc 1', key: '1' }])
         }
         setLoadingPage(false)
     }
@@ -122,7 +122,7 @@ function App() {
 
     function submitCustomCalcs () {
         // FIRST: validate that every colIndex is in tableData
-        const allColIndexes = tableData.columns.filter(column => column.title.startsWith('Column'))
+        const allColIndexes = tableData.columns.filter(column => column.title.startsWith('Col'))
                             .map(column => column.children[0].dataIndex)
         const hasInvalidCol = Object.entries(calcsForm.getFieldsValue())
                             .some(([calcIndex, calc]) => (
@@ -193,8 +193,8 @@ function App() {
     }
 
     
-    function resetQueryForm() { setInitialQueryPanes([{ title: 'Column 1', key: '1' }]); queryForm.resetFields(); setResetQuery(resetQuery+1) }
-    function resetCalcsForm() { setInitialCalcsPanes([{ title: 'Calculation 1', key: '1' }]); calcsForm.resetFields(); setResetCalcs(resetCalcs+1) }
+    function resetQueryForm() { setInitialQueryPanes([{ title: 'Col 1', key: '1' }]); queryForm.resetFields(); setResetQuery(resetQuery+1) }
+    function resetCalcsForm() { setInitialCalcsPanes([{ title: 'Calc 1', key: '1' }]); calcsForm.resetFields(); setResetCalcs(resetCalcs+1) }
 
     function onDownload() {
         const blob = new Blob([toCSV(tableData)], { type: 'text/csv;charset=utf-8;' });
@@ -282,13 +282,13 @@ function App() {
 
             <Header style={{backgroundColor: '#FFF', margin: '5px', padding: '0 10px'}}>
                 <Row>
-                <Col span={12}>
+                <Col span={6}>
                     <Image style={{padding: '8px 0px', }} width={200} src={logo} alt='logo' />
                 </Col>
-                <Col span={12} style={{ textAlign: 'right'}}>
-                    {/* <Button type="danger" onClick={() => console.log(tableData)}>Debug: Table Data</Button>
-                    <Button type="danger" onClick={() => console.log(queryForm.getFieldsValue())}>Debug: Form getFieldsValue</Button>
-                    <Button type="danger" onClick={() => console.log(calcsForm.getFieldsValue())}>Debug: Calc getFieldsValue</Button> */}
+                <Col span={18} style={{ textAlign: 'right'}}>
+                    {/* <Button type="danger" onClick={() => console.log(tableData)}>Table Data</Button>
+                    <Button type="danger" onClick={() => console.log(queryForm.getFieldsValue())}>Form getFieldsValue</Button>
+                    <Button type="danger" onClick={() => console.log(calcsForm.getFieldsValue())}>Calc getFieldsValue</Button> */}
                     <Button type="primary" onClick={onShareURL} shape="round" icon={<CloudUploadOutlined />}>Shareable URL</Button>
                     <Button type="primary" onClick={onDownload} shape="round" icon={<DownloadOutlined />}>Download</Button>
                 </Col>

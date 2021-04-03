@@ -15,7 +15,7 @@ class ColumnTabs extends React.Component {
     };
 
     tabButtons = {
-        right: <Button type="default" onClick={() => this.onDuplicate()}>Duplicate Column</Button>,
+        right: <Button type="default" onClick={() => this.onDuplicate()}>Duplicate Tab</Button>,
     };
 
     onDuplicate = () => {
@@ -38,7 +38,7 @@ class ColumnTabs extends React.Component {
         const { panes } = this.state;
         const activeKey = `${this.tabIndex}`;
         const newPanes = [...panes];
-        newPanes.push({ title: `Column ${this.tabIndex}`, key: activeKey });
+        newPanes.push({ title: `Col ${this.tabIndex}`, key: activeKey });
         this.setState({
             panes: newPanes,
             activeKey,

@@ -15,7 +15,7 @@ export default function CustomCalcForm(props) {
 
 
     const colsInTable = props.tableData.columns && props.tableData.columns.length > 0 ? 
-                        props.tableData.columns.filter(column => column.title.startsWith('Column'))
+                        props.tableData.columns.filter(column => column.title.startsWith('Col'))
                         .map(column => ({label: `${column.title}: ${column.children[0].title}`, value: column.children[0].dataIndex}))
                         // only includes Calculations that have a lower CalcIndex than the current one;
                         // because Calculations are added sequentially to TableData; so later calcs can only draw from earlier ones
@@ -23,10 +23,10 @@ export default function CustomCalcForm(props) {
                             Object.entries(props.calcsForm.getFieldsValue())
                             .filter(([calcIndex, calc]) => calcIndex.slice(4) < props.calcIndex.slice(4))
                             .sort((a, b) => a[0].slice(4) - b[0].slice(4)) 
-                            .map(([calcIndex, calc]) => ({label: `Calculation ${calcIndex.slice(4)}: ${calc.title}`, value: calcIndex}))
+                            .map(([calcIndex, calc]) => ({label: `Calc ${calcIndex.slice(4)}: ${calc.title}`, value: calcIndex}))
                         )
                         : null
-                        // this makes the label "Column 1: Pass Yards 2020, value: "col1"
+                        // this makes the label "Col 1: Pass Yards 2020, value: "col1"
 
     const colSelectProps = {
         placeholder: "column",

@@ -1,20 +1,36 @@
 import React from "react";
 import {Form, Select, Slider, InputNumber, Typography} from 'antd';
 import filtersWhere from '../../inputs/filtersWhere.json'
+import teamList from '../../inputs/teamList.json'
+import playerList from '../../inputs/playerList.json'
+import {renderFilterObject} from './render-filter'
+
+const yearsList = [{value: '2020'}, {value: '2019'}, {value: '2018'}, {value: '2017'}, {value: '2016'}]
+
 const {Title, Paragraph} = Typography
 
 export default function WhereForm(props) {
 
+
     return (<>
             <Paragraph style={{textAlign: 'center'}}>Global filters are optional. These filters will be applied to ALL columns.</Paragraph>
-            {filtersWhere.map(filter => (
-                <Form.Item {...filter.formProps} name={['where', filter.name]} key={filter.name} >
-                {filter.ui.type === 'select' ? <Select {...filter.ui.props} /> : 
-                    filter.ui.type === 'slider' ? <Slider {...filter.ui.props} /> : 
-                    filter.ui.type === 'inputNumber' ? <InputNumber {...filter.ui.props} /> : null
-                    }
-                </Form.Item>
-            ))}
+
+            <Form.Item name={['where', 'season_year']} label={`Select Years`}
+                labelCol={{span: 12}} wrapperCol={{span: 12}} >
+                <Select mode="multiple" showSearch={true} allowClear={true} placeholder='Year' options={yearsList}/>
+            </Form.Item>
+
+            <Form.Item name={['where', 'team_name']} label={`Select Teams`}
+                labelCol={{span: 12}} wrapperCol={{span: 12}} >
+                <Select mode="multiple" showSearch={true} allowClear={true} placeholder='Team' options={teamList}/>
+            </Form.Item>
+
+            <Form.Item name={['where', 'player_name_with_position']} label={`Select Players`}
+                labelCol={{span: 12}} wrapperCol={{span: 12}} >
+                <Select mode="multiple" showSearch={true} allowClear={true} placeholder='Players' options={playerList}/>
+            </Form.Item>
+
+            {filtersWhere.map(filter => renderFilterObject(filter))}
 
         </>
     );

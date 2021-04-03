@@ -27,7 +27,7 @@ export default class CustomCalcTabs extends React.Component {
         const { panes } = this.state;
         const activeKey = `${this.tabIndex}`;
         const newPanes = [...panes];
-        newPanes.push({ title: `Calculation ${this.tabIndex}`, key: activeKey });
+        newPanes.push({ title: `Calc ${this.tabIndex}`, key: activeKey });
         this.setState({
             panes: newPanes,
             activeKey,
