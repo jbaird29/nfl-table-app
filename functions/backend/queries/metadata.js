@@ -1,38 +1,5 @@
 const assert = require('assert');
 
-/*
-----------------------------------------------------------------------------------------------------------------
-This is the spec for a filter
-----------------------------------------------------------------------------------------------------------------
-type: select,                           --> goes as <Select>
-props: {
-  mode: "" (for single) || "multiple"   --> goes as <Select mode="">
-  optionFilterProp: "label",            --> goes as <Select optionFilterProp="">
-  options: [                            --> goes as <Select options=[]>
-  {title: 'optionTitle',                --> will go as the label
-  label: 'optionTitle',                 --> will go as the label (for sorting)
-  value: 'optionSQL',                   --> will go as the value  --> goes into API request
-  key: 'optionSQL',                     --> will go as the key
-  align:'left'}]
-}
-
-type: inputNumber,                      --> goes as <InputNumber>
-props: {                                --> goes as <InputNumber {...props}>
-  min: num,
-}
-
-type: slider,                           --> goes as <Slider>
-props: {                                --> goes as <Slider {...props}>
-  range: true,
-  max: num,
-  min: num,
-  defaultValue: [num, num],
-  marks: {2016: '2016', 2020: '2020'},
-  included: true,
-  style: {margin: '0 25px'}
-}
-
-*/
 
 /** -----------------------------------------------------------------------------------------------------------
  * Global variables for metadata
@@ -74,17 +41,26 @@ class Table {
     name: 'prod',
     sqlName: '`nfl-table.main.prod`',
  })
- tbls.s = new Table({
-    name: 's',
+ tbls.stats = new Table({
+    name: 'stats',
     sqlName: '`nfl-table.main.statistics`',
  })
- tbls.g = new Table({
-    name: 'g',
+ tbls.games = new Table({
+    name: 'games',
     sqlName: '`nfl-table.main.games`',
     sqlJoin: {
-        toTable: tbls.s,
+        toTable: tbls.stats,
         toTableField: 'game_id',
         fromTableField: 'id'
+    }
+})
+tbls.player_info = new Table({
+    name: 'player_info',
+    sqlName: '`nfl-table.main.player_info`',
+    sqlJoin: {
+        toTable: tbls.stats,
+        toTableField: 'player_id',
+        fromTableField: 'sportradar_id'
     }
 })
 tbls.player_stats = new Table({
@@ -216,7 +192,7 @@ class Dimension {
  */
  dims.stat_id = new Dimension({
     sql: 'stat_id',
-    creationSQL: `${tbls.s.name}.game_periods_pbp_events_id || '--' || ${tbls.s.name}.stat_type`,
+    creationSQL: `${tbls.stats.name}.game_periods_pbp_events_id || '--' || ${tbls.stats.name}.stat_type`,
     statType: 'general',
     title: 'Stat ID',
     description: 'Unique ID for the particular statistic',
@@ -227,7 +203,7 @@ class Dimension {
 // ------------------------------------------------------------------------------------------------------------
 dims.stat_type = new Dimension({
     sql: 'stat_type',
-    creationSQL: `CASE WHEN ${tbls.s.name}.stat_type = 'receive' THEN 'recv' ELSE ${tbls.s.name}.stat_type END`,
+    creationSQL: `CASE WHEN ${tbls.stats.name}.stat_type = 'receive' THEN 'recv' ELSE ${tbls.stats.name}.stat_type END`,
     statType: 'general',
     title: 'Stat Type',
     width: '175px',
@@ -237,7 +213,7 @@ dims.stat_type = new Dimension({
 // ------------------------------------------------------------------------------------------------------------
 dims.season_year = new Dimension({
     sql: 'season_year',
-    creationSQL: `${tbls.g.name}.summary_season_year`,
+    creationSQL: `${tbls.games.name}.summary_season_year`,
     statType: 'general',
     title: 'Season Year',
     shortTitle: 'Year',
@@ -248,7 +224,7 @@ dims.season_year = new Dimension({
 // ------------------------------------------------------------------------------------------------------------
 dims.season_week = new Dimension({
     sql: 'season_week',
-    creationSQL: `${tbls.g.name}.summary_week_title`,
+    creationSQL: `${tbls.games.name}.summary_week_title`,
     statType: 'general',
     title: 'Season Week',
     shortTitle: 'Week',
@@ -259,7 +235,7 @@ dims.season_week = new Dimension({
 // ------------------------------------------------------------------------------------------------------------
 dims.venue_name = new Dimension({
     sql: 'venue_name',
-    creationSQL: `${tbls.g.name}.summary_venue_name`,
+    creationSQL: `${tbls.games.name}.summary_venue_name`,
     statType: 'general',
     title: 'Venue Name',
     shortTitle: 'Venue',
@@ -270,14 +246,14 @@ dims.venue_name = new Dimension({
 // ------------------------------------------------------------------------------------------------------------
 dims.player_id = new Dimension({
     sql: 'player_id',
-    creationSQL: `${tbls.s.name}.player_id`,
+    creationSQL: `${tbls.stats.name}.player_id`,
     statType: 'general',
     title: 'Player ID',
 })
 // ------------------------------------------------------------------------------------------------------------
 dims.player_name = new Dimension({
     sql: 'player_name',
-    creationSQL: `${tbls.s.name}.player_name`,
+    creationSQL: `${tbls.player_info.name}.full_name`,
     statType: 'general',
     title: 'Player Name',
     shortTitle: 'Player',
@@ -285,45 +261,63 @@ dims.player_name = new Dimension({
     dataType: 'string',
     format: 'string',
 })
-// ------------------------------------------------------------------------------------------------------------
-dims.unclean_position = new Dimension({
-    sql: 'unclean_position',
-    creationSQL: `SPLIT(s.player_position, '/')[SAFE_OFFSET(0)]`,
-    statType: 'general',
-    title: 'Player Position (Unclean)',
-    shortTitle: 'Position',
-    width: '175px',
-    dataType: 'string',
-    format: 'string',
-    description: 'In cases with multiple positions (eg TE/B) takes the first one (these are fairly rare)',
-    values: ['LB', 'WR', 'DB', 'CB', 'DE', 'RB', 'S', 'DT', 'TE', 'T', 'G', 'DL', 'QB', 'OL', 'OLB', 'C', 'K', 'ILB', 'P', 'LS', 'FB', 'NT', 'FS', 'SS', 'OT', 'HB', 'MLB', 'H', 'RT', '$LB', 'LOLB']
-})
-// ------------------------------------------------------------------------------------------------------------
-dims.player_position_history = new Dimension({
-    sql: 'player_position_history',
-    creationSQL: `CASE WHEN ${dims.unclean_position.creationSQL} = 'HB' THEN 'RB' ELSE ${dims.unclean_position.creationSQL} END`,
-    statType: 'general',
-    title: 'Player Position',
-    shortTitle: 'Position',
-    width: '175px',
-    dataType: 'string',
-    format: 'string',
-    description: 'Cleans HB to be RB',
-    values: ['LB', 'WR', 'DB', 'CB', 'DE', 'RB', 'S', 'DT', 'TE', 'T', 'G', 'DL', 'QB', 'OL', 'OLB', 'C', 'K', 'ILB', 'P', 'LS', 'FB', 'NT', 'FS', 'SS', 'OT', 'MLB', 'H', 'RT', '$LB', 'LOLB']
-})
+// dims.player_name = new Dimension({
+//     sql: 'player_name',
+//     creationSQL: `${tbls.stats.name}.player_name`,
+//     statType: 'general',
+//     title: 'Player Name',
+//     shortTitle: 'Player',
+//     width: '175px',
+//     dataType: 'string',
+//     format: 'string',
+// })
 // ------------------------------------------------------------------------------------------------------------
 dims.player_position = new Dimension({
     sql: 'player_position',
-    creationSQL: `FIRST_VALUE(${dims.player_position_history.creationSQL}) OVER (PARTITION BY ${dims.player_id.creationSQL} ORDER BY ${dims.season_year.creationSQL} DESC, ${dims.season_week.creationSQL} DESC)`,
+    creationSQL: `${tbls.player_info.name}.position`,
     statType: 'general',
     title: 'Player Position',
     shortTitle: 'Position',
     width: '175px',
     dataType: 'string',
     format: 'string',
-    description: 'In cases where a player changed positions (e.g. from FS to CB), this takes the most recent position',
-    values: ['LB', 'WR', 'DB', 'CB', 'DE', 'RB', 'S', 'DT', 'TE', 'T', 'G', 'DL', 'QB', 'OL', 'OLB', 'C', 'K', 'ILB', 'P', 'LS', 'FB', 'NT', 'FS', 'SS', 'OT', 'MLB', 'H', 'RT', '$LB', 'LOLB']
 })
+// dims.unclean_position = new Dimension({
+//     sql: 'unclean_position',
+//     creationSQL: `SPLIT(${tbls.stats.name}.player_position, '/')[SAFE_OFFSET(0)]`,
+//     statType: 'general',
+//     title: 'Player Position (Unclean)',
+//     shortTitle: 'Position',
+//     width: '175px',
+//     dataType: 'string',
+//     format: 'string',
+//     description: 'In cases with multiple positions (eg TE/B) takes the first one (these are fairly rare)',
+//     values: ['LB', 'WR', 'DB', 'CB', 'DE', 'RB', 'S', 'DT', 'TE', 'T', 'G', 'DL', 'QB', 'OL', 'OLB', 'C', 'K', 'ILB', 'P', 'LS', 'FB', 'NT', 'FS', 'SS', 'OT', 'HB', 'MLB', 'H', 'RT', '$LB', 'LOLB']
+// })
+// dims.player_position_history = new Dimension({
+//     sql: 'player_position_history',
+//     creationSQL: `CASE WHEN ${dims.unclean_position.creationSQL} = 'HB' THEN 'RB' ELSE ${dims.unclean_position.creationSQL} END`,
+//     statType: 'general',
+//     title: 'Player Position',
+//     shortTitle: 'Position',
+//     width: '175px',
+//     dataType: 'string',
+//     format: 'string',
+//     description: 'Cleans HB to be RB',
+//     values: ['LB', 'WR', 'DB', 'CB', 'DE', 'RB', 'S', 'DT', 'TE', 'T', 'G', 'DL', 'QB', 'OL', 'OLB', 'C', 'K', 'ILB', 'P', 'LS', 'FB', 'NT', 'FS', 'SS', 'OT', 'MLB', 'H', 'RT', '$LB', 'LOLB']
+// })
+// dims.player_position = new Dimension({
+//     sql: 'player_position',
+//     creationSQL: `FIRST_VALUE(${dims.player_position_history.creationSQL}) OVER (PARTITION BY ${dims.player_id.creationSQL} ORDER BY ${dims.season_year.creationSQL} DESC, ${dims.season_week.creationSQL} DESC)`,
+//     statType: 'general',
+//     title: 'Player Position',
+//     shortTitle: 'Position',
+//     width: '175px',
+//     dataType: 'string',
+//     format: 'string',
+//     description: 'In cases where a player changed positions (e.g. from FS to CB), this takes the most recent position',
+//     values: ['LB', 'WR', 'DB', 'CB', 'DE', 'RB', 'S', 'DT', 'TE', 'T', 'G', 'DL', 'QB', 'OL', 'OLB', 'C', 'K', 'ILB', 'P', 'LS', 'FB', 'NT', 'FS', 'SS', 'OT', 'MLB', 'H', 'RT', '$LB', 'LOLB']
+// })
 // ------------------------------------------------------------------------------------------------------------
 dims.player_name_with_position = new Dimension({
     sql: 'player_name_with_position',
@@ -335,42 +329,70 @@ dims.player_name_with_position = new Dimension({
     dataType: 'string',
     format: 'string',
 })
+// dims.player_name_with_position = new Dimension({
+//     sql: 'player_name_with_position',
+//     creationSQL: `${dims.player_name.creationSQL} || ' (' || ${dims.player_position.creationSQL} || ')'`,
+//     statType: 'general',
+//     title: 'Player Name (Position)',
+//     shortTitle: 'Player',
+//     width: '175px',
+//     dataType: 'string',
+//     format: 'string',
+// })
 // ------------------------------------------------------------------------------------------------------------
-dims.partition_player_id = new Dimension({
-    sql: 'partition_player_id',
-    creationSQL: `DENSE_RANK() OVER (ORDER BY ${dims.player_id.creationSQL} ASC)`,
+dims.player_gsis_id = new Dimension({
+    sql: 'player_gsis_id',
+    creationSQL: `${tbls.player_info.name}.player_gsis_id`,
     statType: 'general',
-    title: 'Partition Player ID',
-    description: 'This is used as the Partition Key for Materialized Views (which require an integer key).'
+    title: 'GSIS Player ID',
 })
+// dims.partition_player_id = new Dimension({
+//     sql: 'partition_player_id',
+//     creationSQL: `DENSE_RANK() OVER (ORDER BY ${dims.player_id.creationSQL} ASC)`,
+//     statType: 'general',
+//     title: 'Partition Player ID',
+//     description: 'This is used as the Partition Key for Materialized Views (which require an integer key).'
+// })
 // ------------------------------------------------------------------------------------------------------------
 dims.team_name = new Dimension({
     sql: 'team_name',
-    creationSQL: `CASE WHEN ${tbls.s.name}.team_name = 'Redskins' THEN 'Football Team' ELSE ${tbls.s.name}.team_name END`,
+    creationSQL: `CASE WHEN ${tbls.stats.name}.team_name = 'Redskins' THEN 'Football Team' ELSE ${tbls.stats.name}.team_name END`,
     statType: 'general',
     title: 'Team Name',
     shortTitle: 'Team',
     width: '175px',
     dataType: 'string',
     format: 'string',
+    description: 'Like: Falcons'
+})
+// ------------------------------------------------------------------------------------------------------------
+dims.team_abbreviation = new Dimension({
+    sql: 'team_abbreviation',
+    creationSQL: `${tbls.player_info.name}.team`,
+    statType: 'general',
+    title: 'Team Name',
+    shortTitle: 'Team',
+    width: '175px',
+    dataType: 'string',
+    format: 'string',
+    description: 'Like: ATL'
 })
 // ------------------------------------------------------------------------------------------------------------
 dims.team_id = new Dimension({
     sql: 'team_id',
-    creationSQL: `${tbls.s.name}.team_id`,
+    creationSQL: `${tbls.stats.name}.team_id`,
     statType: 'general',
     title: 'Team ID',
     description: 'NOTE: Chargers and Raiders have two different IDs when they change cities.'
 })
 // ------------------------------------------------------------------------------------------------------------
-dims.partition_team_id = new Dimension({
-    sql: 'partition_team_id',
-    creationSQL: `DENSE_RANK() OVER (ORDER BY ${dims.team_name.creationSQL} ASC)`,
-    statType: 'general',
-    title: 'Partition Player ID',
-    description: 'This is used as the Partition Key for Materialized Views (which require an integer key).'
-})
-
+// dims.partition_team_id = new Dimension({
+//     sql: 'partition_team_id',
+//     creationSQL: `DENSE_RANK() OVER (ORDER BY ${dims.team_name.creationSQL} ASC)`,
+//     statType: 'general',
+//     title: 'Partition Player ID',
+//     description: 'This is used as the Partition Key for Materialized Views (which require an integer key).'
+// })
 
 
 /** -----------------------------------------------------------------------------------------------------------
@@ -379,21 +401,21 @@ dims.partition_team_id = new Dimension({
  */
 dims.inside_20 = new Dimension({
     sql: 'inside_20',
-    creationSQL: `s.inside_20`,
+    creationSQL: `${tbls.stats.name}.inside_20`,
     statType: 'general',
     title: 'Was Inside 20',
 })
 // ------------------------------------------------------------------------------------------------------------
 dims.goaltogo = new Dimension({
     sql: 'goaltogo',
-    creationSQL: `s.goaltogo`,
+    creationSQL: `${tbls.stats.name}.goaltogo`,
     statType: 'general',
     title: 'Was Goal to Go',
 })
 // ------------------------------------------------------------------------------------------------------------
 dims.nullified = new Dimension({
     sql: 'nullified',
-    creationSQL: `s.nullified`,
+    creationSQL: `${tbls.stats.name}.nullified`,
     statType: 'general',
     title: 'Was Nullified',
     description: '1 if nullified by penalty, otherwise NULL' // check to make sure this is accurate
@@ -401,7 +423,7 @@ dims.nullified = new Dimension({
 // ------------------------------------------------------------------------------------------------------------
 dims.firstdown = new Dimension({
     sql: 'firstdown',
-    creationSQL: `s.firstdown`,
+    creationSQL: `${tbls.stats.name}.firstdown`,
     statType: 'general',
     title: 'Was Firstdown',
 })
@@ -414,14 +436,14 @@ dims.firstdown = new Dimension({
  */
  dims.pass_yards = new Dimension({
     sql: 'pass_yards',
-    creationSQL: `CASE WHEN s.stat_type = "pass"    THEN s.yards ELSE NULL END`,
+    creationSQL: `CASE WHEN ${tbls.stats.name}.stat_type = "pass"    THEN ${tbls.stats.name}.yards ELSE NULL END`,
     statType: 'pass',
     title: 'Pass Yards',
 })
 // ------------------------------------------------------------------------------------------------------------
 dims.pass_attempt_yards = new Dimension({
     sql: 'pass_attempt_yards',
-    creationSQL: `CASE WHEN s.stat_type = "pass"    THEN s.att_yards ELSE NULL END`,
+    creationSQL: `CASE WHEN ${tbls.stats.name}.stat_type = "pass"    THEN ${tbls.stats.name}.att_yards ELSE NULL END`,
     statType: 'pass',
     title: 'Pass Attempt Yards',
     description: 'I think this is the number of yards in the air that the ball traveled. ' 
@@ -430,7 +452,7 @@ dims.pass_attempt_yards = new Dimension({
 // ------------------------------------------------------------------------------------------------------------
 dims.pass_air_yards = new Dimension({
     sql: 'pass_air_yards',
-    creationSQL: `CASE WHEN s.stat_type = "pass" AND s.complete = 1 THEN s.att_yards ELSE NULL END`,
+    creationSQL: `CASE WHEN ${tbls.stats.name}.stat_type = "pass" AND ${tbls.stats.name}.complete = 1 THEN ${tbls.stats.name}.att_yards ELSE NULL END`,
     statType: 'pass',
     title: 'Pass Air Yards',
     description: 'I think this is the number of yards in the air that the ball traveled but only for completions.' 
@@ -438,91 +460,91 @@ dims.pass_air_yards = new Dimension({
 // ------------------------------------------------------------------------------------------------------------
 dims.pass_pocket_time = new Dimension({
     sql: 'pass_pocket_time',
-    creationSQL: `CASE WHEN s.stat_type = "pass"    THEN s.pocket_time ELSE NULL END`,
+    creationSQL: `CASE WHEN ${tbls.stats.name}.stat_type = "pass"    THEN ${tbls.stats.name}.pocket_time ELSE NULL END`,
     statType: 'pass',
     title: 'Pass Pocket Time',
 })
 // ------------------------------------------------------------------------------------------------------------
 dims.pass_sack_yards = new Dimension({
     sql: 'pass_sack_yards',
-    creationSQL: `CASE WHEN s.stat_type = "pass"    THEN s.sack_yards ELSE NULL END`,
+    creationSQL: `CASE WHEN ${tbls.stats.name}.stat_type = "pass"    THEN ${tbls.stats.name}.sack_yards ELSE NULL END`,
     statType: 'pass',
     title: 'Pass Sack Yards',
 })
 // ------------------------------------------------------------------------------------------------------------
 dims.pass_was_attempt = new Dimension({
     sql: 'pass_was_attempt',
-    creationSQL: `CASE WHEN s.stat_type = "pass"    THEN s.attempt ELSE NULL END`,
+    creationSQL: `CASE WHEN ${tbls.stats.name}.stat_type = "pass"    THEN ${tbls.stats.name}.attempt ELSE NULL END`,
     statType: 'pass',
     title: 'Was Pass Attempt',
 })
 // ------------------------------------------------------------------------------------------------------------
 dims.pass_was_completion = new Dimension({
     sql: 'pass_was_completion',
-    creationSQL: `CASE WHEN s.stat_type = "pass"    THEN s.complete ELSE NULL END`,
+    creationSQL: `CASE WHEN ${tbls.stats.name}.stat_type = "pass"    THEN ${tbls.stats.name}.complete ELSE NULL END`,
     statType: 'pass',
     title: 'Was Pass Completion',
 })
 // ------------------------------------------------------------------------------------------------------------
 dims.pass_was_touchdown = new Dimension({
     sql: 'pass_was_touchdown',
-    creationSQL: `CASE WHEN s.stat_type = "pass"    THEN s.touchdown ELSE NULL END`,
+    creationSQL: `CASE WHEN ${tbls.stats.name}.stat_type = "pass"    THEN ${tbls.stats.name}.touchdown ELSE NULL END`,
     statType: 'pass',
     title: 'Was Pass Touchdown',
 })
 // ------------------------------------------------------------------------------------------------------------
 dims.pass_was_interception = new Dimension({
     sql: 'pass_was_interception',
-    creationSQL: `CASE WHEN s.stat_type = "pass"    THEN s.interception ELSE NULL END`,
+    creationSQL: `CASE WHEN ${tbls.stats.name}.stat_type = "pass"    THEN ${tbls.stats.name}.interception ELSE NULL END`,
     statType: 'pass',
     title: 'Was Pass Interception',
 })
 // ------------------------------------------------------------------------------------------------------------
 dims.pass_was_blitzed = new Dimension({
     sql: 'pass_was_blitzed',
-    creationSQL: `CASE WHEN s.stat_type = "pass"    THEN s.blitz ELSE NULL END`,
+    creationSQL: `CASE WHEN ${tbls.stats.name}.stat_type = "pass"    THEN ${tbls.stats.name}.blitz ELSE NULL END`,
     statType: 'pass',
     title: 'Was Pass Blitzed',
 })
 // ------------------------------------------------------------------------------------------------------------
 dims.pass_was_batted = new Dimension({
     sql: 'pass_was_batted',
-    creationSQL: `CASE WHEN s.stat_type = "pass"    THEN s.batted_pass ELSE NULL END`,
+    creationSQL: `CASE WHEN ${tbls.stats.name}.stat_type = "pass"    THEN ${tbls.stats.name}.batted_pass ELSE NULL END`,
     statType: 'pass',
     title: 'Was Pass Batted',
 })
 // ------------------------------------------------------------------------------------------------------------
 dims.pass_was_on_target = new Dimension({
     sql: 'pass_was_on_target',
-    creationSQL: `CASE WHEN s.stat_type = "pass"    THEN s.on_target_throw ELSE NULL END`,
+    creationSQL: `CASE WHEN ${tbls.stats.name}.stat_type = "pass"    THEN ${tbls.stats.name}.on_target_throw ELSE NULL END`,
     statType: 'pass',
     title: 'Was Pass On Target',
 })
 // ------------------------------------------------------------------------------------------------------------
 dims.pass_was_hurry = new Dimension({
     sql: 'pass_was_hurry',
-    creationSQL: `CASE WHEN s.stat_type = "pass"    THEN s.hurry ELSE NULL END`,
+    creationSQL: `CASE WHEN ${tbls.stats.name}.stat_type = "pass"    THEN ${tbls.stats.name}.hurry ELSE NULL END`,
     statType: 'pass',
     title: 'Was Pass Hurried',
 })
 // ------------------------------------------------------------------------------------------------------------
 dims.pass_was_knockdown = new Dimension({
     sql: 'pass_was_knockdown',
-    creationSQL: `CASE WHEN s.stat_type = "pass"    THEN s.knockdown ELSE NULL END`,
+    creationSQL: `CASE WHEN ${tbls.stats.name}.stat_type = "pass"    THEN ${tbls.stats.name}.knockdown ELSE NULL END`,
     statType: 'pass',
     title: 'Was Pass Knocked Down',
 })
 // ------------------------------------------------------------------------------------------------------------
 dims.pass_was_sack = new Dimension({
     sql: 'pass_was_sack',
-    creationSQL: `CASE WHEN s.stat_type = "pass"    THEN s.sack ELSE NULL END`,
+    creationSQL: `CASE WHEN ${tbls.stats.name}.stat_type = "pass"    THEN ${tbls.stats.name}.sack ELSE NULL END`,
     statType: 'pass',
     title: 'Was Sack',
 })
 // ------------------------------------------------------------------------------------------------------------
 dims.pass_incompletion_type = new Dimension({
     sql: 'pass_incompletion_type',
-    creationSQL: `CASE WHEN s.stat_type = "pass"    THEN s.incompletion_type ELSE NULL END`,
+    creationSQL: `CASE WHEN ${tbls.stats.name}.stat_type = "pass"    THEN ${tbls.stats.name}.incompletion_type ELSE NULL END`,
     statType: 'pass',
     title: 'Pass Incompletion Type',
     description: 'Poorly Thrown, Thrown Away, Dropped Pass, Pass Defended, Spike',
@@ -571,28 +593,28 @@ dims.pass_incompletion_was_spike = new Dimension({
  */
 dims.rush_yards = new Dimension({
     sql: 'rush_yards',
-    creationSQL: `CASE WHEN s.stat_type = "rush"    THEN s.yards ELSE NULL END`,
+    creationSQL: `CASE WHEN ${tbls.stats.name}.stat_type = "rush"    THEN ${tbls.stats.name}.yards ELSE NULL END`,
     statType: 'rush',
     title: 'Rush Yards',
 })
 // ------------------------------------------------------------------------------------------------------------
 dims.rush_was_attempt = new Dimension({
     sql: 'rush_was_attempt',
-    creationSQL: `CASE WHEN s.stat_type = "rush"    THEN s.attempt ELSE NULL END`,
+    creationSQL: `CASE WHEN ${tbls.stats.name}.stat_type = "rush"    THEN ${tbls.stats.name}.attempt ELSE NULL END`,
     statType: 'rush',
     title: 'Rush Attempt',
 })
 // ------------------------------------------------------------------------------------------------------------
 dims.rush_was_touchdown = new Dimension({
     sql: 'rush_was_touchdown',
-    creationSQL: `CASE WHEN s.stat_type = "rush"    THEN s.touchdown ELSE NULL END`,
+    creationSQL: `CASE WHEN ${tbls.stats.name}.stat_type = "rush"    THEN ${tbls.stats.name}.touchdown ELSE NULL END`,
     statType: 'rush',
     title: 'Rush Touchdown',
 })
 // ------------------------------------------------------------------------------------------------------------
 dims.rush_broken_tackles = new Dimension({
     sql: 'rush_broken_tackles',
-    creationSQL: `CASE WHEN s.stat_type = "rush"    THEN s.broken_tackles ELSE NULL END`,
+    creationSQL: `CASE WHEN ${tbls.stats.name}.stat_type = "rush"    THEN ${tbls.stats.name}.broken_tackles ELSE NULL END`,
     statType: 'rush',
     title: 'Rush Broken Tackles',
     description: 'Number of broken tackles during the run. On one TD run, Aaron Jones had 6 broken tackles!'
@@ -600,14 +622,14 @@ dims.rush_broken_tackles = new Dimension({
 // ------------------------------------------------------------------------------------------------------------
 dims.yards_after_contact = new Dimension({
     sql: 'yards_after_contact',
-    creationSQL: `CASE WHEN s.stat_type = "rush"    THEN s.yards_after_contact ELSE NULL END`,
+    creationSQL: `CASE WHEN ${tbls.stats.name}.stat_type = "rush"    THEN ${tbls.stats.name}.yards_after_contact ELSE NULL END`,
     statType: 'rush',
     title: 'Rush Yards After Contact',
 })
 // ------------------------------------------------------------------------------------------------------------
 dims.rush_was_scramble = new Dimension({
     sql: 'rush_was_scramble',
-    creationSQL: `CASE WHEN s.stat_type = "rush"    THEN s.scramble ELSE NULL END`,
+    creationSQL: `CASE WHEN ${tbls.stats.name}.stat_type = "rush"    THEN ${tbls.stats.name}.scramble ELSE NULL END`,
     statType: 'rush',
     title: 'Rush Was Scrumble',
 })
@@ -619,28 +641,28 @@ dims.rush_was_scramble = new Dimension({
 //* ----------------------------------------------------------------------------------------------------------
 dims.recv_yards = new Dimension({
     sql: 'recv_yards',
-    creationSQL: `CASE WHEN s.stat_type = "receive" THEN s.yards ELSE NULL END`,
+    creationSQL: `CASE WHEN ${tbls.stats.name}.stat_type = "receive" THEN ${tbls.stats.name}.yards ELSE NULL END`,
     statType: 'recv',
     title: 'Receiving Yards',
 })
 // ------------------------------------------------------------------------------------------------------------
 dims.recv_was_reception = new Dimension({
     sql: 'recv_was_reception',
-    creationSQL: `CASE WHEN s.stat_type = "receive" THEN s.reception ELSE NULL END`,
+    creationSQL: `CASE WHEN ${tbls.stats.name}.stat_type = "receive" THEN ${tbls.stats.name}.reception ELSE NULL END`,
     statType: 'recv',
     title: 'Was Reception',
 })
 // ------------------------------------------------------------------------------------------------------------
 dims.recv_was_target = new Dimension({
     sql: 'recv_was_target',
-    creationSQL: `CASE WHEN s.stat_type = "receive" THEN s.target ELSE NULL END`,
+    creationSQL: `CASE WHEN ${tbls.stats.name}.stat_type = "receive" THEN ${tbls.stats.name}.target ELSE NULL END`,
     statType: 'recv',
     title: 'Was Receiving Target',
 })
 // ------------------------------------------------------------------------------------------------------------
 dims.recv_was_touchdown = new Dimension({
     sql: 'recv_was_touchdown',
-    creationSQL: `CASE WHEN s.stat_type = "receive" THEN s.touchdown ELSE NULL END`,
+    creationSQL: `CASE WHEN ${tbls.stats.name}.stat_type = "receive" THEN ${tbls.stats.name}.touchdown ELSE NULL END`,
     statType: 'recv',
     title: 'Receiving Was Touchdown',
 })

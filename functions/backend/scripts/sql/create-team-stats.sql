@@ -1,12 +1,10 @@
 CREATE OR REPLACE TABLE
   `nfl-table.main.team_stats`
-PARTITION BY
-  RANGE_BUCKET(partition_team_id, GENERATE_ARRAY(1, 33, 1))
 CLUSTER BY
-  season_year
+  team_id
 AS (
   SELECT
-    partition_team_id AS partition_team_id,
+    team_id AS team_id,
     team_name AS team_name,
     season_year AS season_year,
     SUM(CASE WHEN true THEN pass_was_completion ELSE NULL END) AS pass_completions_sum,

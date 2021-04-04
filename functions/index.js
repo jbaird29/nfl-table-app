@@ -8,8 +8,6 @@ const bq = require('./backend/queries/bigquery');
 const meta = require('./backend/queries/metadata');
 const createSID = require('./backend/utils/create-sid')
 
-const playerPartitionLookup = require('./backend/lookups/player-partition-lookup.json')
-const teamPartitionLookup = require('./backend/lookups/team-partition-lookup.json')
 
 // // Create and Deploy Your First Cloud Functions
 // // https://firebase.google.com/docs/functions/write-firebase-functions
@@ -26,8 +24,9 @@ exports.runQuery = functions.https.onRequest(async function(req, res){
         const sql = query.buildSQL()
         functions.logger.log(sql)
         console.log(sql)
-        const queryResult = await bq.runQuery(sql)
+        const queryPromise = bq.runQuery(sql)
         const tableProps = query.buildTableProps()
+        const queryResult = await queryPromise    // this begins execution of tableProps while awaiting resolution of the Promise
         queryResult ? res.status(200).send({dataSource: queryResult, columns: tableProps}) : res.res.status(400).send({error: "Query invalid."})
     } catch(err) {
         functions.logger.warn(err)
@@ -74,8 +73,9 @@ exports.loadState = functions.https.onRequest(async function(req, res){
                 const query = new Query(meta, queryFields)
                 const sql = query.buildSQL()
                 functions.logger.log(sql)
-                const queryResult = await bq.runQuery(sql)
+                const queryPromise = bq.runQuery(sql)
                 const tableProps = query.buildTableProps()
+                const queryResult = await queryPromise
                 functions.logger.log(`Loaded ${stateID}`)
                 queryResult ? res.status(200).send({queryFields, calcsFields, tableData:{dataSource: queryResult, columns: tableProps}}) : res.res.status(400).send({error: "Query invalid."})
             } catch(err) {
@@ -91,15 +91,22 @@ exports.loadState = functions.https.onRequest(async function(req, res){
 
 
 exports.loadStandardPage = functions.https.onRequest(async function(req, res){
-    const {type, resource} = req.query
-    const partitionID  = type === 'player' ? playerPartitionLookup[resource]  : teamPartitionLookup[resource]
-    const sqlParition  = type === 'player' ? 'partition_player_id'       : 'partition_team_id'
-    const sqlDimension = type === 'player' ? 'player_name_with_position' : 'team_name'
+    const {type, id} = req.query
+    const sqlID        = type === 'player' ? 'player_gsis_id'               : 'team_id'
+    const sqlDimension = type === 'player' ? 'player_name_with_position'    : 'team_name'
     const sqlTableName = type === 'player' ? meta.tbls.player_stats.sqlName : meta.tbls.team_stats.sqlName
-    if (!partitionID) {res.status(400).send({error: "Could not complete request with given parameters."}) }
 
-    let sql = `SELECT * EXCEPT(${sqlParition}, ${sqlDimension}) FROM ${sqlTableName}`
-    sql +=    ` WHERE ${sqlParition} = ${partitionID} ORDER BY 1 ASC`
+    const querySQL = `SELECT * EXCEPT(${sqlID}, ${sqlDimension}) FROM ${sqlTableName} WHERE ${sqlID} = ${id} ORDER BY season_year ASC`
+    const infoSQL  = type === 'player' 
+    ? `SELECT full_name, birth_date, main.calculate_age(CURRENT_DATE(), birth_date) AS age, college, weight, height, jersey_number, team_name, team_abbreviation, headshot_url FROM \`nfl-table.main.player_info\` WHERE ${sqlID} = ${id}`
+    : `SELECT team_name, team_abbreviation FROM \`nfl-table.main.team_info\` WHERE ${sqlID} = ${id}`
+
+    functions.logger.log(querySQL)
+    functions.logger.log(infoSQL)
+    console.log(querySQL)
+    console.log(infoSQL)
+    const queryPromise = bq.runQuery(querySQL)
+    const infoPromise  = bq.runQuery(infoSQL)
     const tableProps = Object.values(meta.aggs).filter(field => field.includeInSummary).map(field => ({
         dataIndex: field.name
         , key: field.name
@@ -120,10 +127,9 @@ exports.loadStandardPage = functions.https.onRequest(async function(req, res){
         , fixed: 'left'
     })
     try {
-        functions.logger.log(sql)
-        console.log(sql)
-        const queryResult = await bq.runQuery(sql)
-        queryResult ? res.status(200).send({dataSource: queryResult, columns: tableProps}) : res.res.status(400).send({error: "Query invalid."})
+        const queryResult = await queryPromise
+        const infoResult  = await infoPromise
+        queryResult ? res.status(200).send({tableData: {dataSource: queryResult, columns: tableProps}, info: infoResult[0]}) : res.res.status(400).send({error: "Query invalid."})
     } catch(err) {
         functions.logger.warn(err)
         res.status(400).send({error: "Could not complete request with given parameters."})

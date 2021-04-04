@@ -1,3 +1,14 @@
+import teamList from '../inputs/teamList.json'
+import playerList from '../inputs/playerList.json'
+import { Typography, Tooltip, } from 'antd';
+const { Text, Link } = Typography;
+
+
+// converts: [{value: gsis_id_1, label: player_name_1}] 
+// into:     {player_name_1: gsis_id_1, player_name_2: gsis_id_2}
+const playerMap = Object.assign( ...playerList.map(props => ({[props.label]: props.value })) )
+const teamMap = Object.assign( ...teamList.map(props => ({[props.label]: props.value })) )
+
 /**
  * Given a TableProps column object, adds a sorter function depending on format type
  * @param {Object} column - tableProps Column
@@ -27,6 +38,14 @@ export function addRender(column) {
         column.render = (text, row, index) => (!text ? text : <span>{`${(text*100).toLocaleString(undefined,{minimumFractionDigits: 1, maximumFractionDigits: 1})}%`}</span>)
     } else if (column.format === 'index') {
         column.render = (text, row, index) => (!text ? text : <span>{`${index + 1}`}</span>)
+    } else if (column.format === 'string' && column.dataIndex === 'player_name_with_position') {
+        column.render = (text, row, index) => (!text ? text : <span> 
+            <Tooltip title="View Player Stats" placement="bottom" mouseEnterDelay={0.08} mouseLeaveDelay={0} overlayStyle={{fontSize: '0.75rem'}} >
+            <Link target="_blank" href={`/?type=player&id=${encodeURI(playerMap[text])}`}>{text}</Link></Tooltip></span>)
+    } else if (column.format === 'string' && column.dataIndex === 'team_name') {
+        column.render = (text, row, index) => (!text ? text : <span> 
+            <Tooltip title="View Team Stats" placement="bottom" mouseEnterDelay={0.08} mouseLeaveDelay={0} overlayStyle={{fontSize: '0.75rem'}} >
+            <Link target="_blank" href={`/?type=team&id=${encodeURI(teamMap[text])}`}>{text}</Link></Tooltip></span>)
     }
 }
 

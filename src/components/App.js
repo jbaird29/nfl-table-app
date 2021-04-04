@@ -9,7 +9,7 @@ import RowForm from './query-fields/Row-Form'
 import WhereForm from './query-fields/Where-Form'
 import CustomCalcTabs from './custom-calcs/Custom-Calc-Tabs'
 import SelectPage from './standard-pages/SelectPage'
-import {loadStandardPage, toCSV, copyTableWithoutCalcs, addCalcsToTable, addRenderSorterToTable} from './helper-functions'
+import { toCSV, copyTableWithoutCalcs, addCalcsToTable, addRenderSorterToTable} from './helper-functions'
 import logo from '../images/logo.png'
 
 const { Header, Sider, Content, Footer } = Layout;
@@ -37,6 +37,9 @@ function App() {
     const [loadingURL, setLoadingURL] = useState(false)
     const [loadingPage, setLoadingPage] = useState(false)
     const [isURLVisible, setIsURLVisible] = useState(false)
+    const [activeSiderTab, setActiveSiderTab] = useState('query')
+    const [infoCard, setInfoCard] = useState(null)
+    const [cardLoading, setCardLoading] = useState(false)
     // TODO - when a tab is deleted from a form, its value is not returned via getFieldsValue() but it IS
     //        still included in the form state and it is returnable via getFieldValue(['name'])
     //        this is ok right now because I am only useing getFieldsValue
@@ -46,7 +49,7 @@ function App() {
         const url = new URL(window.location)
         const sid = url.searchParams.get('sid')
         const type = url.searchParams.get('type')
-        const resource = url.searchParams.get('resource')
+        const resource = url.searchParams.get('id')
         if (sid) {
             loadState(sid)
         } else {
@@ -59,25 +62,32 @@ function App() {
         setLoadingPage(false)
     }, []);
 
-    async function loadStandardPage(type, resource) {
+
+    // todo - need to also preserve the form of the standard page
+    async function loadStandardPage(type, id) {
         const url = new URL(window.location)
         const hide = message.loading({content: 'Loading the data', style: {fontSize: '1rem'}}, 0)
-        const response = await fetch(`/loadStandardPage?type=${type}&resource=${resource}`, { method: 'GET'})
+        setCardLoading(true)
+        const response = await fetch(`/loadStandardPage?type=${type}&id=${id}`, { method: 'GET'})
         if (response.status === 200) {
-            const tableData = await response.json();
+            const {tableData, info} = await response.json();
+            setInfoCard(info)
+            setActiveSiderTab('standard')
             addRenderSorterToTable(tableData)
             setTableData(tableData)
             setSavedCalcsFields(null)
             setSavedQueryFields(null)
             hide()
+            setCardLoading(false)
             url.searchParams.set('type', type)
-            url.searchParams.set('resource', resource)
+            url.searchParams.set('id', id)
             window.history.pushState({}, '', url)
         } else {
             message.error({content: 'An error occurred. Please refresh the page and try again.', duration: 5, style: {fontSize: '1rem'} })
             hide()
+            setCardLoading(false)
             url.searchParams.delete('type')
-            url.searchParams.delete('resource')
+            url.searchParams.delete('id')
             window.history.pushState({}, '', url)
         }
     }
@@ -175,8 +185,11 @@ function App() {
         const hide = message.loading({content: 'Loading the data', style: {fontSize: '1rem'}}, 0)
         const url = new URL(window.location)
         url.searchParams.delete('type')
-        url.searchParams.delete('resource')
+        url.searchParams.delete('id')
         window.history.pushState({}, '', url)
+        setInfoCard(null)
+        // TODO - also reset the 'form' (the select option needs to be cleared)
+        //   I should probably make this a state as well
         try {
             const fetchOptions = { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(formFields) } 
             const response = await fetch(`/runQuery`, fetchOptions)
@@ -302,13 +315,13 @@ function App() {
     <Layout style={{ minHeight: '100vh' }}>
     
         <Sider width={300} style={{backgroundColor: '#FFF', textAlign: 'center'}}>
-            <Tabs centered defaultActiveKey="1">
-                <TabPane tab="Custom Query" key="1">
+            <Tabs centered activeKey={activeSiderTab} onChange={(key) => setActiveSiderTab(key)}>
+                <TabPane tab="Custom Query" key="query">
                     <Row style={{padding: '6px 12px'}}><Button block={true} type="primary" onClick={() => setIsFieldDrawerVisible(true)}>Edit Fields</Button></Row>
                     <Row style={{padding: '6px 12px'}}><Button block={true} type="secondary" onClick={handleShowCalc}>Edit Custom Calcs</Button></Row>
                 </TabPane>
-                <TabPane tab="Standard Pages" key="2">
-                    <SelectPage loadStandardPage={loadStandardPage} />
+                <TabPane tab="Standard Pages" key="standard">
+                    <SelectPage cardLoading={cardLoading} loadStandardPage={loadStandardPage} infoCard={infoCard} />
                 </TabPane>
             </Tabs>
         </Sider>
@@ -322,9 +335,9 @@ function App() {
                     <Image style={{padding: '8px 0px', }} width={200} src={logo} alt='logo' />
                 </Col>
                 <Col span={18} style={{ textAlign: 'right'}}>
-                    {/* <Button type="danger" onClick={() => console.log(tableData)}>Table Data</Button>
+                    <Button type="danger" onClick={() => console.log(tableData)}>Table Data</Button>
                     <Button type="danger" onClick={() => console.log(queryForm.getFieldsValue())}>Form getFieldsValue</Button>
-                    <Button type="danger" onClick={() => console.log(calcsForm.getFieldsValue())}>Calc getFieldsValue</Button> */}
+                    <Button type="danger" onClick={() => console.log(calcsForm.getFieldsValue())}>Calc getFieldsValue</Button>
                     <Button type="primary" onClick={onShareURL} shape="round" icon={<CloudUploadOutlined />}>Shareable URL</Button>
                     <Button type="primary" onClick={onDownload} shape="round" icon={<DownloadOutlined />}>Download</Button>
                 </Col>
