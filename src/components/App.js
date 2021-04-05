@@ -10,7 +10,7 @@ import WhereForm from './query-fields/Where-Form'
 import CustomCalcTabs from './custom-calcs/Custom-Calc-Tabs'
 import SelectPage from './standard-pages/SelectPage'
 import { toCSV, copyTableWithoutCalcs, addCalcsToTable, addRenderSorterToTable} from './helper-functions'
-import { Switch, Route, Link} from 'react-router-dom';
+import { Switch, Route, Link, useLocation} from 'react-router-dom';
 import logo from '../images/logo.png'
 
 const { Header, Sider, Content, Footer } = Layout;
@@ -44,6 +44,15 @@ function App() {
     // TODO - when a tab is deleted from a form, its value is not returned via getFieldsValue() but it IS
     //        still included in the form state and it is returnable via getFieldValue(['name'])
     //        this is ok right now because I am only useing getFieldsValue
+
+    const location = useLocation();
+    const pageType = location.pathname.includes('players') ? 'players' :
+                    (location.pathname.includes('teams') ? 'teams' : null)
+    // when a user switches page type, this empties tableData
+    useEffect(() => {
+        setTableData({})
+    }, [pageType])
+
 
     useEffect(() => {
         setLoadingPage(true)

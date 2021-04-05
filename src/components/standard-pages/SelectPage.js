@@ -12,8 +12,6 @@ const {Paragraph, Text} = Typography
 export default function SelectPage(props) {
     const [statType, setStatType] = useState('pass')
     const history = useHistory();
-    const location = useLocation();
-    const pageType = location.pathname.includes('players') ? 'players' : 'teams'
 
     // todo - add logic for toggling between Pass / Rush / Recv stats
     // todo - add a 'position' filter before player?
@@ -25,10 +23,6 @@ export default function SelectPage(props) {
 
     const selectStyle = { width: '85%' }
 
-    // when a user switches page type, this empties tableData
-    useEffect(() => {
-        props.setTableData({})
-    }, [pageType])
 
     return (<>
         <Row gutter={[0, 18]}>
