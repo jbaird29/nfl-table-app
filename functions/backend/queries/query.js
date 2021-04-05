@@ -22,6 +22,7 @@ module.exports.Query = class Query {
         const {sql, singleOperator, multipleOperator, joiner, dataType} = this.fltrs[name]
         if (!Array.isArray(values)) {
             const escaped = dataType === 'string' ? `'${values}'` : values
+            console.log("XXXX", `${sql} ${singleOperator} ${escaped}`)
             return `${sql} ${singleOperator} ${escaped}`
         } else {
             const escaped = dataType === 'string' ? values.map(value => `'${value}'`) : values
@@ -44,7 +45,7 @@ module.exports.Query = class Query {
         const filtersSQLArray = Object.entries(filters)
                                 .filter(([name, values]) => values && (Array.isArray(values) ? values.length > 0 : true))
                                 .map(([name, values]) => (this.buildFilterSQL(name, values)))
-        if (filtersSQLArray.length > 1) {
+        if (filtersSQLArray.length > 0) {
             const filtersSQLString = filtersSQLArray.join(' AND ')
             return sql.replace(/true/g, `true AND ${filtersSQLString}`)  //TODO- use replaceAll
         } else {

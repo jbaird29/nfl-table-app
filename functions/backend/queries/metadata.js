@@ -371,7 +371,7 @@ dims.team_name = new Dimension({
 // ------------------------------------------------------------------------------------------------------------
 dims.team_abbreviation = new Dimension({
     sql: 'team_abbreviation',
-    creationSQL: `${tbls.player_info.name}.team`,
+    creationSQL: `${tbls.player_info.name}.team_abbreviation`,
     statType: 'general',
     title: 'Team Name',
     shortTitle: 'Team',
@@ -450,8 +450,8 @@ dims.firstdown = new Dimension({
     dataType: 'number',
 })
 // ------------------------------------------------------------------------------------------------------------
-dims.pass_attempt_yards = new Dimension({
-    sql: 'pass_attempt_yards',
+dims.pass_attempt_air_yards = new Dimension({
+    sql: 'pass_attempt_air_yards',
     creationSQL: `CASE WHEN ${tbls.stats.name}.stat_type = "pass"    THEN ${tbls.stats.name}.att_yards ELSE NULL END`,
     statType: 'pass',
     title: 'Pass Attempt Yards',
@@ -1051,6 +1051,21 @@ fltrs.pass_pocket_time = new Filter(dims.pass_pocket_time, {
     }, ui: {
         type: 'slider',
         props: {range: true, max: 10, min: 0, step: 0.1, marks: {0: '0s', 10: '10s'},
+            included: true, style: {margin: '0 25px'}}
+    }
+})
+// ------------------------------------------------------------------------------------------------------------
+fltrs.pass_attempt_air_yards = new Filter(dims.pass_attempt_air_yards, {
+    name: 'pass_attempt_air_yards',
+    multipleOperator: 'BETWEEN', 
+    joiner: ' AND ', 
+    formProps: {
+        label: 'Attempt Air Yards',
+        labelCol: {span: 10},
+        wrapperCol: {span: 14},
+    }, ui: {
+        type: 'slider',
+        props: {range: true, max: 100, min: 0, step: 1,
             included: true, style: {margin: '0 25px'}}
     }
 })
