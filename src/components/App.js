@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 import './App.css';
 import 'antd/dist/antd.css';
-import {Layout, Button, Drawer, message, Divider, Row, Col, Form, Modal, Steps, Spin, Alert, Image, Tabs, Typography } from 'antd';
+import {Layout, Button, Drawer, message, Divider, Row, Col, Form, Modal, Steps, Spin, Alert, Image, Tabs, Typography, Menu } from 'antd';
 import { DownloadOutlined, CloudUploadOutlined, CopyOutlined } from '@ant-design/icons';
 import Table from './Table'
 import ColumnTabs from './query-fields/Column-Tabs'
@@ -10,6 +10,7 @@ import WhereForm from './query-fields/Where-Form'
 import CustomCalcTabs from './custom-calcs/Custom-Calc-Tabs'
 import SelectPage from './standard-pages/SelectPage'
 import { toCSV, copyTableWithoutCalcs, addCalcsToTable, addRenderSorterToTable} from './helper-functions'
+import { Switch, Route, Link} from 'react-router-dom';
 import logo from '../images/logo.png'
 
 const { Header, Sider, Content, Footer } = Layout;
@@ -72,7 +73,7 @@ function App() {
         if (response.status === 200) {
             const {tableData, info} = await response.json();
             setInfoCard(info)
-            setActiveSiderTab('standard')
+            setActiveSiderTab('pages')
             addRenderSorterToTable(tableData)
             setTableData(tableData)
             setSavedCalcsFields(null)
@@ -315,15 +316,31 @@ function App() {
     <Layout style={{ minHeight: '100vh' }}>
     
         <Sider width={300} style={{backgroundColor: '#FFF', textAlign: 'center'}}>
-            <Tabs centered activeKey={activeSiderTab} onChange={(key) => setActiveSiderTab(key)}>
+            {/* <Tabs centered activeKey={activeSiderTab} onChange={(key) => setActiveSiderTab(key)}>
                 <TabPane tab="Custom Query" key="query">
                     <Row style={{padding: '6px 12px'}}><Button block={true} type="primary" onClick={() => setIsFieldDrawerVisible(true)}>Edit Fields</Button></Row>
                     <Row style={{padding: '6px 12px'}}><Button block={true} type="secondary" onClick={handleShowCalc}>Edit Custom Calcs</Button></Row>
                 </TabPane>
-                <TabPane tab="Standard Pages" key="standard">
+                <TabPane tab="Standard Pages" key="pages">
                     <SelectPage cardLoading={cardLoading} loadStandardPage={loadStandardPage} infoCard={infoCard} />
                 </TabPane>
-            </Tabs>
+            </Tabs> */}
+
+            <Menu defaultSelectedKeys="query" mode="horizontal" style={{lineHeight: '2.5rem', marginBottom: 12}}>
+                <Menu.Item key="query"><Link to="/">Custom Query</Link></Menu.Item>
+                <Menu.Item key="pages"><Link to="/pages/players">Standard Pages</Link></Menu.Item>
+            </Menu>
+
+            <Switch>
+                <Route exact path="/">
+                    <Row style={{padding: '6px 12px'}}><Button block={true} type="primary" onClick={() => setIsFieldDrawerVisible(true)}>Edit Fields</Button></Row>
+                    <Row style={{padding: '6px 12px'}}><Button block={true} type="secondary" onClick={handleShowCalc}>Edit Custom Calcs</Button></Row>
+                </Route>
+                <Route path="/pages">
+                    <SelectPage setTableData={setTableData} setSavedCalcsFields={setSavedCalcsFields} setSavedQueryFields={setSavedQueryFields}/>
+                </Route>
+            </Switch>
+        
         </Sider>
 
         <Layout >

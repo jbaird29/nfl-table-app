@@ -5,6 +5,7 @@ import App from './components/App';
 import reportWebVitals from './components/1unused/reportWebVitals';
 import Firebase from './firebase/firebase'
 import FirebaseContext from './firebase/context'
+import { BrowserRouter as Router} from 'react-router-dom';
 
 
 // https://www.robinwieruch.de/complete-firebase-authentication-react-tutorial
@@ -13,7 +14,9 @@ import FirebaseContext from './firebase/context'
 ReactDOM.render(
   <React.StrictMode>
     <FirebaseContext.Provider value={new Firebase()}>
-      <App />
+      <Router>
+        <App />
+      </Router>
     </FirebaseContext.Provider>
   </React.StrictMode>,
   document.getElementById('root')
