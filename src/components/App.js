@@ -335,9 +335,9 @@ function App() {
                 </TabPane>
             </Tabs> */}
 
-            <Menu defaultSelectedKeys="query" mode="horizontal" style={{lineHeight: '2.5rem', marginBottom: 12}}>
+            <Menu defaultSelectedKeys={location.pathname.includes('pages') ? 'pages' : 'query'} mode="horizontal" style={{lineHeight: '2.5rem', marginBottom: 12}}>
                 <Menu.Item key="query"><Link to="/">Custom Query</Link></Menu.Item>
-                <Menu.Item key="pages"><Link to="/pages/players">Standard Pages</Link></Menu.Item>
+                <Menu.Item key="pages"><Link to="/pages">Standard Pages</Link></Menu.Item>
             </Menu>
 
             <Switch>

@@ -9,18 +9,10 @@ async function writePlayerList() {
         FROM ${tbls.prod.sqlName} WHERE ${dims.player_position.sql} in ('QB', 'RB', 'WR', 'TE') ORDER BY 1 ASC`
     const result = await bq.runQuery(sqlPlayerList)
     
-    const listForSelectProps = result.map(row => ({value: `'${row.player_gsis_id}'`, label: row.player_name_with_position}) )
+    const listForSelectProps = result.map(row => ({value: row.player_gsis_id, label: row.player_name_with_position}) )
     fs.writeFile(relativePath + 'playerList.json', JSON.stringify(listForSelectProps), function (err) {
         if (err) return console.log(err);
     })
-
-    // const lookupObject = {}
-    // result.forEach(row => {
-    //     lookupObject[`'${row.player_name_with_position}'`] = row.player_gsis_id
-    // })
-    // fs.writeFile('../lookups/player-partition-lookup.json', JSON.stringify(lookupObject), function (err) {
-    //     if (err) return console.log(err);
-    // })
 }
 
 async function writeTeamList() {
@@ -28,18 +20,10 @@ async function writeTeamList() {
         FROM ${tbls.prod.sqlName} ORDER BY 1 ASC`
     const result = await bq.runQuery(sqlTeamList)
 
-    const listForSelectProps = result.map(row => ({value: `'${row.team_id}'`, label: row.team_name}) )
+    const listForSelectProps = result.map(row => ({value: row.team_id, label: row.team_name}) )
     fs.writeFile(relativePath + 'teamList.json', JSON.stringify(listForSelectProps), function (err) {
         if (err) return console.log(err);
     })
-
-    // const lookupObject = {}
-    // result.forEach(row => {
-    //     lookupObject[`'${row.team_name}'`] = row.team_id
-    // })
-    // fs.writeFile('../lookups/team-partition-lookup.json', JSON.stringify(lookupObject), function (err) {
-    //     if (err) return console.log(err);
-    // })
 }
 
 

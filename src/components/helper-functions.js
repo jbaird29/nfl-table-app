@@ -41,11 +41,11 @@ export function addRender(column) {
     } else if (column.format === 'string' && column.dataIndex === 'player_name_with_position') {
         column.render = (text, row, index) => (!text ? text : <span> 
             <Tooltip title="View Player Stats" placement="bottom" mouseEnterDelay={0.08} mouseLeaveDelay={0} overlayStyle={{fontSize: '0.75rem'}} >
-            <Link target="_blank" href={`/?type=player&id=${encodeURI(playerMap[text])}`}>{text}</Link></Tooltip></span>)
+            <Link target="_blank" href={`/pages/players/${encodeURI(playerMap[text])}`}>{text}</Link></Tooltip></span>)
     } else if (column.format === 'string' && column.dataIndex === 'team_name') {
         column.render = (text, row, index) => (!text ? text : <span> 
             <Tooltip title="View Team Stats" placement="bottom" mouseEnterDelay={0.08} mouseLeaveDelay={0} overlayStyle={{fontSize: '0.75rem'}} >
-            <Link target="_blank" href={`/?type=team&id=${encodeURI(teamMap[text])}`}>{text}</Link></Tooltip></span>)
+            <Link target="_blank" href={`/pages/teams/${encodeURI(teamMap[text])}`}>{text}</Link></Tooltip></span>)
     }
 }
 

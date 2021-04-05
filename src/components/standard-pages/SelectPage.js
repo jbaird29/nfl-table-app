@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import {Radio, Row, Col, Typography, Select, Divider, message, Image, Card, List, Avatar, Menu, } from 'antd';
-import { UserOutlined } from '@ant-design/icons';
+import {Radio, Row, Col, Typography, Select, Divider, message, Image, Card, List, Avatar, Menu, Dropdown, } from 'antd';
+import { DownOutlined } from '@ant-design/icons';
 import { Switch, Route, Link, useHistory, useParams, useLocation} from 'react-router-dom';
 import { addRenderSorterToTable} from '../helper-functions'
 import LoadPage from './LoadPage'
@@ -16,21 +16,26 @@ export default function SelectPage(props) {
     // todo - add logic for toggling between Pass / Rush / Recv stats
     // todo - add a 'position' filter before player?
     // todo - add team info card
-    // todo - bug when I type in player, switch and type in team, and then type in player again
 
     const onPlayerSelect = (id) => history.push(`/pages/players/${encodeURI(id)}`)
     const onTeamSelect   = (id) => history.push(`/pages/teams/${encodeURI(id)}`)
 
     const selectStyle = { width: '85%' }
 
+    const menu = (
+        <Menu>
+          <Menu.Item key="players"><Link to="/pages/players/">Player Stats</Link></Menu.Item>
+          <Menu.Item key="teams"><Link to="/pages/teams/">Team Stats</Link></Menu.Item>
+        </Menu>
+      );      
+
 
     return (<>
         <Row gutter={[0, 18]}>
         <Col span={24} style={{textAlign: 'center'}}>
-            <Menu defaultSelectedKeys="players" mode="horizontal" style={{lineHeight: '1.5rem', marginBottom: 6}}>
-                <Menu.Item key="players"><Link to="/pages/players/">Player Stats</Link></Menu.Item>
-                <Menu.Item key="teams"><Link to="/pages/teams/">Team Stats</Link></Menu.Item>
-            </Menu>
+        <Dropdown overlay={menu}>
+            <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>Select a Page Type <DownOutlined /></a>
+        </Dropdown>
         </Col>
         </Row>
 
@@ -47,8 +52,6 @@ export default function SelectPage(props) {
         </Col>
         </Row>
 
-        <Divider />
-
         <Row gutter={[0, 18]}>
         <Col span={24} style={{textAlign: 'center'}}>
             <Radio.Group onChange={(e) => setStatType(e.target.value)} value={statType} buttonStyle="solid">
@@ -61,9 +64,11 @@ export default function SelectPage(props) {
 
         <Switch>
             <Route path="/pages/players/:id"> 
+                <Divider />
                 <LoadPage type="player" setTableData={props.setTableData} setSavedCalcsFields={props.setSavedCalcsFields} setSavedQueryFields={props.setSavedQueryFields} />
             </Route>
             <Route path="/pages/teams/:id"> 
+                <Divider />
                 <LoadPage type="team" setTableData={props.setTableData} setSavedCalcsFields={props.setSavedCalcsFields} setSavedQueryFields={props.setSavedQueryFields} />
             </Route>
         </Switch>
