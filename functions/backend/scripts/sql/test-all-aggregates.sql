@@ -17,9 +17,9 @@ SELECT
     SUM(CASE WHEN true THEN rush_was_touchdown ELSE NULL END) AS rush_touchdowns_sum,
     SUM(CASE WHEN true THEN rush_broken_tackles ELSE NULL END) AS rush_broken_tackles_sum,
     SUM(CASE WHEN true THEN yards_after_contact ELSE NULL END) AS rush_yards_after_contact_sum,
-    SUM(CASE WHEN true THEN recv_yards ELSE NULL END) AS recv_yards_sum,
     SUM(CASE WHEN true THEN recv_was_reception ELSE NULL END) AS recv_receptions_sum,
     SUM(CASE WHEN true THEN recv_was_target ELSE NULL END) AS recv_targets_sum,
+    SUM(CASE WHEN true THEN recv_yards ELSE NULL END) AS recv_yards_sum,
     SUM(CASE WHEN true THEN recv_was_touchdown ELSE NULL END) AS recv_touchdowns_sum,
     SUM(CASE WHEN true THEN recv_yards ELSE NULL END) / SUM(CASE WHEN true THEN recv_was_reception ELSE NULL END) AS recv_yards_per_reception,
 FROM

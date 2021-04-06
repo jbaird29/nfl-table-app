@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Radio, Row, Col, Typography, Select, Divider, message, Image, Card, List, Avatar, Menu, Spin } from 'antd';
-import { UserOutlined } from '@ant-design/icons';
+import { UserOutlined, LoadingOutlined } from '@ant-design/icons';
 import { useParams} from 'react-router-dom';
 import { addRenderSorterToTable} from '../helper-functions'
 
@@ -100,9 +100,28 @@ export default function LoadPage(props) {
         </Card>
     )
 
-    const getTeamCard = info => (<div>Test</div>)
+    const getTeamCard = info => (
+        <Card loading={false} size='small' style={{ width: 250, margin: 'auto', }}
+        cover={<Image alt={info.team_name} src={info.logo_url} />} >
+        <Card.Meta title={info.team_name} description={`(${info.team_abbreviation})`} 
+            style={{marginBottom: 8, marginTop: 4, lineHeight: 1.2}}
+        />
+        <Card.Grid hoverable={false} style={{padding: 6, width: '100%', textAlign: 'left', lineHeight: 1.5, }}>
+            <Paragraph style={paragraphStyle}><Text strong>Coach:</Text> {info.coach}</Paragraph>
+            <Divider style={dividerStyle} />
+            <Paragraph style={paragraphStyle}><Text strong>General Manager:</Text> {info.general_manager}</Paragraph>
+            <Divider style={dividerStyle} />
+            <Paragraph style={paragraphStyle}><Text strong>Owners:</Text> {info.owners}</Paragraph>
+            <Divider style={dividerStyle} />
+            <Paragraph style={paragraphStyle}><Text strong>Venue:</Text> {info.venue}</Paragraph>
+        </Card.Grid>
+        </Card>
+    )
 
-    const getTeamLoadingCard = () => (<div>Test</div>)
+    const getTeamLoadingCard = () => (
+        <Card loading={true} size='small' style={{ width: 250, margin: 'auto', }}
+        cover={<Avatar shape="square" style={{width: 250, height: 181.656}} size={181.656} icon={<LoadingOutlined />} />} />
+    )
 
     const getInfoCard = (type, info) => (type === 'player' ? getPlayerCard(info) : getTeamCard(info))
 

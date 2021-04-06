@@ -49,15 +49,16 @@ export default function ColumnForm(props) {
         </Form.Item>
     )
 
-    const renderRowTypeFilter = (fieldName, fieldLabel, fieldOptions) => (
+    const renderRowTypeFilter = (fieldName, fieldLabel, fieldOptions, toolTipText) => (
         <Form.Item noStyle shouldUpdate={(prev, current) =>
             (!current.row || !prev.row) ? true :
             (current.row.field !== prev.row.field)}>
             {({ getFieldValue }) =>
                 getFieldValue(['row', 'field']) !== fieldName ? (
                 <Form.Item name={['columns', props.colIndex, 'filters', fieldName]} label={`Select ${fieldLabel}`}
-                    labelCol={{span: 16}} wrapperCol={{span: 8}} >
-                    <Select showSearch={true} allowClear={true} placeholder={fieldLabel} options={fieldOptions}/>
+                    labelCol={{span: 16}} wrapperCol={{span: 8}} 
+                    tooltip={!toolTipText ? false : { title: toolTipText, icon: <InfoCircleOutlined /> }} >
+                    <Select showSearch={true} allowClear={true} placeholder={fieldLabel} options={fieldOptions}  optionFilterProp="label"/>
                 </Form.Item>
                 ) : null
             }
@@ -68,7 +69,7 @@ export default function ColumnForm(props) {
     <>
 
             <Form.Item name={['columns', props.colIndex, 'title']} label='Enter a Column Title'
-                tooltip={{ title: 'This title will appear in the table above this column. If no title is entred, it will be titled based on the Stat Type.', 
+                tooltip={{ title: 'Optional. If no title is entered, it will be auto-generated based on the Stat Type.', 
                 icon: <InfoCircleOutlined /> }}>
                 <Input autoComplete="off" placeholder="Title (Optional)" style={{textAlign: "center"}} />
             </Form.Item>
@@ -78,11 +79,9 @@ export default function ColumnForm(props) {
                 <Select {...selectProps}/>
             </Form.Item>
 
-            <Divider orientation="center" plain>Recommended Filters</Divider>
-
-            {renderRowTypeFilter('season_year', 'Year', yearsList)}
-            {renderRowTypeFilter('team_name', 'Team', teamList)}
-            {renderRowTypeFilter('player_name_with_position', 'Player', playerList)}
+            {renderRowTypeFilter('season_year', 'Year', yearsList, 'If no year is selected, the stats will display total career statistics.')}
+            {renderRowTypeFilter('player_gsis_id', 'Player', playerList)}
+            {renderRowTypeFilter('team_id', 'Team', teamList)}
 
             <Divider orientation="center" plain>General Filters (Optional)</Divider>
 

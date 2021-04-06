@@ -993,6 +993,16 @@ fltrs.player_name_with_position = new Filter(dims.player_name_with_position, {
     name: 'player_name_with_position',
     expose: false,   // this is enetered manually right now because it appears above the 'General Filters' box
 })
+// ------------------------------------------------------------------------------------------------------------
+fltrs.team_id = new Filter(dims.team_id, {
+    name: 'team_id',
+    expose: false,   // this is enetered manually right now because it appears above the 'General Filters' box
+})
+// ------------------------------------------------------------------------------------------------------------
+fltrs.player_gsis_id = new Filter(dims.player_gsis_id, {
+    name: 'player_gsis_id',
+    expose: false,   // this is enetered manually right now because it appears above the 'General Filters' box
+})
 
 
 /** -----------------------------------------------------------------------------------------------------------

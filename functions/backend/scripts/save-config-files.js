@@ -13,6 +13,16 @@ async function writePlayerList() {
     fs.writeFile(relativePath + 'playerList.json', JSON.stringify(listForSelectProps), function (err) {
         if (err) return console.log(err);
     })
+
+    // converts: [{value: gsis_id_1, label: player_name_1}]   into: {player_name_1: gsis_id_1, player_name_2: gsis_id_2}
+    const playerNameToIDMap = Object.assign( ...listForSelectProps.map(props => ({[props.label]: props.value })) )
+    const playerIDToNameMap = Object.assign( ...listForSelectProps.map(props => ({[props.value]: props.label })) )
+    fs.writeFile('../lookups/playerNameToIDMap.json', JSON.stringify(playerNameToIDMap), function (err) {
+        if (err) return console.log(err);
+    })
+    fs.writeFile('../lookups/playerIDToNameMap.json', JSON.stringify(playerIDToNameMap), function (err) {
+        if (err) return console.log(err);
+    })
 }
 
 async function writeTeamList() {
@@ -24,6 +34,17 @@ async function writeTeamList() {
     fs.writeFile(relativePath + 'teamList.json', JSON.stringify(listForSelectProps), function (err) {
         if (err) return console.log(err);
     })
+
+    // converts: [{value: team_id_1, label: team_name_1}]   into: {team_id_1: team_name_1, team_id_2: team_name_2}
+    const teamNameToIDMap = Object.assign( ...listForSelectProps.map(props => ({[props.label]: props.value })) )
+    const teamIDToNameMap = Object.assign( ...listForSelectProps.map(props => ({[props.value]: props.label })) )
+    fs.writeFile('../lookups/teamNameToIDMap.json', JSON.stringify(teamNameToIDMap), function (err) {
+        if (err) return console.log(err);
+    })
+    fs.writeFile('../lookups/teamIDToNameMap.json', JSON.stringify(teamIDToNameMap), function (err) {
+        if (err) return console.log(err);
+    })
+    
 }
 
 

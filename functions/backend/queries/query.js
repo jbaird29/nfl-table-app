@@ -1,3 +1,6 @@
+const playerIDToNameMap = require('../lookups/playerIDToNameMap.json')
+const teamIDToNameMap = require('../lookups/teamIDToNameMap.json')
+
 module.exports.Query = class Query {
     constructor(meta, queryForm) {
         this.dims = meta.dims
@@ -22,7 +25,6 @@ module.exports.Query = class Query {
         const {sql, singleOperator, multipleOperator, joiner, dataType} = this.fltrs[name]
         if (!Array.isArray(values)) {
             const escaped = dataType === 'string' ? `'${values}'` : values
-            console.log("XXXX", `${sql} ${singleOperator} ${escaped}`)
             return `${sql} ${singleOperator} ${escaped}`
         } else {
             const escaped = dataType === 'string' ? values.map(value => `'${value}'`) : values
@@ -74,9 +76,10 @@ module.exports.Query = class Query {
     */ 
     buildWhere() {
         // create array of SQL strings with what is in the WHERE portion of the request
-        const whereArr = Object.entries(this.where)
-                        .filter(([name, values]) => values && (Array.isArray(values) ? values.length > 0 : true))
-                        .map(([name, values]) => this.buildFilterSQL(name, values))
+        const whereArr = !this.where ? [] : 
+                Object.entries(this.where)
+                .filter(([name, values]) => values && (Array.isArray(values) ? values.length > 0 : true))
+                .map(([name, values]) => this.buildFilterSQL(name, values))
 
         // append season_year filter based on what is in the columns
         const yearsWithDuplicates = Object.entries(this.columns)
@@ -161,7 +164,10 @@ module.exports.Query = class Query {
         const {field, title, filters} = column
         const {shortTitle, width, dataType, format, } = this.aggs[field]
         // default title will include year if year is selected
-        const defaultTitle = `${shortTitle}` + (!filters.season_year ? '' : ` (${filters.season_year})`)
+        const seasonYear = !filters.season_year ? '' : ` (${filters.season_year})`
+        const playerName = !filters.player_gsis_id ? '' : ` (${playerIDToNameMap[filters.player_gsis_id]})`
+        const teamName = !filters.team_id ? '' : ` (${teamIDToNameMap[filters.team_id]})`
+        const defaultTitle = `${shortTitle}` + seasonYear + playerName + teamName
         return ({
             title: `Col ${colIndex.slice(3)}`, 
             align: 'center', 

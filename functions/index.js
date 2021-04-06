@@ -109,7 +109,7 @@ exports.loadStandardPage = functions.https.onRequest(async function(req, res){
         infoSQL += ` FROM \`nfl-table.main.player_info\``
         infoSQL += ` WHERE ${sqlID} = '${id}' `
     } else if (type === 'team') {
-        infoSQL += `SELECT team_name, team_abbreviation `
+        infoSQL += `SELECT team_name, team_abbreviation, coach, venue, general_manager, owners, logo_url `
         infoSQL += ` FROM \`nfl-table.main.team_info\` WHERE ${sqlID} = '${id}' `
     } else {
         res.status(400).send({error: "Type invalid."})

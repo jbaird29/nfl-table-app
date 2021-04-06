@@ -20,14 +20,14 @@ export default function WhereForm(props) {
                 <Select mode="multiple" showSearch={true} allowClear={true} placeholder='Year' options={yearsList}/>
             </Form.Item>
 
-            <Form.Item name={['where', 'team_name']} label={`Select Teams`}
+            <Form.Item name={['where', 'team_id']} label={`Select Teams`}
                 labelCol={{span: 12}} wrapperCol={{span: 12}} >
-                <Select mode="multiple" showSearch={true} allowClear={true} placeholder='Team' options={teamList}/>
+                <Select mode="multiple" showSearch={true} allowClear={true} placeholder='Team' options={teamList} optionFilterProp="label"/>
             </Form.Item>
 
-            <Form.Item name={['where', 'player_name_with_position']} label={`Select Players`}
+            <Form.Item name={['where', 'player_gsis_id']} label={`Select Players`}
                 labelCol={{span: 12}} wrapperCol={{span: 12}} >
-                <Select mode="multiple" showSearch={true} allowClear={true} placeholder='Players' options={playerList}/>
+                <Select mode="multiple" showSearch={true} allowClear={true} placeholder='Players' options={playerList} optionFilterProp="label"/>
             </Form.Item>
 
             {filtersWhere.map(filter => renderFilterObject(filter))}

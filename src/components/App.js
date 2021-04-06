@@ -231,7 +231,7 @@ function App() {
 
     const fieldDrawerProps = {
         title: 'Edit Query Fields',
-        width: '50%',
+        width: '55%',
         visible: isFieldDrawerVisible,
         placement: 'left',
         onClose: () => setIsFieldDrawerVisible(false),
@@ -346,7 +346,7 @@ function App() {
                                 size="small" className="site-navigation-steps" >
                         <Step status={step === 0 ? "process" : "wait"}  title="Select Row Type" />
                         <Step status={step === 1 ? "process" : "wait"} title="Add Columns"/>
-                        <Step status={step === 2 ? "process" : "wait"} title="Global Filters"/>
+                        {/* <Step status={step === 2 ? "process" : "wait"} title="Global Filters"/> */}
                     </Steps>
 
                     <Form {...queryFormProps} key={`queryForm_reset_${resetQuery}`}>
@@ -356,9 +356,9 @@ function App() {
                         <div style={step === 1 ? {} : { display: 'none' } } >
                             <ColumnTabs initialQueryPanes={initialQueryPanes}  queryForm={queryForm} />
                         </div>
-                        <div style={step === 2 ? {} : { display: 'none' } } >
+                        {/* <div style={step === 2 ? {} : { display: 'none' } } >
                             <WhereForm />
-                        </div>
+                        </div> */}
                     </Form>
 
                 </Drawer>

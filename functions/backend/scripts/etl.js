@@ -108,8 +108,22 @@ function writeTeamStats() {
     })
 }
 
+async function executeQueries() {
+    const creationSQL = getCreationSQL()
+    const result1 = await bq.runQuery(creationSQL)
+    console.log(result1)
+
+    const playerStatsSQL = getPlayerStats()
+    const result2 = await bq.runQuery(playerStatsSQL)
+    console.log(result2)
+
+    const teamStatsSQL = getTeamStats()
+    const result3 = await bq.runQuery(teamStatsSQL)
+    console.log(result3)
+}
 
 writePlayerStats()
 writeTeamStats()
 writeCreationSQL()
 writeAllAggregatesSQL()
+executeQueries()
