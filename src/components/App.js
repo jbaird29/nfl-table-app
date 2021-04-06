@@ -10,7 +10,7 @@ import WhereForm from './query-fields/Where-Form'
 import CustomCalcTabs from './custom-calcs/Custom-Calc-Tabs'
 import SelectPage from './standard-pages/SelectPage'
 import { toCSV, copyTableWithoutCalcs, addCalcsToTable, addRenderSorterToTable} from './helper-functions'
-import { Switch, Route, Link, useLocation, useParams} from 'react-router-dom';
+import { Switch, Route, Link, useLocation, useHistory, } from 'react-router-dom';
 import logo from '../images/logo.png'
 
 const { Header, Sider, Content, Footer } = Layout;
@@ -45,14 +45,7 @@ function App() {
     const [urlText, setURLText] = useState('')
 
     const location = useLocation();
-
-    // onSubmit query --> setSavedQueryFields; setSavedCalcsFields(null)
-    // useEffect(savedQueryFields) --> async fetch(); addSorterRender(); setTableData()
-
-    // onSubmit calcs --> setSavedCalcsFields()
-    // useEffect(savedCalcsFields) --> copyTableWithoutCalcs(); addCalcs(); addSorterRender(); setTableData()
-
-    // useEffect(pageLoad) --> async fetch(); setSavedQueryFields(); setSavedCalcsFields(); 
+    const history = useHistory();
 
 
     // when the page is first loaded, check to see if a ?sid= state is included
@@ -74,6 +67,37 @@ function App() {
     // ?sid=5nqfxVMpXUen5bQ5Jf6o        = adds Col1 and Col2; adds Calc1; then changes Col2 (so Calc1 disappears)
     //                                    ASSERT that Calcs form is empty
     // ?sid=5TjRMklHXcivbsQYzJSf        = 8 columns & 4 calcs
+
+    function openStandardInCustomQuery(type, id) {
+        // step 1: transform the tableData into queryFields object
+        const row = { field: tableData.columns[0].dataIndex}
+        const where = type === 'player' ? { player_gsis_id: id} : { team_id : id}
+        const columns = Object.assign({}, ...tableData.columns.slice(1)
+            .map((column, i) => ( {['col'+(i+1)]: { field : column.dataIndex }} )))
+        const queryFields = {row: row, where: where, columns: columns}
+        // skipped for now - I need to figure out how to prevent the LoadPage cleanup which empties tableData
+        // // step 2: add 'Col' headers to the tableData
+        // const newColumns = tableData.columns.slice(1).map((column, index) => ({
+        //     title: `Col ${index+1}`, 
+        //     align: 'center', 
+        //     key: `wrapper_col${index+1}`,
+        //     children: [column]
+        // }))
+        // newColumns.splice(0, 0, tableData.columns[0])
+        // // step 3: update the state
+        // setTableData({columns: newColumns, dataSource: tableData.dataSource})
+        setInitialQueryPanes(Object.keys(queryFields.columns).map(colIndex => ({ title: `Col ${colIndex.slice(3)}`, key: `${colIndex.slice(3)}` })))
+        queryForm.setFieldsValue(queryFields)
+        setSavedQueryFields(queryFields)
+        setIsFieldDrawerVisible(true)
+        setStep(1)
+    }
+    // note the initial query pane methodology currently DOESNT WORK
+    // if you open a couple tabs, then hit this method, it only shows those 2 tabs
+    // I should refactor the 'initial query panes' method to be a state-setting method on the tabs
+    // I think I can then do a force render on the queryDrawer
+
+    // other bug - when I click on the button, the rotue changes but the Menu item doesnt
 
     async function loadState(sid) {
         const hide = message.loading({content: 'Loading the data', style: {fontSize: '1rem'}}, 0)
@@ -312,7 +336,8 @@ function App() {
                     <Row style={{padding: '6px 12px'}}><Button block onClick={onDownload} shape="round" icon={<DownloadOutlined />}>Download Data</Button></Row>
                 </Route>
                 <Route path="/pages">
-                    <SelectPage setTableData={setTableData} setSavedCalcsFields={setSavedCalcsFields} setSavedQueryFields={setSavedQueryFields}/>
+                    <SelectPage openStandardInCustomQuery={openStandardInCustomQuery} setTableData={setTableData} 
+                        setSavedCalcsFields={setSavedCalcsFields} setSavedQueryFields={setSavedQueryFields}/>
                 </Route>
             </Switch>
         
@@ -355,7 +380,7 @@ function App() {
                                 size="small" className="site-navigation-steps" >
                         <Step status={step === 0 ? "process" : "wait"}  title="Select Row Type" />
                         <Step status={step === 1 ? "process" : "wait"} title="Add Columns"/>
-                        {/* <Step status={step === 2 ? "process" : "wait"} title="Global Filters"/> */}
+                        <Step status={step === 2 ? "process" : "wait"} title="Global Filters"/>
                     </Steps>
 
                     <Form {...queryFormProps} key={`queryForm_reset_${resetQuery}`}>
@@ -365,9 +390,9 @@ function App() {
                         <div style={step === 1 ? {} : { display: 'none' } } >
                             <ColumnTabs initialQueryPanes={initialQueryPanes}  queryForm={queryForm} />
                         </div>
-                        {/* <div style={step === 2 ? {} : { display: 'none' } } >
+                        <div style={step === 2 ? {} : { display: 'none' } } >
                             <WhereForm />
-                        </div> */}
+                        </div>
                     </Form>
 
                 </Drawer>

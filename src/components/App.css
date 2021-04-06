@@ -1,3 +1,6 @@
+body {
+  overscroll-behavior-x: none;
+}
 
 /* this sets the style for the navigation steps in the queryForm*/
 .site-navigation-steps {

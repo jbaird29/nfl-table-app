@@ -9,6 +9,8 @@ const { Text, Link } = Typography;
 const playerMap = Object.assign( ...playerList.map(props => ({[props.label]: props.value })) )
 const teamMap = Object.assign( ...teamList.map(props => ({[props.label]: props.value })) )
 
+export const listOfRowTypes = ['season_year', 'player_name_with_position', 'team_name']
+
 /**
  * Given a TableProps column object, adds a sorter function depending on format type
  * @param {Object} column - tableProps Column

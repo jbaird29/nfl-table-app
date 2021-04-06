@@ -18,7 +18,7 @@ export default function SelectPage(props) {
     const selectStyle = { width: '85%' }
 
     const menu = (
-        <Menu style={{width: '85%', margin: 'auto', }}>
+        <Menu style={{textAlign: 'center', width: '85%', margin: 'auto', }}>
           <Menu.Item key="players"><Link to="/pages/players/">Player Stats</Link></Menu.Item>
           <Menu.Item key="teams"><Link to="/pages/teams/">Team Stats</Link></Menu.Item>
         </Menu>
@@ -52,11 +52,13 @@ export default function SelectPage(props) {
         <Switch>
             <Route path="/pages/players/:id"> 
                 <Divider />
-                <LoadPage type="player" setTableData={props.setTableData} setSavedCalcsFields={props.setSavedCalcsFields} setSavedQueryFields={props.setSavedQueryFields} />
+                <LoadPage type="player" openStandardInCustomQuery={props.openStandardInCustomQuery} setTableData={props.setTableData} 
+                    setSavedCalcsFields={props.setSavedCalcsFields} setSavedQueryFields={props.setSavedQueryFields} />
             </Route>
             <Route path="/pages/teams/:id"> 
                 <Divider />
-                <LoadPage type="team" setTableData={props.setTableData} setSavedCalcsFields={props.setSavedCalcsFields} setSavedQueryFields={props.setSavedQueryFields} />
+                <LoadPage type="team" openStandardInCustomQuery={props.openStandardInCustomQuery} setTableData={props.setTableData} 
+                    setSavedCalcsFields={props.setSavedCalcsFields} setSavedQueryFields={props.setSavedQueryFields} />
             </Route>
         </Switch>
  

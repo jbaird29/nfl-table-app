@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { Radio, Row, Col, Typography, Select, Divider, message, Image, Card, List, Avatar, Menu, Spin } from 'antd';
+import { Radio, Row, Col, Typography, Select, Divider, message, Image, Card, List, Avatar, Menu, Spin, Button } from 'antd';
 import { UserOutlined, LoadingOutlined } from '@ant-design/icons';
-import { useParams} from 'react-router-dom';
-import { addRenderSorterToTable} from '../helper-functions'
+import { useParams, useHistory} from 'react-router-dom';
+import { addRenderSorterToTable, listOfRowTypes} from '../helper-functions'
 
 const {Paragraph, Text} = Typography
 
 export default function LoadPage(props) {
     const [cardLoading, setCardLoading] = useState(true)
     const [infoCard, setInfoCard] = useState(null)
+
+    const history = useHistory();
     const {id} = useParams()
     const type = props.type
 
@@ -54,9 +56,7 @@ export default function LoadPage(props) {
         }
     }
 
-    // NOTE: If I add other possible row types, include them here
-    const rowTypes = ['season_year', 'player_name_with_position', 'team_name']
-    const shouldInclude = (dataIndex, statType) => dataIndex.startsWith(statType) || rowTypes.includes(dataIndex)
+    const shouldInclude = (dataIndex, statType) => dataIndex.startsWith(statType) || listOfRowTypes.includes(dataIndex)
 
     const filterRow = (row, statType) => Object.fromEntries(
         Object.entries(row).filter(([dataIndex, value]) => shouldInclude(dataIndex, statType))
@@ -70,6 +70,12 @@ export default function LoadPage(props) {
             props.setTableData({columns: newColumns, dataSource: newDatasource})
         }
     }, [allPlayerData, statType])
+
+
+    const handleOpenCustomQueryClick = () => {
+        history.push('/')
+        props.openStandardInCustomQuery(type, id)
+    }
 
 
     const paragraphStyle = { margin: '4px 0'}
@@ -143,5 +149,6 @@ export default function LoadPage(props) {
         {selectStats}
         {cardLoading && getLoadingCard()}
         {infoCard && !cardLoading && getInfoCard(type, infoCard)}
+        <Button onClick={handleOpenCustomQueryClick}>Open in Custom Query</Button>
     </>);
 };
