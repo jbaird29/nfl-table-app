@@ -25,7 +25,7 @@ function Table(props) {
       size="small"
       showSorterTooltip={true}
       sortDirections={['descend', 'ascend', 'descend']}
-      rowKey={columns ? columns[1].dataIndex : ''}   // this will make the row field (i.e. player_name) the rowKey
+      // rowKey={columns ? columns[1].dataIndex : ''}   // this will make the row field (i.e. player_name) the rowKey
       className={'custom-table'}
       rowClassName={'custom-table-row'}
     />

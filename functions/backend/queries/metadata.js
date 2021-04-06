@@ -276,7 +276,7 @@ dims.player_name = new Dimension({
 // ------------------------------------------------------------------------------------------------------------
 dims.player_position = new Dimension({
     sql: 'player_position',
-    creationSQL: `${tbls.player_info.name}.position`,
+    creationSQL: `${tbls.player_info.name}.player_position`,
     statType: 'general',
     title: 'Player Position',
     shortTitle: 'Position',
@@ -863,15 +863,17 @@ aggs.rush_touchdowns_sum = new Aggregate({
 })
 aggs.rush_broken_tackles_sum = new Aggregate({
     name: 'rush_broken_tackles_sum',
-    title: 'Total Broken Tackles', 
-    shortTitle: 'Rush Broken Tackles', 
+    includeInSummary: true,
+    title: 'Rush Total Broken Tackles', 
+    shortTitle: 'Broken Tackles', 
     statType: 'rush',
     sql: `SUM(CASE WHEN true THEN ${dims.rush_broken_tackles.sql} ELSE NULL END)`, 
 })
 aggs.rush_yards_after_contact_sum = new Aggregate({
     name: 'rush_yards_after_contact_sum',
-    title: 'Yards Ater Contact', 
-    shortTitle: 'Rush YDS After Contact', 
+    includeInSummary: true,
+    title: 'Rush Yards Ater Contact', 
+    shortTitle: 'YDS After Contact', 
     statType: 'rush',
     sql: `SUM(CASE WHEN true THEN ${dims.yards_after_contact.sql} ELSE NULL END)`, 
 })
@@ -881,15 +883,9 @@ aggs.rush_yards_after_contact_sum = new Aggregate({
 //* -----------------------------------------------------------------------------------------------------------
 //* Receiving Aggregates
 //* -----------------------------------------------------------------------------------------------------------
-aggs.recv_yards_sum = new Aggregate({
-    name: 'recv_yards_sum',
-    title: 'Receiving Yards', 
-    shortTitle: 'Recv YDS', 
-    statType: 'recv',
-    sql: `SUM(CASE WHEN true THEN ${dims.recv_yards.sql} ELSE NULL END)`, 
-})
 aggs.recv_receptions_sum = new Aggregate({
     name: 'recv_receptions_sum',
+    includeInSummary: true,
     title: 'Receptions', 
     shortTitle: 'Recv REC', 
     statType: 'recv',
@@ -897,13 +893,23 @@ aggs.recv_receptions_sum = new Aggregate({
 })
 aggs.recv_targets_sum = new Aggregate({
     name: 'recv_targets_sum',
+    includeInSummary: true,
     title: 'Receiving Targets', 
     shortTitle: 'Recv TGT', 
     statType: 'recv',
     sql: `SUM(CASE WHEN true THEN ${dims.recv_was_target.sql} ELSE NULL END)`, 
 })
+aggs.recv_yards_sum = new Aggregate({
+    name: 'recv_yards_sum',
+    includeInSummary: true,
+    title: 'Receiving Yards', 
+    shortTitle: 'Recv YDS', 
+    statType: 'recv',
+    sql: `SUM(CASE WHEN true THEN ${dims.recv_yards.sql} ELSE NULL END)`, 
+})
 aggs.recv_touchdowns_sum = new Aggregate({
     name: 'recv_touchdowns_sum',
+    includeInSummary: true,
     title: 'Receiving Touchdowns', 
     shortTitle: 'Recv TDS', 
     statType: 'recv',
@@ -911,6 +917,7 @@ aggs.recv_touchdowns_sum = new Aggregate({
 })
 aggs.recv_yards_per_reception = new Aggregate({
     name: 'recv_yards_per_reception',
+    includeInSummary: true,
     expose: true, 
     title: 'Yards / Catch', 
     shortTitle: 'Y/REC', 

@@ -190,7 +190,7 @@ function App() {
         if (tableData.columns && tableData.columns.length > 0) {
             setIsCalcVisible(true)
         } else {
-            message.error({content: 'Please select fields first', duration: 2.5, style: {fontSize: '1rem'} })
+            message.error({content: 'Please run a query before adding Custom Calculations.', duration: 2.5, style: {fontSize: '1rem'} })
         }
     }
 
@@ -225,7 +225,7 @@ function App() {
     }
 
     const fieldDrawerProps = {
-        title: 'Edit Fields',
+        title: 'Edit Query Fields',
         width: '50%',
         visible: isFieldDrawerVisible,
         placement: 'left',
@@ -291,7 +291,7 @@ function App() {
 
             <Switch>
                 <Route exact path="/">
-                    <Row style={{padding: '6px 12px'}}><Button block type="primary" onClick={() => setIsFieldDrawerVisible(true)}>Edit Fields</Button></Row>
+                    <Row style={{padding: '6px 12px'}}><Button block type="primary" onClick={() => setIsFieldDrawerVisible(true)}>Edit Query Fields</Button></Row>
                     <Row style={{padding: '6px 12px'}}><Button block onClick={handleShowCalc}>Edit Custom Calcs</Button></Row>
                     <Divider />
                     <Row style={{padding: '6px 12px'}}><Button block onClick={onShareURL} shape="round" icon={<CloudUploadOutlined />}>Generate URL</Button></Row>

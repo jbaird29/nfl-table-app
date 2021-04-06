@@ -103,7 +103,7 @@ exports.loadStandardPage = functions.https.onRequest(async function(req, res){
     let infoSQL = ''
     if (type === 'player') {
         infoSQL += `SELECT full_name, birth_date, main.calculate_age(CURRENT_DATE(), birth_date) AS age, `
-        infoSQL += ` college, weight, height, jersey_number, team_name, team_abbreviation, headshot_url `
+        infoSQL += ` college, weight, height, jersey_number, team_name, team_abbreviation, headshot_url, player_position `
         infoSQL += ` FROM \`nfl-table.main.player_info\``
         infoSQL += ` WHERE ${sqlID} = '${id}' `
     } else if (type === 'team') {

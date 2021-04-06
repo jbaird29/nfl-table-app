@@ -10,7 +10,6 @@ import playerList from '../../inputs/playerList.json'
 const {Paragraph, Text} = Typography
 
 export default function SelectPage(props) {
-    const [statType, setStatType] = useState('pass')
     const history = useHistory();
 
     // todo - add logic for toggling between Pass / Rush / Recv stats
@@ -49,16 +48,6 @@ export default function SelectPage(props) {
                     component={() => <Select onChange={onTeamSelect} style={selectStyle} showSearch={true} allowClear={true} placeholder='Teams' options={teamList} optionFilterProp="label"/>}
                 />
             </Switch>
-        </Col>
-        </Row>
-
-        <Row gutter={[0, 18]}>
-        <Col span={24} style={{textAlign: 'center'}}>
-            <Radio.Group onChange={(e) => setStatType(e.target.value)} value={statType} buttonStyle="solid">
-                <Radio.Button value={'pass'}>Passing</Radio.Button>
-                <Radio.Button value={'rush'}>Rushing</Radio.Button>
-                <Radio.Button value={'recv'}>Receiving</Radio.Button>
-            </Radio.Group>
         </Col>
         </Row>
 

@@ -12,14 +12,43 @@ export default function LoadPage(props) {
     const {id} = useParams()
     const type = props.type
 
+    const [allPlayerData, setAllPlayerData] = useState(null)
+    const [statType, setStatType] = useState(null)
+
+    useEffect(() => {
+        loadStandardPage(type, id)
+    }, [id])
+
+    const positionToStatType = { QB: 'pass', RB: 'rush', WR: 'recv', TE: 'recv' }
+
+    // NOTE: If I add other possible row types, include them here
+    const rowTypes = ['season_year', 'player_name_with_position', 'team_name']
+    const shouldInclude = (dataIndex, statType) => dataIndex.startsWith(statType) || rowTypes.includes(dataIndex)
+
+    const filterRow = (row, statType) => Object.fromEntries(
+        Object.entries(row).filter(([dataIndex, value]) => shouldInclude(dataIndex, statType))
+    ) 
+
+    // in loadStandardPage: setAllPlayerData(tableData) and setStatType('pass') (or set dynamically based on position)
+    useEffect(() => {
+        if (allPlayerData && statType) {
+            const newColumns = allPlayerData.columns.filter(column => shouldInclude(column.dataIndex, statType))
+            const newDatasource = allPlayerData.dataSource.map(row => filterRow(row, statType))
+            props.setTableData({columns: newColumns, dataSource: newDatasource})
+        }
+    }, [allPlayerData, statType])
+
     async function loadStandardPage(type, id) {
         const hide = message.loading({content: 'Loading the data', style: {fontSize: '1rem'}}, 0)
         setCardLoading(true)
+        setStatType(null)
         const response = await fetch(`/loadStandardPage?type=${type}&id=${id}`, { method: 'GET'})
         if (response.status === 200) {
             const {tableData, info} = await response.json();
+            const defaultStatType = info.player_position ? positionToStatType[info.player_position] : 'pass'
             addRenderSorterToTable(tableData)
-            props.setTableData(tableData)
+            setAllPlayerData(tableData)
+            setStatType(defaultStatType)                 // next: set dynamically based on position
             props.setSavedCalcsFields(null)
             props.setSavedQueryFields(null)
             hide()
@@ -33,11 +62,6 @@ export default function LoadPage(props) {
             return null
         }
     }
-
-    useEffect(() => {
-        loadStandardPage(type, id)
-    }, [id])
-
 
     const paragraphStyle = { margin: '4px 0'}
     const dividerStyle = { margin: '0'}
@@ -75,7 +99,18 @@ export default function LoadPage(props) {
 
     const getLoadingCard = () => (type === 'player' ? getPlayerLoadingCard() : getTeamLoadingCard())
 
+    const selectStats = (
+        <Col style={{marginBottom: 16}}>
+        <Radio.Group onChange={(e) => setStatType(e.target.value)} value={statType} buttonStyle="solid">
+            <Radio.Button value={'pass'}>Passing</Radio.Button>
+            <Radio.Button value={'rush'}>Rushing</Radio.Button>
+            <Radio.Button value={'recv'}>Receiving</Radio.Button>
+        </Radio.Group>
+        </Col>
+    )
+
     return (<>
+        {selectStats}
         {cardLoading && getLoadingCard()}
         {infoCard && !cardLoading && getInfoCard(type, infoCard)}
     </>);
