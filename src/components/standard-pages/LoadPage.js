@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Radio, Row, Col, Typography, Select, Divider, message, Image, Card, List, Avatar, Menu, } from 'antd';
+import { Radio, Row, Col, Typography, Select, Divider, message, Image, Card, List, Avatar, Menu, Spin } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
 import { useParams} from 'react-router-dom';
 import { addRenderSorterToTable} from '../helper-functions'
@@ -20,23 +20,6 @@ export default function LoadPage(props) {
     }, [id])
 
     const positionToStatType = { QB: 'pass', RB: 'rush', WR: 'recv', TE: 'recv' }
-
-    // NOTE: If I add other possible row types, include them here
-    const rowTypes = ['season_year', 'player_name_with_position', 'team_name']
-    const shouldInclude = (dataIndex, statType) => dataIndex.startsWith(statType) || rowTypes.includes(dataIndex)
-
-    const filterRow = (row, statType) => Object.fromEntries(
-        Object.entries(row).filter(([dataIndex, value]) => shouldInclude(dataIndex, statType))
-    ) 
-
-    // in loadStandardPage: setAllPlayerData(tableData) and setStatType('pass') (or set dynamically based on position)
-    useEffect(() => {
-        if (allPlayerData && statType) {
-            const newColumns = allPlayerData.columns.filter(column => shouldInclude(column.dataIndex, statType))
-            const newDatasource = allPlayerData.dataSource.map(row => filterRow(row, statType))
-            props.setTableData({columns: newColumns, dataSource: newDatasource})
-        }
-    }, [allPlayerData, statType])
 
     async function loadStandardPage(type, id) {
         const hide = message.loading({content: 'Loading the data', style: {fontSize: '1rem'}}, 0)
@@ -62,6 +45,23 @@ export default function LoadPage(props) {
             return null
         }
     }
+
+    // NOTE: If I add other possible row types, include them here
+    const rowTypes = ['season_year', 'player_name_with_position', 'team_name']
+    const shouldInclude = (dataIndex, statType) => dataIndex.startsWith(statType) || rowTypes.includes(dataIndex)
+
+    const filterRow = (row, statType) => Object.fromEntries(
+        Object.entries(row).filter(([dataIndex, value]) => shouldInclude(dataIndex, statType))
+    ) 
+
+    useEffect(() => {
+        if (allPlayerData && statType) {
+            const newColumns = allPlayerData.columns.filter(column => shouldInclude(column.dataIndex, statType))
+            const newDatasource = allPlayerData.dataSource.map(row => filterRow(row, statType))
+            props.setTableData({columns: newColumns, dataSource: newDatasource})
+        }
+    }, [allPlayerData, statType])
+
 
     const paragraphStyle = { margin: '4px 0'}
     const dividerStyle = { margin: '0'}
@@ -100,6 +100,7 @@ export default function LoadPage(props) {
     const getLoadingCard = () => (type === 'player' ? getPlayerLoadingCard() : getTeamLoadingCard())
 
     const selectStats = (
+        <Spin spinning={cardLoading}>
         <Col style={{marginBottom: 16}}>
         <Radio.Group onChange={(e) => setStatType(e.target.value)} value={statType} buttonStyle="solid">
             <Radio.Button value={'pass'}>Passing</Radio.Button>
@@ -107,6 +108,7 @@ export default function LoadPage(props) {
             <Radio.Button value={'recv'}>Receiving</Radio.Button>
         </Radio.Group>
         </Col>
+        </Spin>
     )
 
     return (<>
