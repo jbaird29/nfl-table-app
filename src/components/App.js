@@ -45,15 +45,17 @@ function App() {
     const [urlText, setURLText] = useState('')
 
     const location = useLocation();
-    const pageType = location.pathname.includes('players') ? 'players' :
-                    (location.pathname.includes('teams') ? 'teams' : null)
-                    
-    // when a user switches page type, this empties tableData
-    useEffect(() => {
-        setTableData({})
-    }, [pageType])
+
+    // onSubmit query --> setSavedQueryFields; setSavedCalcsFields(null)
+    // useEffect(savedQueryFields) --> async fetch(); addSorterRender(); setTableData()
+
+    // onSubmit calcs --> setSavedCalcsFields()
+    // useEffect(savedCalcsFields) --> copyTableWithoutCalcs(); addCalcs(); addSorterRender(); setTableData()
+
+    // useEffect(pageLoad) --> async fetch(); setSavedQueryFields(); setSavedCalcsFields(); 
 
 
+    // when the page is first loaded, check to see if a ?sid= state is included
     useEffect(() => {
         const url = new URL(window.location)
         const sid = url.searchParams.get('sid')

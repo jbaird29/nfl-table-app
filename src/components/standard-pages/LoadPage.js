@@ -16,10 +16,17 @@ export default function LoadPage(props) {
     const [statType, setStatType] = useState(null)
 
     useEffect(() => {
-        loadStandardPage(type, id)
+        loadStandardPage(props.type, id)
+        const cleanUp = () => {
+            props.setTableData({})
+            document.title = 'NFL Table'
+        }
+        return cleanUp
     }, [id])
 
     const positionToStatType = { QB: 'pass', RB: 'rush', WR: 'recv', TE: 'recv' }
+
+    const defaultTableInfo = {sorter: {field: null, order: null},  filters: {} }
 
     async function loadStandardPage(type, id) {
         const hide = message.loading({content: 'Loading the data', style: {fontSize: '1rem'}}, 0)
@@ -29,11 +36,12 @@ export default function LoadPage(props) {
         if (response.status === 200) {
             const {tableData, info} = await response.json();
             const defaultStatType = info.player_position ? positionToStatType[info.player_position] : 'pass'
-            addRenderSorterToTable(tableData)
+            addRenderSorterToTable(tableData, defaultTableInfo)
             setAllPlayerData(tableData)
             setStatType(defaultStatType)
             props.setSavedCalcsFields(null)
             props.setSavedQueryFields(null)
+            document.title = props.type === 'player' ? `${info.full_name} Stats` : `${info.team_name} Stats`
             hide()
             setCardLoading(false)
             setInfoCard(info)
@@ -54,6 +62,7 @@ export default function LoadPage(props) {
         Object.entries(row).filter(([dataIndex, value]) => shouldInclude(dataIndex, statType))
     ) 
 
+    // when the user selects a different stat type, filter the tableData based on that stat type
     useEffect(() => {
         if (allPlayerData && statType) {
             const newColumns = allPlayerData.columns.filter(column => shouldInclude(column.dataIndex, statType))
