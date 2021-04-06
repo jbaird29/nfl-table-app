@@ -49,12 +49,12 @@ export default function ColumnForm(props) {
         </Form.Item>
     )
 
-    const renderRowTypeFilter = (fieldName, fieldLabel, fieldOptions, toolTipText) => (
+    const renderRowTypeFilter = (correspondingRow, fieldName, fieldLabel, fieldOptions, toolTipText) => (
         <Form.Item noStyle shouldUpdate={(prev, current) =>
             (!current.row || !prev.row) ? true :
             (current.row.field !== prev.row.field)}>
             {({ getFieldValue }) =>
-                getFieldValue(['row', 'field']) !== fieldName ? (
+                getFieldValue(['row', 'field']) !== correspondingRow ? (
                 <Form.Item name={['columns', props.colIndex, 'filters', fieldName]} label={`Select ${fieldLabel}`}
                     labelCol={{span: 16}} wrapperCol={{span: 8}} 
                     tooltip={!toolTipText ? false : { title: toolTipText, icon: <InfoCircleOutlined /> }} >
@@ -79,9 +79,9 @@ export default function ColumnForm(props) {
                 <Select {...selectProps}/>
             </Form.Item>
 
-            {renderRowTypeFilter('season_year', 'Year', yearsList, 'If no year is selected, the stats will display total career statistics.')}
-            {renderRowTypeFilter('player_gsis_id', 'Player', playerList)}
-            {renderRowTypeFilter('team_id', 'Team', teamList)}
+            {renderRowTypeFilter('season_year', 'season_year', 'Year', yearsList, 'If no year is selected, the stats will display total career statistics.')}
+            {renderRowTypeFilter('player_name_with_position', 'player_gsis_id', 'Player', playerList)}
+            {renderRowTypeFilter('team_name', 'team_id', 'Team', teamList)}
 
             <Divider orientation="center" plain>General Filters (Optional)</Divider>
 

@@ -35,23 +35,6 @@ function writeCreationSQL() {
     })
 }
 
-function getAllAggregateSQL() {
-    let sql = ``
-    sql += `SELECT\n`
-    Object.values(aggs).forEach(field => {
-        sql += `    ${field.buildSQL()},\n`
-    })
-    sql += `FROM\n`
-    sql += `    ${tbls.prod.sqlName}\n`
-    return sql
-}
-
-function writeAllAggregatesSQL() {
-    fs.writeFile('./sql/test-all-aggregates.sql', getAllAggregateSQL(), function (err) {
-        if (err) return console.log(err);
-    })
-}
-
 function getPlayerStats() {
     let sql = ``
     sql += `CREATE OR REPLACE TABLE\n` 
@@ -125,5 +108,4 @@ async function executeQueries() {
 writePlayerStats()
 writeTeamStats()
 writeCreationSQL()
-writeAllAggregatesSQL()
 executeQueries()

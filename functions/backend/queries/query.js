@@ -90,17 +90,17 @@ module.exports.Query = class Query {
 
         // append player_name filter based on what is in the columns
         const playersWithDuplicates = Object.entries(this.columns)
-            .filter(([colIndex, column]) => column.filters.player_name_with_position)
-            .map(([colIndex, column]) => column.filters.player_name_with_position)
+            .filter(([colIndex, column]) => column.filters.player_gsis_id)
+            .map(([colIndex, column]) => column.filters.player_gsis_id)
         const players = Array.from(new Set(playersWithDuplicates))
-        players.length > 0 ? whereArr.push(this.buildFilterSQL('player_name_with_position', players)) : null
+        players.length > 0 ? whereArr.push(this.buildFilterSQL('player_gsis_id', players)) : null
     
         // append team_name filter based on what is in the columns
         const teamsWithDuplicates = Object.entries(this.columns)
-            .filter(([colIndex, column]) => column.filters.team_name)
-            .map(([colIndex, column]) => column.filters.team_name)
+            .filter(([colIndex, column]) => column.filters.team_id)
+            .map(([colIndex, column]) => column.filters.team_id)
         const teams = Array.from(new Set(teamsWithDuplicates))
-        teams.length > 0 ? whereArr.push(this.buildFilterSQL('team_name', teams)) : null
+        teams.length > 0 ? whereArr.push(this.buildFilterSQL('team_id', teams)) : null
 
         // append stat_type filter based on what is in the columns
         //   if the stat field is an "info" type, then no stat_type filter is appended

@@ -208,10 +208,19 @@ function App() {
             message.error({content: 'Ensure every column has a stat type selected.', duration: 2.5, style: {fontSize: '1rem'} })
         })
     }
-
     
-    function resetQueryForm() { setInitialQueryPanes([{ title: 'Col 1', key: '1' }]); queryForm.resetFields(); setResetQuery(resetQuery+1) }
-    function resetCalcsForm() { setInitialCalcsPanes([{ title: 'Calc 1', key: '1' }]); calcsForm.resetFields(); setResetCalcs(resetCalcs+1) }
+    function resetQueryForm() { 
+        setInitialQueryPanes([{ title: 'Col 1', key: '1' }]); 
+        queryForm.resetFields();
+        setResetQuery(resetQuery+1);
+        setTableData({})
+    }
+
+    function resetCalcsForm() { 
+        setInitialCalcsPanes([{ title: 'Calc 1', key: '1' }]); 
+        calcsForm.resetFields(); 
+        setResetCalcs(resetCalcs+1) 
+    }
 
     function onDownload() {
         if (!tableData.columns) {

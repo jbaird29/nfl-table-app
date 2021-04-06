@@ -172,10 +172,13 @@ class Dimension {
         this.formProps = formProps
         this.ui = ui
         this.expose = expose
-        this.linkedFilters = linkedFilters
-        this.linkedAggs = linkedAggs
+        this.linkedFilters = linkedFilters        // not using this yet, but could implement in future
+        this.linkedAggs = linkedAggs              // currently implementing sparingly
     }
  }
+
+
+
 
 
 
@@ -263,16 +266,6 @@ dims.player_name = new Dimension({
     dataType: 'string',
     format: 'string',
 })
-// dims.player_name = new Dimension({
-//     sql: 'player_name',
-//     creationSQL: `${tbls.stats.name}.player_name`,
-//     statType: 'general',
-//     title: 'Player Name',
-//     shortTitle: 'Player',
-//     width: '175px',
-//     dataType: 'string',
-//     format: 'string',
-// })
 // ------------------------------------------------------------------------------------------------------------
 dims.player_position = new Dimension({
     sql: 'player_position',
@@ -284,42 +277,6 @@ dims.player_position = new Dimension({
     dataType: 'string',
     format: 'string',
 })
-// dims.unclean_position = new Dimension({
-//     sql: 'unclean_position',
-//     creationSQL: `SPLIT(${tbls.stats.name}.player_position, '/')[SAFE_OFFSET(0)]`,
-//     statType: 'general',
-//     title: 'Player Position (Unclean)',
-//     shortTitle: 'Position',
-//     width: '175px',
-//     dataType: 'string',
-//     format: 'string',
-//     description: 'In cases with multiple positions (eg TE/B) takes the first one (these are fairly rare)',
-//     values: ['LB', 'WR', 'DB', 'CB', 'DE', 'RB', 'S', 'DT', 'TE', 'T', 'G', 'DL', 'QB', 'OL', 'OLB', 'C', 'K', 'ILB', 'P', 'LS', 'FB', 'NT', 'FS', 'SS', 'OT', 'HB', 'MLB', 'H', 'RT', '$LB', 'LOLB']
-// })
-// dims.player_position_history = new Dimension({
-//     sql: 'player_position_history',
-//     creationSQL: `CASE WHEN ${dims.unclean_position.creationSQL} = 'HB' THEN 'RB' ELSE ${dims.unclean_position.creationSQL} END`,
-//     statType: 'general',
-//     title: 'Player Position',
-//     shortTitle: 'Position',
-//     width: '175px',
-//     dataType: 'string',
-//     format: 'string',
-//     description: 'Cleans HB to be RB',
-//     values: ['LB', 'WR', 'DB', 'CB', 'DE', 'RB', 'S', 'DT', 'TE', 'T', 'G', 'DL', 'QB', 'OL', 'OLB', 'C', 'K', 'ILB', 'P', 'LS', 'FB', 'NT', 'FS', 'SS', 'OT', 'MLB', 'H', 'RT', '$LB', 'LOLB']
-// })
-// dims.player_position = new Dimension({
-//     sql: 'player_position',
-//     creationSQL: `FIRST_VALUE(${dims.player_position_history.creationSQL}) OVER (PARTITION BY ${dims.player_id.creationSQL} ORDER BY ${dims.season_year.creationSQL} DESC, ${dims.season_week.creationSQL} DESC)`,
-//     statType: 'general',
-//     title: 'Player Position',
-//     shortTitle: 'Position',
-//     width: '175px',
-//     dataType: 'string',
-//     format: 'string',
-//     description: 'In cases where a player changed positions (e.g. from FS to CB), this takes the most recent position',
-//     values: ['LB', 'WR', 'DB', 'CB', 'DE', 'RB', 'S', 'DT', 'TE', 'T', 'G', 'DL', 'QB', 'OL', 'OLB', 'C', 'K', 'ILB', 'P', 'LS', 'FB', 'NT', 'FS', 'SS', 'OT', 'MLB', 'H', 'RT', '$LB', 'LOLB']
-// })
 // ------------------------------------------------------------------------------------------------------------
 dims.player_name_with_position = new Dimension({
     sql: 'player_name_with_position',
@@ -331,16 +288,6 @@ dims.player_name_with_position = new Dimension({
     dataType: 'string',
     format: 'string',
 })
-// dims.player_name_with_position = new Dimension({
-//     sql: 'player_name_with_position',
-//     creationSQL: `${dims.player_name.creationSQL} || ' (' || ${dims.player_position.creationSQL} || ')'`,
-//     statType: 'general',
-//     title: 'Player Name (Position)',
-//     shortTitle: 'Player',
-//     width: '175px',
-//     dataType: 'string',
-//     format: 'string',
-// })
 // ------------------------------------------------------------------------------------------------------------
 dims.player_gsis_id = new Dimension({
     sql: 'player_gsis_id',
@@ -349,13 +296,6 @@ dims.player_gsis_id = new Dimension({
     title: 'GSIS Player ID',
     dataType: 'string',
 })
-// dims.partition_player_id = new Dimension({
-//     sql: 'partition_player_id',
-//     creationSQL: `DENSE_RANK() OVER (ORDER BY ${dims.player_id.creationSQL} ASC)`,
-//     statType: 'general',
-//     title: 'Partition Player ID',
-//     description: 'This is used as the Partition Key for Materialized Views (which require an integer key).'
-// })
 // ------------------------------------------------------------------------------------------------------------
 dims.team_name = new Dimension({
     sql: 'team_name',
@@ -389,14 +329,6 @@ dims.team_id = new Dimension({
     description: 'NOTE: Chargers and Raiders have two different IDs when they change cities.',
     dataType: 'string',
 })
-// ------------------------------------------------------------------------------------------------------------
-// dims.partition_team_id = new Dimension({
-//     sql: 'partition_team_id',
-//     creationSQL: `DENSE_RANK() OVER (ORDER BY ${dims.team_name.creationSQL} ASC)`,
-//     statType: 'general',
-//     title: 'Partition Player ID',
-//     description: 'This is used as the Partition Key for Materialized Views (which require an integer key).'
-// })
 
 
 /** -----------------------------------------------------------------------------------------------------------
@@ -427,15 +359,6 @@ dims.nullified = new Dimension({
     dataType: 'number',
     description: '1 if nullified by penalty, otherwise NULL' // check to make sure this is accurate
 })
-// ------------------------------------------------------------------------------------------------------------
-dims.firstdown = new Dimension({
-    sql: 'firstdown',
-    creationSQL: `${tbls.stats.name}.firstdown`,
-    statType: 'general',
-    title: 'Was Firstdown',
-    dataType: 'number',
-})
-
 
 
 /** -----------------------------------------------------------------------------------------------------------
@@ -653,8 +576,8 @@ dims.rush_broken_tackles = new Dimension({
     description: 'Number of broken tackles during the run. On one TD run, Aaron Jones had 6 broken tackles!'
 })
 // ------------------------------------------------------------------------------------------------------------
-dims.yards_after_contact = new Dimension({
-    sql: 'yards_after_contact',
+dims.rush_yards_after_contact = new Dimension({
+    sql: 'rush_yards_after_contact',
     creationSQL: `CASE WHEN ${tbls.stats.name}.stat_type = "rush"    THEN ${tbls.stats.name}.yards_after_contact ELSE NULL END`,
     statType: 'rush',
     dataType: 'number',
@@ -668,7 +591,30 @@ dims.rush_was_scramble = new Dimension({
     dataType: 'number',
     title: 'Rush Was Scrumble',
 })
-
+// ------------------------------------------------------------------------------------------------------------
+dims.rush_was_tackle_for_loss = new Dimension({
+    sql: 'rush_was_tackle_for_loss',
+    creationSQL: `CASE WHEN ${tbls.stats.name}.stat_type = "rush"    THEN ${tbls.stats.name}.tlost ELSE NULL END`,
+    statType: 'rush',
+    dataType: 'number',
+    title: 'Rush Was Tackle for Loss',
+})
+// ------------------------------------------------------------------------------------------------------------
+dims.rush_tackle_for_loss_yards = new Dimension({
+    sql: 'rush_tackle_for_loss_yards',
+    creationSQL: `CASE WHEN ${tbls.stats.name}.stat_type = "rush"    THEN ${tbls.stats.name}.tlost_yards ELSE NULL END`,
+    statType: 'rush',
+    dataType: 'number',
+    title: 'Rush Tackle for Loss Yards',
+})
+// ------------------------------------------------------------------------------------------------------------
+dims.rush_was_firstdown = new Dimension({
+    sql: 'rush_was_firstdown',
+    creationSQL: `CASE WHEN ${tbls.stats.name}.stat_type = "rush"    THEN ${tbls.stats.name}.firstdown ELSE NULL END`,
+    statType: 'rush',
+    dataType: 'number',
+    title: 'Was Rush Firstdown',
+})
 
 
 //* ----------------------------------------------------------------------------------------------------------
@@ -698,6 +644,17 @@ dims.recv_was_target = new Dimension({
     title: 'Was Receiving Target',
 })
 // ------------------------------------------------------------------------------------------------------------
+dims.recv_was_catchable = new Dimension({
+    sql: 'recv_was_catchable',
+    creationSQL: `CASE WHEN ${tbls.stats.name}.stat_type = "receive" THEN ${tbls.stats.name}.catchable ELSE NULL END`,
+    statType: 'recv',
+    dataType: 'number',
+    title: 'Was Catchable',
+    description: 'For the most part, there are no cases where a ball was catchable but not a target.'+
+        'So it is safe to title this Catchable Targets. There are only ~10 edge cases where not:'+
+        'SELECT target, SUM(catchable) FROM `nfl-table.main.statistics`'
+})
+// ------------------------------------------------------------------------------------------------------------
 dims.recv_was_touchdown = new Dimension({
     sql: 'recv_was_touchdown',
     creationSQL: `CASE WHEN ${tbls.stats.name}.stat_type = "receive" THEN ${tbls.stats.name}.touchdown ELSE NULL END`,
@@ -705,6 +662,39 @@ dims.recv_was_touchdown = new Dimension({
     dataType: 'number',
     title: 'Receiving Was Touchdown',
 })
+// ------------------------------------------------------------------------------------------------------------
+dims.recv_yards_after_contact = new Dimension({
+    sql: 'recv_yards_after_contact',
+    creationSQL: `CASE WHEN ${tbls.stats.name}.stat_type = "receive"    THEN ${tbls.stats.name}.yards_after_contact ELSE NULL END`,
+    statType: 'recv',
+    dataType: 'number',
+    title: 'Receiving Yards After Contact',
+})
+// ------------------------------------------------------------------------------------------------------------
+dims.recv_yards_after_catch = new Dimension({
+    sql: 'recv_yards_after_catch',
+    creationSQL: `CASE WHEN ${tbls.stats.name}.stat_type = "receive"    THEN ${tbls.stats.name}.yards_after_catch ELSE NULL END`,
+    statType: 'recv',
+    dataType: 'number',
+    title: 'Receiving Yards After Catch',
+})
+// ------------------------------------------------------------------------------------------------------------
+dims.recv_broken_tackles = new Dimension({
+    sql: 'recv_broken_tackles',
+    creationSQL: `CASE WHEN ${tbls.stats.name}.stat_type = "receive" THEN ${tbls.stats.name}.broken_tackles ELSE NULL END`,
+    statType: 'recv',
+    dataType: 'number',
+    title: 'Receiving Broken Tackles',
+})
+// ------------------------------------------------------------------------------------------------------------
+dims.recv_was_dropped = new Dimension({
+    sql: 'recv_was_dropped',
+    creationSQL: `CASE WHEN ${tbls.stats.name}.stat_type = "receive" THEN ${tbls.stats.name}.dropped ELSE NULL END`,
+    statType: 'recv',
+    dataType: 'number',
+    title: 'Was Drop',
+})
+
 
 
 
@@ -728,6 +718,14 @@ aggs.pass_completions_sum = new Aggregate({
     statType: 'pass',
     sql: `SUM(CASE WHEN true THEN ${dims.pass_was_completion.sql} ELSE NULL END)`, 
 })
+aggs.pass_incompletions_sum = new Aggregate({
+    name: 'pass_incompletions_sum',
+    includeInSummary: false,
+    title: 'Pass Incompletions', 
+    shortTitle: 'Pass Incompletions',
+    statType: 'pass',
+    sql: `SUM(CASE WHEN true THEN IFNULL(${dims.pass_was_attempt.sql},0) - IFNULL(${dims.pass_was_completion.sql},0) ELSE NULL END)`, 
+})
 aggs.pass_attempts_sum = new Aggregate({
     name: 'pass_attempts_sum',
     includeInSummary: true,
@@ -735,6 +733,7 @@ aggs.pass_attempts_sum = new Aggregate({
     shortTitle: 'Pass ATT',
     statType: 'pass',
     sql: `SUM(CASE WHEN true THEN ${dims.pass_was_attempt.sql}  ELSE NULL END)`, 
+    description: 'Total Attempts = Pass Completions + Pass Incompletions'
 })
 aggs.pass_completion_percentage = new Aggregate({
     name: 'pass_completion_percentage',
@@ -752,6 +751,15 @@ aggs.pass_yards_sum = new Aggregate({
     shortTitle: 'Pass YDS', 
     statType: 'pass',
     sql: `SUM(CASE WHEN true THEN ${dims.pass_yards.sql} ELSE NULL END)`, 
+})
+aggs.pass_yards_per_attempt = new Aggregate({
+    name: 'pass_yards_per_attempt',
+    includeInSummary: true,
+    title: 'Yards / Pass Att',
+    shortTitle: 'Pass Y/A', 
+    statType: 'pass',
+    sql: `${aggs.pass_yards_sum.sql} / ${aggs.pass_attempts_sum.sql}`, 
+    format: 'dec_1', 
 })
 aggs.pass_touchdowns_sum = new Aggregate({
     name: 'pass_touchdowns_sum',
@@ -784,6 +792,7 @@ aggs.pass_rating = new Aggregate({
 })
  aggs.pass_air_yards_sum = new Aggregate({
     name: 'pass_air_yards_sum',
+    includeInSummary: true,
     title: 'Total Air Yards', 
     shortTitle: 'Air YDS', 
     statType: 'pass',
@@ -791,24 +800,45 @@ aggs.pass_rating = new Aggregate({
 })
 aggs.pass_pocket_time_average = new Aggregate({
     name: 'pass_pocket_time_average',
+    includeInSummary: true,
     title: 'Average Time in Pocket', 
     shortTitle: 'Avg Time in Pocket',
     format: 'dec_2',
     statType: 'pass',
     sql: `AVG(CASE WHEN true THEN ${dims.pass_pocket_time.sql} ELSE NULL END)`, 
 })
-aggs.pass_yards_per_attempt = new Aggregate({
-    name: 'pass_yards_per_attempt',
-    title: 'Yards / Pass Att',
-    expose: false,   // this can be calculated by user with a custom calculation
-    shortTitle: 'Pass Y/A', 
+aggs.pass_batted_sum = new Aggregate({
+    name: 'pass_batted_sum',
+    title: 'Passes Batted', 
+    shortTitle: 'Passes Batted',
     statType: 'pass',
-    sql: `${aggs.pass_yards_sum.sql} / ${aggs.pass_attempts_sum.sql}`, 
-    format: 'dec_1', 
+    sql: `SUM(CASE WHEN true THEN ${dims.pass_was_batted.sql} ELSE NULL END)`, 
+})
+aggs.pass_knockdowns_sum = new Aggregate({
+    name: 'pass_knockdowns_sum',
+    title: 'Passes Knocked Down', 
+    shortTitle: 'Passes Knocked Down',
+    statType: 'pass',
+    sql: `SUM(CASE WHEN true THEN ${dims.pass_was_knockdown.sql} ELSE NULL END)`, 
+})
+aggs.pass_sacked_sum = new Aggregate({
+    name: 'pass_sacked_sum',
+    includeInSummary: true,
+    title: 'Total Sacks Taken', 
+    shortTitle: 'Sacks',
+    statType: 'pass',
+    sql: `SUM(CASE WHEN true THEN ${dims.pass_was_sack.sql} ELSE NULL END)`, 
+})
+aggs.pass_sack_yards_sum = new Aggregate({
+    name: 'pass_sack_yards_sum',
+    includeInSummary: true,
+    title: 'Total Sacks Yards Taken', 
+    shortTitle: 'Sack Yards',
+    statType: 'pass',
+    sql: `SUM(CASE WHEN true THEN ${dims.pass_sack_yards.sql} ELSE NULL END)`, 
 })
 aggs.pass_on_target_sum = new Aggregate({
     name: 'pass_on_target_sum',
-    expose: false,   // this can be calculated by user with a custom calculation
     title: 'Total On-target Pass Attempts', 
     shortTitle: 'Pass INT', 
     statType: 'pass',
@@ -817,7 +847,6 @@ aggs.pass_on_target_sum = new Aggregate({
 aggs.pass_on_target_percentage = new Aggregate({
     name: 'pass_on_target_percentage',
     title: '% of Attempts On-target', 
-    expose: false,   // this can be calculated by user with a custom calculation
     shortTitle: 'Pass ATT ON-TGT %', 
     statType: 'pass',
     sql: `100 * ${aggs.pass_on_target_sum.sql} / ${aggs.pass_attempts_sum.sql}`, 
@@ -875,9 +904,40 @@ aggs.rush_yards_after_contact_sum = new Aggregate({
     title: 'Rush Yards Ater Contact', 
     shortTitle: 'YDS After Contact', 
     statType: 'rush',
-    sql: `SUM(CASE WHEN true THEN ${dims.yards_after_contact.sql} ELSE NULL END)`, 
+    sql: `SUM(CASE WHEN true THEN ${dims.rush_yards_after_contact.sql} ELSE NULL END)`, 
 })
-
+aggs.rush_yards_after_per_attempt = new Aggregate({
+    name: 'rush_yards_after_per_attempt',
+    includeInSummary: true,
+    title: 'Rush Yards Ater Contact', 
+    shortTitle: 'Avg YDS After Contact', 
+    statType: 'rush',
+    sql: `${aggs.rush_yards_after_contact_sum.sql} / ${aggs.rush_attempts_sum.sql}`, 
+})
+aggs.rush_tackle_for_loss_sum = new Aggregate({
+    name: 'rush_tackle_for_loss_sum',
+    includeInSummary: true,
+    title: 'Total Times Tackled for Loss', 
+    shortTitle: 'TCKL for Loss', 
+    statType: 'rush',
+    sql: `SUM(CASE WHEN true THEN ${dims.rush_was_tackle_for_loss.sql} ELSE NULL END)`, 
+})
+aggs.rush_tackle_for_loss_yards_sum = new Aggregate({
+    name: 'rush_tackle_for_loss_yards_sum',
+    includeInSummary: true,
+    title: 'Total Yards from Tackles for Loss', 
+    shortTitle: 'TCKL for Loss YDS', 
+    statType: 'rush',
+    sql: `SUM(CASE WHEN true THEN ${dims.rush_tackle_for_loss_yards.sql} ELSE NULL END)`, 
+})
+aggs.rush_firstdown_sum = new Aggregate({
+    name: 'rush_firstdown_sum',
+    includeInSummary: true,
+    title: 'Total Rushing Firstdowns', 
+    shortTitle: 'Rush Firstdowns', 
+    statType: 'rush',
+    sql: `SUM(CASE WHEN true THEN ${dims.rush_was_firstdown.sql} ELSE NULL END)`, 
+})
 
 
 //* -----------------------------------------------------------------------------------------------------------
@@ -886,7 +946,7 @@ aggs.rush_yards_after_contact_sum = new Aggregate({
 aggs.recv_receptions_sum = new Aggregate({
     name: 'recv_receptions_sum',
     includeInSummary: true,
-    title: 'Receptions', 
+    title: 'Total Receptions', 
     shortTitle: 'Recv REC', 
     statType: 'recv',
     sql: `SUM(CASE WHEN true THEN ${dims.recv_was_reception.sql} ELSE NULL END)`, 
@@ -894,10 +954,36 @@ aggs.recv_receptions_sum = new Aggregate({
 aggs.recv_targets_sum = new Aggregate({
     name: 'recv_targets_sum',
     includeInSummary: true,
-    title: 'Receiving Targets', 
+    title: 'Total Targets', 
     shortTitle: 'Recv TGT', 
     statType: 'recv',
     sql: `SUM(CASE WHEN true THEN ${dims.recv_was_target.sql} ELSE NULL END)`, 
+})
+aggs.recv_catch_percentage = new Aggregate({
+    name: 'recv_catch_percentage',
+    includeInSummary: true,
+    expose: true, 
+    title: 'Total Receptions / Targets', 
+    shortTitle: 'Catch %', 
+    statType: 'recv',
+    sql: `${aggs.recv_receptions_sum.sql} / ${aggs.recv_targets_sum.sql}`, 
+    format: 'percent', 
+})
+aggs.recv_dropped_sum = new Aggregate({
+    name: 'recv_dropped_sum',
+    includeInSummary: true,
+    title: 'Total Drops', 
+    shortTitle: 'Recv Drops', 
+    statType: 'recv',
+    sql: `SUM(CASE WHEN true THEN ${dims.recv_was_dropped.sql} ELSE NULL END)`, 
+})
+aggs.recv_catchable_sum = new Aggregate({
+    name: 'recv_catchable_sum',
+    includeInSummary: true,
+    title: 'Total Catchable Targets', 
+    shortTitle: 'Recv Catchable Targets', 
+    statType: 'recv',
+    sql: `SUM(CASE WHEN true THEN ${dims.recv_was_catchable.sql} ELSE NULL END)`, 
 })
 aggs.recv_yards_sum = new Aggregate({
     name: 'recv_yards_sum',
@@ -919,12 +1005,38 @@ aggs.recv_yards_per_reception = new Aggregate({
     name: 'recv_yards_per_reception',
     includeInSummary: true,
     expose: true, 
-    title: 'Yards / Catch', 
+    title: 'Yards / Receptions', 
     shortTitle: 'Y/REC', 
     statType: 'recv',
     sql: `${aggs.recv_yards_sum.sql} / ${aggs.recv_receptions_sum.sql}`, 
     format: 'dec_1', 
 })
+aggs.recv_yards_after_catch_sum = new Aggregate({
+    name: 'recv_yards_after_catch_sum',
+    includeInSummary: true,
+    title: 'Yards after Catch', 
+    shortTitle: 'Recv YDS after Catch', 
+    statType: 'recv',
+    sql: `SUM(CASE WHEN true THEN ${dims.recv_yards_after_catch.sql} ELSE NULL END)`, 
+})
+aggs.recv_broken_tackles_sum = new Aggregate({
+    name: 'recv_broken_tackles_sum',
+    includeInSummary: true,
+    title: 'Broken Tackles after Catch', 
+    shortTitle: 'Recv Broken Tackles', 
+    statType: 'recv',
+    sql: `SUM(CASE WHEN true THEN ${dims.recv_broken_tackles.sql} ELSE NULL END)`, 
+})
+aggs.recv_yards_after_contact_sum = new Aggregate({
+    name: 'recv_yards_after_contact_sum',
+    includeInSummary: true,
+    title: 'Receiving Yards after Contact', 
+    shortTitle: 'Recv YDS after Contact', 
+    statType: 'recv',
+    sql: `SUM(CASE WHEN true THEN ${dims.recv_yards_after_contact.sql} ELSE NULL END)`, 
+})
+
+
 
 
 
@@ -1087,10 +1199,71 @@ fltrs.pass_attempt_air_yards = new Filter(dims.pass_attempt_air_yards, {
     }
 })
 // ------------------------------------------------------------------------------------------------------------
+fltrs.pass_incompletion_type = new Filter(dims.pass_incompletion_type, {
+    name: 'pass_incompletion_type',
+    linkedAggs: ['pass_incompletions_sum', 'pass_attempts_sum', 'pass_pocket_time_average'],
+    formProps: {
+        label: 'Type of Pass Incompletion',
+        labelCol: {span: 16},
+        wrapperCol: {span: 8},
+    }, ui: {
+        type: 'select',
+        props: {
+            allowClear: true,
+            optionFilterProp: "label",
+            options: [
+            {align: 'left', title: 'Poorly Thrown', label: 'Poorly Thrown', value: 'Poorly Thrown', key: 'poorly_thrown'},
+            {align: 'left', title: 'Thrown Away', label: 'Thrown Away', value: 'Thrown Away', key: 'thrown_away'},
+            {align: 'left', title: 'Dropped Pass', label: 'Dropped Pass', value: 'Dropped Pass', key: 'dropped_pass'},
+            {align: 'left', title: 'Pass Defended', label: 'Pass Defended', value: 'Pass Defended', key: 'pass_defended'},
+            {align: 'left', title: 'Spike', label: 'Spike', value: "'Spike'", key: 'spike'},
+            ]
+        }
+    }
+})
+// ------------------------------------------------------------------------------------------------------------
+fltrs.pass_was_hurried = new Filter(dims.pass_was_hurry,{
+    name: 'pass_was_hurried',
+    formProps: {
+        label: 'Pass Hurried?',
+        labelCol: {span: 16},
+        wrapperCol: {span: 8},
+    }, ui: {
+        type: 'select',
+        props: {
+            optionFilterProp: "label",
+            allowClear: true,
+            options: [
+            {align: 'left', title: 'Either', label: 'Either', value: '', key: 'either'},
+            {align: 'left', title: 'Yes', label: 'Yes', value: '1', key: '1'},
+            {align: 'left', title: 'No', label: 'No', value: '0', key: '0'},
+        ]}
+    }
+})
+// ------------------------------------------------------------------------------------------------------------
 fltrs.pass_was_blitzed = new Filter(dims.pass_was_blitzed,{
     name: 'pass_was_blitzed',
     formProps: {
         label: 'Pass Blitzed?',
+        labelCol: {span: 16},
+        wrapperCol: {span: 8},
+    }, ui: {
+        type: 'select',
+        props: {
+            optionFilterProp: "label",
+            allowClear: true,
+            options: [
+            {align: 'left', title: 'Either', label: 'Either', value: '', key: 'either'},
+            {align: 'left', title: 'Yes', label: 'Yes', value: '1', key: '1'},
+            {align: 'left', title: 'No', label: 'No', value: '0', key: '0'},
+        ]}
+    }
+})
+// ------------------------------------------------------------------------------------------------------------
+fltrs.pass_was_sack = new Filter(dims.pass_was_sack,{
+    name: 'pass_was_sack',
+    formProps: {
+        label: 'Sack Taken?',
         labelCol: {span: 16},
         wrapperCol: {span: 8},
     }, ui: {
@@ -1145,29 +1318,6 @@ fltrs.pass_was_on_target = new Filter(dims.pass_was_on_target, {
         }
     }
 })
-// ------------------------------------------------------------------------------------------------------------
-fltrs.pass_incompletion_type = new Filter(dims.pass_incompletion_type, {
-    name: 'pass_incompletion_type',
-    linkedAggs: ['pass_attempts_sum'],
-    formProps: {
-        label: 'Type of Pass Incompletion',
-        labelCol: {span: 16},
-        wrapperCol: {span: 8},
-    }, ui: {
-        type: 'select',
-        props: {
-            allowClear: true,
-            optionFilterProp: "label",
-            options: [
-            {align: 'left', title: 'Poorly Thrown', label: 'Poorly Thrown', value: 'Poorly Thrown', key: 'poorly_thrown'},
-            {align: 'left', title: 'Thrown Away', label: 'Thrown Away', value: 'Thrown Away', key: 'thrown_away'},
-            {align: 'left', title: 'Dropped Pass', label: 'Dropped Pass', value: 'Dropped Pass', key: 'dropped_pass'},
-            {align: 'left', title: 'Pass Defended', label: 'Pass Defended', value: 'Pass Defended', key: 'pass_defended'},
-            {align: 'left', title: 'Spike', label: 'Spike', value: "'Spike'", key: 'spike'},
-            ]
-        }
-    }
-})
 
 
 
@@ -1210,11 +1360,28 @@ fltrs.rush_was_scramble = new Filter(dims.rush_was_scramble, {
     }
 })
 
-// idea - instead of slider use two inputNumbers? something like below:
-// }, ui: {
-//     type: 'inputNumberGroup',
-//     elements: [
-//         {name: 'min', props: {min: -100}},
-//         {name: 'max', props: {min: -100}}
-//     ]
-// }
+
+
+/** -----------------------------------------------------------------------------------------------------------
+ * Recv filters
+ * ------------------------------------------------------------------------------------------------------------
+ */
+fltrs.recv_was_catchable = new Filter(dims.recv_was_catchable, {
+    name: 'recv_was_catchable',
+    formProps: {
+        label: 'Was Target Catchable?',
+        labelCol: {span: 16},
+        wrapperCol: {span: 8},
+    }, ui: {
+        type: 'select',
+        props: {
+            optionFilterProp: "label",
+            allowClear: true,
+            options: [
+            {align: 'left', title: 'Either', label: 'Either', value: '', key: 'either'},
+            {align: 'left', title: 'Yes', label: 'Yes', value: '1', key: '1'},
+            {align: 'left', title: 'No', label: 'No', value: '0', key: '0'},
+            ]
+        }
+    }
+})

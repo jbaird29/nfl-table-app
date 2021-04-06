@@ -18,7 +18,7 @@ export default function SelectPage(props) {
     const selectStyle = { width: '85%' }
 
     const menu = (
-        <Menu>
+        <Menu style={{width: '85%', margin: 'auto', }}>
           <Menu.Item key="players"><Link to="/pages/players/">Player Stats</Link></Menu.Item>
           <Menu.Item key="teams"><Link to="/pages/teams/">Team Stats</Link></Menu.Item>
         </Menu>
@@ -29,7 +29,9 @@ export default function SelectPage(props) {
         <Row gutter={[0, 18]}>
         <Col span={24} style={{textAlign: 'center'}}>
         <Dropdown overlay={menu}>
-            <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>Select a Page Type <DownOutlined /></a>
+            <Row>
+            <a onClick={e => e.preventDefault()} className="ant-dropdown-link"  style={{width: '85%', margin: 'auto', }} >Select a Page Type <DownOutlined /></a>
+            </Row>
         </Dropdown>
         </Col>
         </Row>
