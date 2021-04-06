@@ -19,14 +19,20 @@ module.exports.Query = class Query {
      **   returns a SQL string => `pass_pocket_time BETWEEN 0 AND 3.5`
     */ 
     buildFilterSQL(name, values) {
-        const {sql, singleOperator, multipleOperator, joiner} = this.fltrs[name]
+        const {sql, singleOperator, multipleOperator, joiner, dataType} = this.fltrs[name]
         if (!Array.isArray(values)) {
-            return `${sql} ${singleOperator} ${values}`
-        } else if (multipleOperator === 'BETWEEN') {
-            return `${sql} ${multipleOperator} ${values.join(joiner)}`
+            const escaped = dataType === 'string' ? `'${values}'` : values
+            console.log("XXXX", `${sql} ${singleOperator} ${escaped}`)
+            return `${sql} ${singleOperator} ${escaped}`
         } else {
-            return `${sql} ${multipleOperator} (${values.join(joiner)})`
-        }
+            const escaped = dataType === 'string' ? values.map(value => `'${value}'`) : values
+            const input = escaped.join(joiner)
+            if (multipleOperator === 'BETWEEN') {
+                return `${sql} ${multipleOperator} ${input}`                    // BETWEEN can't take parentheses
+            } else {
+                return `${sql} ${multipleOperator} (${input})`
+            }
+        } 
     }
 
     /** Given a column object {field: 'sum_yds_pass', filters: {pass_was_blitzed: 1, pass_pocket_time: [0, 3.5]} }
@@ -39,7 +45,7 @@ module.exports.Query = class Query {
         const filtersSQLArray = Object.entries(filters)
                                 .filter(([name, values]) => values && (Array.isArray(values) ? values.length > 0 : true))
                                 .map(([name, values]) => (this.buildFilterSQL(name, values)))
-        if (filtersSQLArray.length > 1) {
+        if (filtersSQLArray.length > 0) {
             const filtersSQLString = filtersSQLArray.join(' AND ')
             return sql.replace(/true/g, `true AND ${filtersSQLString}`)  //TODO- use replaceAll
         } else {
@@ -99,7 +105,7 @@ module.exports.Query = class Query {
         if (!hasInfoAgg) {
             const statsWithDuplicates = Object.entries(this.columns)
                                     .filter(([colIndex, column]) => ['pass', 'rush', 'recv'].includes(column.field.slice(0, 4)))
-                                    .map(([colIndex, column]) => `"${column.field.slice(0, 4)}"`)
+                                    .map(([colIndex, column]) => `${column.field.slice(0, 4)}`)
             const stats = Array.from(new Set(statsWithDuplicates))
             whereArr.push(this.buildFilterSQL('stat_type', stats))
         }

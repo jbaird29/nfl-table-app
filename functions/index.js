@@ -96,15 +96,28 @@ exports.loadStandardPage = functions.https.onRequest(async function(req, res){
     const sqlDimension = type === 'player' ? 'player_name_with_position'    : 'team_name'
     const sqlTableName = type === 'player' ? meta.tbls.player_stats.sqlName : meta.tbls.team_stats.sqlName
 
-    const querySQL = `SELECT * EXCEPT(${sqlID}, ${sqlDimension}) FROM ${sqlTableName} WHERE ${sqlID} = ${id} ORDER BY season_year ASC`
-    const infoSQL  = type === 'player' 
-    ? `SELECT full_name, birth_date, main.calculate_age(CURRENT_DATE(), birth_date) AS age, college, weight, height, jersey_number, team_name, team_abbreviation, headshot_url FROM \`nfl-table.main.player_info\` WHERE ${sqlID} = ${id}`
-    : `SELECT team_name, team_abbreviation FROM \`nfl-table.main.team_info\` WHERE ${sqlID} = ${id}`
+    let querySQL = ''
+    querySQL += `SELECT * EXCEPT(${sqlID}, ${sqlDimension}) FROM ${sqlTableName} `
+    querySQL += ` WHERE ${sqlID} = '${id}' ORDER BY season_year ASC`
+
+    let infoSQL = ''
+    if (type === 'player') {
+        infoSQL += `SELECT full_name, birth_date, main.calculate_age(CURRENT_DATE(), birth_date) AS age, `
+        infoSQL += ` college, weight, height, jersey_number, team_name, team_abbreviation, headshot_url, player_position `
+        infoSQL += ` FROM \`nfl-table.main.player_info\``
+        infoSQL += ` WHERE ${sqlID} = '${id}' `
+    } else if (type === 'team') {
+        infoSQL += `SELECT team_name, team_abbreviation `
+        infoSQL += ` FROM \`nfl-table.main.team_info\` WHERE ${sqlID} = '${id}' `
+    } else {
+        res.status(400).send({error: "Type invalid."})
+    }
 
     functions.logger.log(querySQL)
     functions.logger.log(infoSQL)
     console.log(querySQL)
     console.log(infoSQL)
+    
     const queryPromise = bq.runQuery(querySQL)
     const infoPromise  = bq.runQuery(infoSQL)
     const tableProps = Object.values(meta.aggs).filter(field => field.includeInSummary).map(field => ({

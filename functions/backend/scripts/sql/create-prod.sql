@@ -12,19 +12,19 @@ AS (
     games.summary_week_title AS season_week,
     games.summary_venue_name AS venue_name,
     stats.player_id AS player_id,
-    latest_rosters.full_name AS player_name,
-    latest_rosters.position AS player_position,
-    latest_rosters.full_name || ' (' || latest_rosters.position || ')' AS player_name_with_position,
-    latest_rosters.gsis_id AS player_gsis_id,
+    player_info.full_name AS player_name,
+    player_info.player_position AS player_position,
+    player_info.full_name || ' (' || player_info.player_position || ')' AS player_name_with_position,
+    player_info.player_gsis_id AS player_gsis_id,
     CASE WHEN stats.team_name = 'Redskins' THEN 'Football Team' ELSE stats.team_name END AS team_name,
-    latest_rosters.team AS team_abbreviation,
+    player_info.team_abbreviation AS team_abbreviation,
     stats.team_id AS team_id,
     stats.inside_20 AS inside_20,
     stats.goaltogo AS goaltogo,
     stats.nullified AS nullified,
     stats.firstdown AS firstdown,
     CASE WHEN stats.stat_type = "pass"    THEN stats.yards ELSE NULL END AS pass_yards,
-    CASE WHEN stats.stat_type = "pass"    THEN stats.att_yards ELSE NULL END AS pass_attempt_yards,
+    CASE WHEN stats.stat_type = "pass"    THEN stats.att_yards ELSE NULL END AS pass_attempt_air_yards,
     CASE WHEN stats.stat_type = "pass" AND stats.complete = 1 THEN stats.att_yards ELSE NULL END AS pass_air_yards,
     CASE WHEN stats.stat_type = "pass"    THEN stats.pocket_time ELSE NULL END AS pass_pocket_time,
     CASE WHEN stats.stat_type = "pass"    THEN stats.sack_yards ELSE NULL END AS pass_sack_yards,
@@ -61,7 +61,7 @@ AS (
   ON
     stats.game_id = games.id
   JOIN
-    `nfl-table.main.latest_rosters` AS latest_rosters
+    `nfl-table.main.player_info` AS player_info
   ON
-    stats.player_id = latest_rosters.sportradar_id
+    stats.player_id = player_info.sportradar_id
 )

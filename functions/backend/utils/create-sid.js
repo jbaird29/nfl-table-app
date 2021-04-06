@@ -24,9 +24,7 @@ const btoa = (str) => {
 module.exports = function createSID(saveDataJSON) {
     const unique = '51d37bbb-b62c-4f24-a1e6-d0778d7d7deb';
     const hex = uuidv5(saveDataJSON, unique).replace(/-/g, '').slice(0,30)  // need to shorten to 30 digits to encode in base64
-    console.log('hex:', hex)
     const base64 = btoa(hex.match(/\w{2}/g).map(a => String.fromCharCode(parseInt(a, 16))).join(""))
-    console.log('b64:', base64)
     const urlEncode = base64.replace(/\+/g, '-').replace(/\//g, '~')
     return urlEncode
 }

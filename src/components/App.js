@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 import './App.css';
 import 'antd/dist/antd.css';
-import {Layout, Button, Drawer, message, Divider, Row, Col, Form, Modal, Steps, Spin, Alert, Image, Tabs, Typography } from 'antd';
-import { DownloadOutlined, CloudUploadOutlined, CopyOutlined } from '@ant-design/icons';
+import {Layout, Button, Drawer, message, Divider, Row, Col, Form, Modal, Steps, Spin, Alert, Image, Tabs, Typography, Menu } from 'antd';
+import { DownloadOutlined, CloudUploadOutlined, CopyOutlined,  } from '@ant-design/icons';
 import Table from './Table'
 import ColumnTabs from './query-fields/Column-Tabs'
 import RowForm from './query-fields/Row-Form'
@@ -10,6 +10,7 @@ import WhereForm from './query-fields/Where-Form'
 import CustomCalcTabs from './custom-calcs/Custom-Calc-Tabs'
 import SelectPage from './standard-pages/SelectPage'
 import { toCSV, copyTableWithoutCalcs, addCalcsToTable, addRenderSorterToTable} from './helper-functions'
+import { Switch, Route, Link, useLocation, useParams} from 'react-router-dom';
 import logo from '../images/logo.png'
 
 const { Header, Sider, Content, Footer } = Layout;
@@ -21,77 +22,49 @@ const calcsFormV = 1
 
 function App() {
     // application state
-    const [tableData, setTableData] = useState({});
     const [queryForm] = Form.useForm()
     const [calcsForm] = Form.useForm()
     const [savedQueryFields, setSavedQueryFields] = useState(null)  // ensures ShareableURL matches what the user sees in table
-    const [savedCalscFields, setSavedCalcsFields] = useState(null)  // ensures ShareableURL matches what the user sees in table
+    const [savedCalcsFields, setSavedCalcsFields] = useState(null)  // ensures ShareableURL matches what the user sees in table
     const [initialQueryPanes, setInitialQueryPanes] = useState([])
     const [initialCalcsPanes, setInitialCalcsPanes] = useState([])
-    // UI rendering state
+    // table state
+    const [tableData, setTableData] = useState({});
+    const [filterInfo, setFilterInfo] = useState(null)
+    const [sortInfo, setSortInfo] = useState(null)
+    // reset helpers
+    const [resetQuery, setResetQuery] = useState(1);
+    const [resetCalcs, setResetCalcs] = useState(1);
+    // UI render - query page
     const [isFieldDrawerVisible, setIsFieldDrawerVisible] = useState(false);
     const [isCalcVisible, setIsCalcVisible] = useState(false);
     const [step, setStep] = useState(0)
-    const [resetQuery, setResetQuery] = useState(1);
-    const [resetCalcs, setResetCalcs] = useState(1);
-    const [loadingURL, setLoadingURL] = useState(false)
     const [loadingPage, setLoadingPage] = useState(false)
+    // UI render - URL page
+    const [loadingURL, setLoadingURL] = useState(false)
     const [isURLVisible, setIsURLVisible] = useState(false)
-    const [activeSiderTab, setActiveSiderTab] = useState('query')
-    const [infoCard, setInfoCard] = useState(null)
-    const [cardLoading, setCardLoading] = useState(false)
-    // TODO - when a tab is deleted from a form, its value is not returned via getFieldsValue() but it IS
-    //        still included in the form state and it is returnable via getFieldValue(['name'])
-    //        this is ok right now because I am only useing getFieldsValue
+    const [urlText, setURLText] = useState('')
+
+    const location = useLocation();
+    const pageType = location.pathname.includes('players') ? 'players' :
+                    (location.pathname.includes('teams') ? 'teams' : null)
+                    
+    // when a user switches page type, this empties tableData
+    useEffect(() => {
+        setTableData({})
+    }, [pageType])
+
 
     useEffect(() => {
-        setLoadingPage(true)
         const url = new URL(window.location)
         const sid = url.searchParams.get('sid')
-        const type = url.searchParams.get('type')
-        const resource = url.searchParams.get('id')
         if (sid) {
             loadState(sid)
         } else {
             setInitialQueryPanes([{ title: 'Col 1', key: '1' }])
             setInitialCalcsPanes([{ title: 'Calc 1', key: '1' }])
         }
-        if (type && resource) {
-            loadStandardPage(type, resource)
-        }
-        setLoadingPage(false)
-    }, []);
-
-
-    // todo - need to also preserve the form of the standard page
-    async function loadStandardPage(type, id) {
-        const url = new URL(window.location)
-        const hide = message.loading({content: 'Loading the data', style: {fontSize: '1rem'}}, 0)
-        setCardLoading(true)
-        const response = await fetch(`/loadStandardPage?type=${type}&id=${id}`, { method: 'GET'})
-        if (response.status === 200) {
-            const {tableData, info} = await response.json();
-            setInfoCard(info)
-            setActiveSiderTab('standard')
-            addRenderSorterToTable(tableData)
-            setTableData(tableData)
-            setSavedCalcsFields(null)
-            setSavedQueryFields(null)
-            hide()
-            setCardLoading(false)
-            url.searchParams.set('type', type)
-            url.searchParams.set('id', id)
-            window.history.pushState({}, '', url)
-        } else {
-            message.error({content: 'An error occurred. Please refresh the page and try again.', duration: 5, style: {fontSize: '1rem'} })
-            hide()
-            setCardLoading(false)
-            url.searchParams.delete('type')
-            url.searchParams.delete('id')
-            window.history.pushState({}, '', url)
-        }
-    }
-    
+    }, []);    
 
     // ?sid=a~j-X0qNUJmB9SjtujjB        = basic test with cols and calcs
     // ?sid=1Q1yy-YLX8ijesPJepLK        = basic test with cols anc calcs
@@ -102,9 +75,10 @@ function App() {
     // ?sid=5TjRMklHXcivbsQYzJSf        = 8 columns & 4 calcs
 
     async function loadState(sid) {
-        const url = new URL(window.location)
+        const hide = message.loading({content: 'Loading the data', style: {fontSize: '1rem'}}, 0)
+        setLoadingPage(true)
         const response = await fetch(`/loadState?sid=${sid}`, { method: 'GET'})
-        if (response.status === 200) {
+        if (response.ok) {
             const data = await response.json()
             const {queryFields, calcsFields, tableData } = data
             if (queryFields) {
@@ -123,43 +97,43 @@ function App() {
             } else {
                 setInitialCalcsPanes([{ title: 'Calc 1', key: '1' }])
             }
-            setTableData(tableData)             
+            setTableData(tableData)
+            hide()
+            setLoadingPage(false)
         } else {
             console.log('An error occurred')
+            hide()
+            setLoadingPage(false)
             message.error({content: `There was an error loading that page. Unfortunately the link is no longer valid.`, duration: 2.5, style: {fontSize: '1rem'} })
         }
+        const url = new URL(window.location)
         url.searchParams.delete('sid')
         window.history.pushState({}, '', url);
-    } 
+    }
 
     async function saveState() {
-        const saveData = {queryFormV, calcsFormV, queryFields: savedQueryFields, calcsFields: savedCalscFields}
+        const saveData = {queryFormV, calcsFormV, queryFields: savedQueryFields, calcsFields: savedCalcsFields}
         const response = await fetch(`/saveState`, { method: 'POST', headers: {'Content-Type': 'application/json'},body: JSON.stringify(saveData)})
         const data = await response.json()
-        return response.status === 201 ? {success: true, stateID: data.stateID} : {success: false, error: response.statusText}
+        return response.ok ? {success: true, stateID: data.stateID} : {success: false, error: response.statusText}
     }
     
     async function onShareURL() {
         if (!tableData.columns) {
-            message.error({content: `Please select fields and load data before generating a shareable URL.`, duration: 2.5, style: {fontSize: '1rem'} })
+            message.error({content: `Please run a query before generating a shareable URL.`, duration: 2.5, style: {fontSize: '1rem'} })
             return
         }
-        const urlDOM = document.getElementById('shareable-url')
-        urlDOM.innerText = ''
-        setLoadingURL(true)
-        setIsURLVisible(true)
+        setLoadingURL(true); setIsURLVisible(true)
         const save = await saveState()
         if(save.success) {
             setLoadingURL(false)
-            urlDOM.innerText = `${window.origin}?sid=${save.stateID}`
+            setURLText(`${window.origin}?sid=${save.stateID}`)
         } else {
             console.log(save.error)
             message.error({content: `There was an error. Please refresh the page and try again.`, duration: 2.5, style: {fontSize: '1rem'} })
-            setLoadingURL(false)
-            setIsURLVisible(false)
+            setLoadingURL(false); setIsURLVisible(false)
         }
     }
-
 
     function submitCustomCalcs () {
         // FIRST: validate that every colIndex is in tableData
@@ -183,17 +157,10 @@ function App() {
 
     async function submitQuery(formFields) {
         const hide = message.loading({content: 'Loading the data', style: {fontSize: '1rem'}}, 0)
-        const url = new URL(window.location)
-        url.searchParams.delete('type')
-        url.searchParams.delete('id')
-        window.history.pushState({}, '', url)
-        setInfoCard(null)
-        // TODO - also reset the 'form' (the select option needs to be cleared)
-        //   I should probably make this a state as well
         try {
             const fetchOptions = { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(formFields) } 
             const response = await fetch(`/runQuery`, fetchOptions)
-            if (response.status !== 200) {
+            if (!response.ok) {
                 hide()
                 const error = await response.json()
                 message.error({content: 'An error occurred. Please refresh the page and try again.', duration: 5, style: {fontSize: '1rem'} })
@@ -226,7 +193,7 @@ function App() {
         if (tableData.columns && tableData.columns.length > 0) {
             setIsCalcVisible(true)
         } else {
-            message.error({content: 'Please select fields first', duration: 2.5, style: {fontSize: '1rem'} })
+            message.error({content: 'Please run a query before adding Custom Calculations.', duration: 2.5, style: {fontSize: '1rem'} })
         }
     }
 
@@ -245,19 +212,23 @@ function App() {
     function resetCalcsForm() { setInitialCalcsPanes([{ title: 'Calc 1', key: '1' }]); calcsForm.resetFields(); setResetCalcs(resetCalcs+1) }
 
     function onDownload() {
+        if (!tableData.columns) {
+            message.error({content: `Please run a query before downloading data.`, duration: 2.5, style: {fontSize: '1rem'} })
+            return
+        }
         const blob = new Blob([toCSV(tableData)], { type: 'text/csv;charset=utf-8;' });
         const url = URL.createObjectURL(blob)
         const link = document.createElement("a");
+        link.style.visibility = 'hidden';
         link.setAttribute("href", url);
         link.setAttribute("download", "datatable.csv");
-        link.style.visibility = 'hidden';
         document.body.appendChild(link); 
         link.click(); 
         document.body.removeChild(link);
     }
 
     const fieldDrawerProps = {
-        title: 'Edit Fields',
+        title: 'Edit Query Fields',
         width: '50%',
         visible: isFieldDrawerVisible,
         placement: 'left',
@@ -299,10 +270,9 @@ function App() {
         title: "Shareable URL",
         visible: isURLVisible,
         footer: null,
-        forceRender: true,  // need this so that the querySelect can target the DOM before it is loaded
-        onCancel: () => setIsURLVisible(false),
-        onOk: () => setIsURLVisible(false),
-        width: 650,
+        onCancel: () => {setIsURLVisible(false); setURLText('') },
+        onOk: () => {setIsURLVisible(false); setURLText('') },
+        width: 550,
         style: {top: 150}
     }
 
@@ -311,20 +281,33 @@ function App() {
 
     return (
     <>
-    <Spin spinning={loadingPage}>
-    <Layout style={{ minHeight: '100vh' }}>
+    
+    <Layout style={{ minHeight: '100vh' }}>    
     
         <Sider width={300} style={{backgroundColor: '#FFF', textAlign: 'center'}}>
-            <Tabs centered activeKey={activeSiderTab} onChange={(key) => setActiveSiderTab(key)}>
-                <TabPane tab="Custom Query" key="query">
-                    <Row style={{padding: '6px 12px'}}><Button block={true} type="primary" onClick={() => setIsFieldDrawerVisible(true)}>Edit Fields</Button></Row>
-                    <Row style={{padding: '6px 12px'}}><Button block={true} type="secondary" onClick={handleShowCalc}>Edit Custom Calcs</Button></Row>
-                </TabPane>
-                <TabPane tab="Standard Pages" key="standard">
-                    <SelectPage cardLoading={cardLoading} loadStandardPage={loadStandardPage} infoCard={infoCard} />
-                </TabPane>
-            </Tabs>
+        <Spin spinning={loadingPage}>
+            
+            <Menu defaultSelectedKeys={location.pathname.includes('pages') ? 'pages' : 'query'} mode="horizontal" style={{lineHeight: '2.5rem', marginBottom: 12}}>
+                <Menu.Item key="query"><Link to="/">Custom Query</Link></Menu.Item>
+                <Menu.Item key="pages"><Link to="/pages">Standard Pages</Link></Menu.Item>
+            </Menu>
+
+            <Switch>
+                <Route exact path="/">
+                    <Row style={{padding: '6px 12px'}}><Button block type="primary" onClick={() => setIsFieldDrawerVisible(true)}>Edit Query Fields</Button></Row>
+                    <Row style={{padding: '6px 12px'}}><Button block onClick={handleShowCalc}>Edit Custom Calcs</Button></Row>
+                    <Divider />
+                    <Row style={{padding: '6px 12px'}}><Button block onClick={onShareURL} shape="round" icon={<CloudUploadOutlined />}>Generate URL</Button></Row>
+                    <Row style={{padding: '6px 12px'}}><Button block onClick={onDownload} shape="round" icon={<DownloadOutlined />}>Download Data</Button></Row>
+                </Route>
+                <Route path="/pages">
+                    <SelectPage setTableData={setTableData} setSavedCalcsFields={setSavedCalcsFields} setSavedQueryFields={setSavedQueryFields}/>
+                </Route>
+            </Switch>
+        
+            </Spin>
         </Sider>
+        
 
         <Layout >
         
@@ -338,8 +321,6 @@ function App() {
                     <Button type="danger" onClick={() => console.log(tableData)}>Table Data</Button>
                     <Button type="danger" onClick={() => console.log(queryForm.getFieldsValue())}>Form getFieldsValue</Button>
                     <Button type="danger" onClick={() => console.log(calcsForm.getFieldsValue())}>Calc getFieldsValue</Button>
-                    <Button type="primary" onClick={onShareURL} shape="round" icon={<CloudUploadOutlined />}>Shareable URL</Button>
-                    <Button type="primary" onClick={onDownload} shape="round" icon={<DownloadOutlined />}>Download</Button>
                 </Col>
                 </Row>
             </Header>
@@ -347,7 +328,7 @@ function App() {
             <Content style={{margin: '0 5px'}}>
                 {!tableData.columns 
                 ? <Footer style={{ textAlign: 'center', height: '22', padding: '20px 0px'}}>NFL Table ©{new Date().getFullYear()} Created by Jon Baird</Footer>
-                : <Table tableData={tableData} />
+                : <Table setSortInfo={setSortInfo} tableData={tableData} />
                 }
                 
 
@@ -396,32 +377,18 @@ function App() {
 
                 <Modal {...urlModalProps}>
                     <Spin spinning={loadingURL}>
-                    <Alert
-                        message="Copy the Shareable URL below"
-                        size="large"
-                        description={<Row>
-                                <Col span={20} style={{textAlign: 'center', backgroundColor: '#fff', borderColor: 'd9d9d9', border: 5}}>
-                                    <div id='shareable-url'></div></Col>
-                                <Col span={4}><Button type="default" size="small" icon={<CopyOutlined/>} 
-                                    onClick={() => navigator.clipboard.writeText(document.getElementById('shareable-url').innerText)                                 }
-                                >
-                                    Copy</Button></Col>
-                                </Row>
-                        }
-                        type="info"
-                        />
-                        {/* TODO - replace with Paragraph element https://ant.design/components/typography/?theme=compact */}
-                    </Spin>
+                        <Row><Paragraph style={{color: 'grey', fontSize: '0.9rem', margin: 'auto'}} keyboard 
+                            copyable={{icon: <CopyOutlined style={{paddingLeft: 4, fontSize: '1.1rem'}} key="copy-icon" />,}}
+                        >{urlText}</Paragraph></Row>
+                    </Spin>         
 
                 </Modal>
             
             </Content>
             
-            
         </Layout>
-    
     </Layout>
-    </Spin>
+    
     </>
     );
 }
