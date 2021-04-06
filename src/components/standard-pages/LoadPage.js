@@ -67,9 +67,9 @@ export default function LoadPage(props) {
         </Card>
     )
 
-    const getTeamCard = info => (null)
+    const getTeamCard = info => (<div>Test</div>)
 
-    const getTeamLoadingCard = () => (null)
+    const getTeamLoadingCard = () => (<div>Test</div>)
 
     const getInfoCard = (type, info) => (type === 'player' ? getPlayerCard(info) : getTeamCard(info))
 
