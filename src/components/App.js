@@ -22,13 +22,16 @@ const calcsFormV = 1
 
 function App() {
     // application state
-    const [tableData, setTableData] = useState({});
     const [queryForm] = Form.useForm()
     const [calcsForm] = Form.useForm()
     const [savedQueryFields, setSavedQueryFields] = useState(null)  // ensures ShareableURL matches what the user sees in table
     const [savedCalcsFields, setSavedCalcsFields] = useState(null)  // ensures ShareableURL matches what the user sees in table
     const [initialQueryPanes, setInitialQueryPanes] = useState([])
     const [initialCalcsPanes, setInitialCalcsPanes] = useState([])
+    // table state
+    const [tableData, setTableData] = useState({});
+    const [filterInfo, setFilterInfo] = useState(null)
+    const [sortInfo, setSortInfo] = useState(null)
     // reset helpers
     const [resetQuery, setResetQuery] = useState(1);
     const [resetCalcs, setResetCalcs] = useState(1);
@@ -325,7 +328,7 @@ function App() {
             <Content style={{margin: '0 5px'}}>
                 {!tableData.columns 
                 ? <Footer style={{ textAlign: 'center', height: '22', padding: '20px 0px'}}>NFL Table ©{new Date().getFullYear()} Created by Jon Baird</Footer>
-                : <Table tableData={tableData} />
+                : <Table setSortInfo={setSortInfo} tableData={tableData} />
                 }
                 
 
