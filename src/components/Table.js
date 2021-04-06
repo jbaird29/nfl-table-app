@@ -8,11 +8,8 @@ function Table(props) {
   const columns = props.tableData.columns
 
   const handleChange = (pagination, filters, sorter, extra) => {
-    props.setSortInfo(sorter)
-    console.log(pagination)
-    console.log(filters)
-    console.log(sorter)
-    console.log(extra)
+    props.setTableInfo({filters, sorter})
+    console.log({filters, sorter})
   }
 
   // if the first column is the rnk, use the second column, otherwise use first coumn

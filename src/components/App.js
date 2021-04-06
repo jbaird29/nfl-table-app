@@ -30,8 +30,7 @@ function App() {
     const [initialCalcsPanes, setInitialCalcsPanes] = useState([])
     // table state
     const [tableData, setTableData] = useState({});
-    const [filterInfo, setFilterInfo] = useState(null)
-    const [sortInfo, setSortInfo] = useState(null)
+    const [tableInfo, setTableInfo] = useState( {sorter: {field: null, order: null},  filters: {} })
     // reset helpers
     const [resetQuery, setResetQuery] = useState(1);
     const [resetCalcs, setResetCalcs] = useState(1);
@@ -80,12 +79,11 @@ function App() {
         const response = await fetch(`/loadState?sid=${sid}`, { method: 'GET'})
         if (response.ok) {
             const data = await response.json()
-            const {queryFields, calcsFields, tableData } = data
+            const {tableInfo, queryFields, calcsFields, tableData } = data
             if (queryFields) {
                 setInitialQueryPanes(Object.keys(queryFields.columns).map(colIndex => ({ title: `Col ${colIndex.slice(3)}`, key: `${colIndex.slice(3)}` })))
                 queryForm.setFieldsValue(queryFields)
                 setSavedQueryFields(queryFields)
-                addRenderSorterToTable(tableData)
             } else {
                 setInitialQueryPanes([{ title: 'Col 1', key: '1' }])
             }
@@ -97,6 +95,7 @@ function App() {
             } else {
                 setInitialCalcsPanes([{ title: 'Calc 1', key: '1' }])
             }
+            addRenderSorterToTable(tableData, tableInfo)
             setTableData(tableData)
             hide()
             setLoadingPage(false)
@@ -112,7 +111,7 @@ function App() {
     }
 
     async function saveState() {
-        const saveData = {queryFormV, calcsFormV, queryFields: savedQueryFields, calcsFields: savedCalcsFields}
+        const saveData = {queryFormV, calcsFormV, tableInfo,  queryFields: savedQueryFields, calcsFields: savedCalcsFields}
         const response = await fetch(`/saveState`, { method: 'POST', headers: {'Content-Type': 'application/json'},body: JSON.stringify(saveData)})
         const data = await response.json()
         return response.ok ? {success: true, stateID: data.stateID} : {success: false, error: response.statusText}
@@ -150,6 +149,7 @@ function App() {
         // CONTINUE: if valid
         const newTableData = copyTableWithoutCalcs(tableData)
         addCalcsToTable(newTableData, calcsForm.getFieldsValue())
+        addRenderSorterToTable(newTableData, tableInfo)
         setTableData(newTableData)
         setIsCalcVisible(false)
         setSavedCalcsFields(calcsForm.getFieldsValue())
@@ -170,7 +170,7 @@ function App() {
                 hide()
                 const tableData = await response.json();
                 if (tableData) {
-                    addRenderSorterToTable(tableData)
+                    addRenderSorterToTable(tableData, tableInfo)
                     setTableData(tableData)
                     setIsFieldDrawerVisible(false)
                     setSavedCalcsFields(null)
@@ -328,7 +328,7 @@ function App() {
             <Content style={{margin: '0 5px'}}>
                 {!tableData.columns 
                 ? <Footer style={{ textAlign: 'center', height: '22', padding: '20px 0px'}}>NFL Table ©{new Date().getFullYear()} Created by Jon Baird</Footer>
-                : <Table setSortInfo={setSortInfo} tableData={tableData} />
+                : <Table setTableInfo={setTableInfo} tableData={tableData} />
                 }
                 
 

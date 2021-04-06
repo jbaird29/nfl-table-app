@@ -13,13 +13,22 @@ const teamMap = Object.assign( ...teamList.map(props => ({[props.label]: props.v
  * Given a TableProps column object, adds a sorter function depending on format type
  * @param {Object} column - tableProps Column
  */
-export function addSorter(column) {
+export function addSorter(column, tableInfo) {
+    const columnName = column.dataIndex
     if (column.dataType === 'number') {
-        const columnName = column.dataIndex
         column.sorter = (a, b) => a[columnName] - b[columnName]
     } else if (column.dataType === 'string') {
-        const columnName = column.dataIndex
         column.sorter = (a, b) => (a[columnName].toUpperCase() < b[columnName].toUpperCase() ? -1 : 1)
+    }
+    // potentially make this column the default sort
+    // https://ant.design/components/table/?theme=compact#components-table-demo-head
+    const {sorter} = tableInfo
+    const {field, order} = sorter
+    console.log(columnName)
+    console.log(tableInfo)    
+    if (columnName === field) {
+        console.log('match')
+        column.defaultSortOrder = order
     }
 }
 
@@ -54,15 +63,15 @@ export function addRender(column) {
  * Given a tableData object, adds render and sorter functions to each of the columns
  * @param {Object} tableData 
  */
-export function addRenderSorterToTable(tableData) {
+export function addRenderSorterToTable(tableData, tableInfo) {
     tableData.columns.forEach(column => {
         if ('children' in column) {
             column.children.forEach(child => {
-                addSorter(child);
+                addSorter(child, tableInfo);
                 addRender(child);
             })
         } else {
-            addSorter(column);
+            addSorter(column, tableInfo);
             addRender(column);
         }
     })
@@ -83,6 +92,7 @@ export function buildTableCalcColumn(calcIndex, calc) {
         align: 'center',
         children: [{
             dataIndex: calcIndex, 
+            columnKey: calcIndex,
             title: title,
             align: "right",
             width: "75px",
@@ -91,8 +101,8 @@ export function buildTableCalcColumn(calcIndex, calc) {
             dataType: 'number'
         }]
     }
-    addRender(newColumn.children[0])
-    addSorter(newColumn.children[0])
+    // addRender(newColumn.children[0], tableProps)
+    // addSorter(newColumn.children[0])
     return newColumn
 }
 

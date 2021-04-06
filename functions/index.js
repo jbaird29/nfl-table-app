@@ -37,7 +37,7 @@ exports.runQuery = functions.https.onRequest(async function(req, res){
 exports.saveState = functions.https.onRequest(async function(req, res){
     const saveData = req.body
     functions.logger.log(saveData)
-    const {queryFormV, calcsFormV, queryFields, calcsFields} = saveData
+    const {queryFormV, calcsFormV, tableInfo, queryFields, calcsFields} = saveData
     const stateID = createSID(JSON.stringify(saveData))
     functions.logger.log("Attempting to save stateID: ", stateID)
     try {
@@ -47,6 +47,7 @@ exports.saveState = functions.https.onRequest(async function(req, res){
             calcsFields: JSON.stringify(calcsFields),
             queryFormV: queryFormV,
             calcsFormV: calcsFormV,
+            tableInfo: JSON.stringify(tableInfo)
         });
         functions.logger.log(`Saved ${stateID}`)
         res.status(201).send({stateID: stateID})
@@ -69,6 +70,7 @@ exports.loadState = functions.https.onRequest(async function(req, res){
             const data = doc.data()
             const queryFields = JSON.parse(data.queryFields)
             const calcsFields = JSON.parse(data.calcsFields)
+            const tableInfo = JSON.parse(data.tableInfo)
             try {
                 const query = new Query(meta, queryFields)
                 const sql = query.buildSQL()
@@ -77,7 +79,7 @@ exports.loadState = functions.https.onRequest(async function(req, res){
                 const tableProps = query.buildTableProps()
                 const queryResult = await queryPromise
                 functions.logger.log(`Loaded ${stateID}`)
-                queryResult ? res.status(200).send({queryFields, calcsFields, tableData:{dataSource: queryResult, columns: tableProps}}) : res.res.status(400).send({error: "Query invalid."})
+                queryResult ? res.status(200).send({queryFields, calcsFields, tableInfo, tableData:{dataSource: queryResult, columns: tableProps}}) : res.res.status(400).send({error: "Query invalid."})
             } catch(err) {
                 functions.logger.warn(err)
                 res.status(400).send({error: "Could not complete request with given parameters."})
