@@ -31,7 +31,7 @@ export default function LoadPage(props) {
             const defaultStatType = info.player_position ? positionToStatType[info.player_position] : 'pass'
             addRenderSorterToTable(tableData)
             setAllPlayerData(tableData)
-            setStatType(defaultStatType)                 // next: set dynamically based on position
+            setStatType(defaultStatType)
             props.setSavedCalcsFields(null)
             props.setSavedQueryFields(null)
             hide()

@@ -12,10 +12,6 @@ const {Paragraph, Text} = Typography
 export default function SelectPage(props) {
     const history = useHistory();
 
-    // todo - add logic for toggling between Pass / Rush / Recv stats
-    // todo - add a 'position' filter before player?
-    // todo - add team info card
-
     const onPlayerSelect = (id) => history.push(`/pages/players/${encodeURI(id)}`)
     const onTeamSelect   = (id) => history.push(`/pages/teams/${encodeURI(id)}`)
 
