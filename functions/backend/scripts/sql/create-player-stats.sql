@@ -25,6 +25,7 @@ AS (
     SUM(CASE WHEN true THEN rush_was_touchdown ELSE NULL END) AS rush_touchdowns_sum,
     SUM(CASE WHEN true THEN rush_broken_tackles ELSE NULL END) AS rush_broken_tackles_sum,
     SUM(CASE WHEN true THEN rush_yards_after_contact ELSE NULL END) AS rush_yards_after_contact_sum,
+    SUM(CASE WHEN true THEN rush_yards_after_contact ELSE NULL END) / SUM(CASE WHEN true THEN rush_was_attempt  ELSE NULL END) AS rush_yards_after_per_attempt,
     SUM(CASE WHEN true THEN rush_was_tackle_for_loss ELSE NULL END) AS rush_tackle_for_loss_sum,
     SUM(CASE WHEN true THEN rush_tackle_for_loss_yards ELSE NULL END) AS rush_tackle_for_loss_yards_sum,
     SUM(CASE WHEN true THEN rush_was_firstdown ELSE NULL END) AS rush_firstdown_sum,
@@ -41,5 +42,6 @@ AS (
     SUM(CASE WHEN true THEN recv_yards_after_contact ELSE NULL END) AS recv_yards_after_contact_sum,
   FROM
     `nfl-table.main.prod`
+  WHERE nullified IS NULL
   GROUP BY 1, 2, 3
 )
