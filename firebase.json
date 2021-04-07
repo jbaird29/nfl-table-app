@@ -20,6 +20,10 @@
         "function": "loadState"
       },
       {
+        "source": "/loadStandardPage",
+        "function": "loadStandardPage"
+      },
+      {
         "source": "**",
         "destination": "/index.html"
       }
