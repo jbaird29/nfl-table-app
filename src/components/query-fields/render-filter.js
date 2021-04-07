@@ -1,4 +1,4 @@
-import {Form, Slider, Select, InputNumber, Divider, Input, Row, Col, } from 'antd';
+import {Form, Slider, Select, InputNumber, } from 'antd';
 
 // this takes a filter object (from metadata) with formProps and ui.props and returns the JSX
 export function renderFilterObject(filter, name, key) { return (

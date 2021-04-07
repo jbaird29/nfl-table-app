@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import App from './components/App';
-import reportWebVitals from './components/1unused/reportWebVitals';
+// import reportWebVitals from './components/1unused/reportWebVitals';
 import Firebase from './firebase/firebase'
 import FirebaseContext from './firebase/context'
 import { BrowserRouter as Router} from 'react-router-dom';

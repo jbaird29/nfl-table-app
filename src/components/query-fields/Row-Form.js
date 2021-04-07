@@ -1,6 +1,6 @@
 import React from "react";
-import {Form, Radio, Typography, Alert} from 'antd';
-const {Title, Paragraph} = Typography
+import {Form, Radio, Typography, } from 'antd';
+const { Paragraph} = Typography
 
 
 export default function RowForm(props) {

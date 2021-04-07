@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Radio, Row, Col, Typography, Select, Divider, message, Image, Card, List, Avatar, Menu, Spin, Button } from 'antd';
+import { Radio, Row, Col, Typography, Divider, message, Image, Card, Avatar, Spin, Button } from 'antd';
 import { UserOutlined, LoadingOutlined, FormOutlined } from '@ant-design/icons';
-import { useParams, useHistory, Redirect} from 'react-router-dom';
+import { useParams, useHistory, } from 'react-router-dom';
 import { addRenderSorterToTable, listOfRowTypes} from '../helper-functions'
 
 const {Paragraph, Text} = Typography

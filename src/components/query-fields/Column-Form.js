@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import {Form, Slider, Select, InputNumber, Divider, Input, Row, Col, } from 'antd';
+import React from "react";
+import {Form,  Select, InputNumber, Divider, Input, } from 'antd';
 import { InfoCircleOutlined } from '@ant-design/icons';
 import statsInputs from '../../inputs/statsInputs.json'
 import filtersStats from '../../inputs/filtersStats.json'

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 import 'antd/dist/antd.css';
-import {Layout, Button, Drawer, message, Divider, Row, Col, Form, Modal, Steps, Spin, Alert, Image, Tabs, Typography, Menu, notification } from 'antd';
+import {Layout, Button, Drawer, message, Divider, Row, Col, Form, Modal, Steps, Spin, Image, Tabs, Typography, Menu, notification } from 'antd';
 import { DownloadOutlined, CloudUploadOutlined, CopyOutlined, QuestionCircleOutlined, } from '@ant-design/icons';
 import Table from './Table'
 import ColumnTabs from './query-fields/Column-Tabs'
@@ -10,13 +10,13 @@ import WhereForm from './query-fields/Where-Form'
 import CustomCalcTabs from './custom-calcs/Custom-Calc-Tabs'
 import SelectPage from './standard-pages/SelectPage'
 import { toCSV, copyTableWithoutCalcs, addCalcsToTable, addRenderSorterToTable} from './helper-functions'
-import { Switch, Route, Link, useLocation, useHistory, } from 'react-router-dom';
+import { Switch, Route, Link, useLocation, } from 'react-router-dom';
 import logo from '../images/logo.png'
 
 const { Header, Sider, Content, Footer } = Layout;
 const { Step } = Steps;
 const { TabPane } = Tabs
-const { Title, Paragraph } = Typography
+const { Paragraph } = Typography
 const queryFormV = 1
 const calcsFormV = 1
 

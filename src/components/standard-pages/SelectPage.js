@@ -1,13 +1,11 @@
-import React, { useState, useEffect } from "react";
-import {Radio, Row, Col, Typography, Select, Divider, message, Image, Card, List, Avatar, Menu, Dropdown, } from 'antd';
+import React from "react";
+import { Row, Col, Typography, Select, Menu, Dropdown, } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
-import { Switch, Route, Link, useHistory, useParams, useLocation} from 'react-router-dom';
-import { addRenderSorterToTable} from '../helper-functions'
+import { Switch, Route, Link, useHistory, } from 'react-router-dom';
 import LoadPage from './LoadPage'
 import teamList from '../../inputs/teamList.json'
 import playerList from '../../inputs/playerList.json'
 
-const {Paragraph, Text} = Typography
 
 export default function SelectPage(props) {
     const history = useHistory();

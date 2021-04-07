@@ -1,7 +1,7 @@
 import teamList from '../inputs/teamList.json'
 import playerList from '../inputs/playerList.json'
 import { Typography, Tooltip, } from 'antd';
-const { Text, Link } = Typography;
+const { Link } = Typography;
 
 
 // converts: [{value: gsis_id_1, label: player_name_1}] 

@@ -1,12 +1,12 @@
 import React from "react";
-import {Form, Select, Slider, InputNumber, Typography} from 'antd';
+import {Form, Select, Typography} from 'antd';
 import filtersWhere from '../../inputs/filtersWhere.json'
 import teamList from '../../inputs/teamList.json'
 import playerList from '../../inputs/playerList.json'
 import {renderFilterObject} from './render-filter'
 import {yearsList} from '../helper-functions'
 
-const {Title, Paragraph} = Typography
+const {Paragraph} = Typography
 
 export default function WhereForm(props) {
 
