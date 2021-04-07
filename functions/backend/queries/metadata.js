@@ -908,6 +908,7 @@ aggs.rush_yards_after_contact_sum = new Aggregate({
 })
 aggs.rush_yards_after_per_attempt = new Aggregate({
     name: 'rush_yards_after_per_attempt',
+    format: 'dec_1',
     includeInSummary: true,
     title: 'Rush Yards Ater Contact', 
     shortTitle: 'Avg YDS After Contact', 

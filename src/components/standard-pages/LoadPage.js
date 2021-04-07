@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Radio, Row, Col, Typography, Select, Divider, message, Image, Card, List, Avatar, Menu, Spin, Button } from 'antd';
-import { UserOutlined, LoadingOutlined } from '@ant-design/icons';
+import { UserOutlined, LoadingOutlined, FormOutlined } from '@ant-design/icons';
 import { useParams, useHistory} from 'react-router-dom';
 import { addRenderSorterToTable, listOfRowTypes} from '../helper-functions'
 
@@ -12,7 +12,7 @@ export default function LoadPage(props) {
 
     const history = useHistory();
     const {id} = useParams()
-    const type = props.type
+    const type = props.type   // 'player' or 'team'
 
     const [allPlayerData, setAllPlayerData] = useState(null)
     const [statType, setStatType] = useState(null)
@@ -145,10 +145,19 @@ export default function LoadPage(props) {
         </Spin>
     )
 
+    const button = (
+    <Spin spinning={cardLoading}>
+        <Row style={{marginTop: 12}}>
+            <Button style={{width: 250, margin: 'auto'}} block onClick={handleOpenCustomQueryClick} shape="round" icon={<FormOutlined />}>Open in Custom Query</Button>
+        </Row>
+    </Spin>
+    )
+
     return (<>
+        <Divider />
         {selectStats}
         {cardLoading && getLoadingCard()}
         {infoCard && !cardLoading && getInfoCard(type, infoCard)}
-        <Button onClick={handleOpenCustomQueryClick}>Open in Custom Query</Button>
+        {infoCard && !cardLoading && button}
     </>);
 };

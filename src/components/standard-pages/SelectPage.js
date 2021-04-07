@@ -24,6 +24,10 @@ export default function SelectPage(props) {
         </Menu>
       );      
 
+    const getLoadPageEl = (type) => (
+        <LoadPage type={type} openStandardInCustomQuery={props.openStandardInCustomQuery} setTableData={props.setTableData} 
+            setSavedCalcsFields={props.setSavedCalcsFields} setSavedQueryFields={props.setSavedQueryFields} />
+    )
 
     return (<>
         <Row gutter={[0, 18]}>
@@ -40,26 +44,22 @@ export default function SelectPage(props) {
         <Col span={24}>
             <Switch>
                 <Route path="/pages/players/"
-                    component={() => <Select onChange={onPlayerSelect} style={selectStyle} showSearch={true} allowClear={true} placeholder='Players' options={playerList} optionFilterProp="label"/>}
+                    children={() => <Select onChange={onPlayerSelect} style={selectStyle} showSearch={true} allowClear={true} placeholder='Players' options={playerList} optionFilterProp="label"/>}
                 />
                 <Route path="/pages/teams/"
-                    component={() => <Select onChange={onTeamSelect} style={selectStyle} showSearch={true} allowClear={true} placeholder='Teams' options={teamList} optionFilterProp="label"/>}
+                    children={() => <Select onChange={onTeamSelect} style={selectStyle} showSearch={true} allowClear={true} placeholder='Teams' options={teamList} optionFilterProp="label"/>}
                 />
             </Switch>
         </Col>
         </Row>
 
         <Switch>
-            <Route path="/pages/players/:id"> 
-                <Divider />
-                <LoadPage type="player" openStandardInCustomQuery={props.openStandardInCustomQuery} setTableData={props.setTableData} 
-                    setSavedCalcsFields={props.setSavedCalcsFields} setSavedQueryFields={props.setSavedQueryFields} />
-            </Route>
-            <Route path="/pages/teams/:id"> 
-                <Divider />
-                <LoadPage type="team" openStandardInCustomQuery={props.openStandardInCustomQuery} setTableData={props.setTableData} 
-                    setSavedCalcsFields={props.setSavedCalcsFields} setSavedQueryFields={props.setSavedQueryFields} />
-            </Route>
+            <Route path="/pages/players/:id" 
+                children={() => getLoadPageEl('player')}
+            /> 
+            <Route path="/pages/teams/:id" 
+                children={() => getLoadPageEl('team')}
+            /> 
         </Switch>
  
     </>);
