@@ -332,7 +332,8 @@ function App() {
                 </Route>
                 <Route path="/pages">
                     <SelectPage openStandardInCustomQuery={openStandardInCustomQuery} setTableData={setTableData} 
-                        setSavedCalcsFields={setSavedCalcsFields} setSavedQueryFields={setSavedQueryFields}/>
+                        setSavedCalcsFields={setSavedCalcsFields} setSavedQueryFields={setSavedQueryFields}
+                        />
                 </Route>
             </Switch>
         
@@ -349,7 +350,7 @@ function App() {
                     <Image style={{padding: '8px 0px', }} width={200} src={logo} alt='logo' />
                 </Col>
                 <Col span={12} style={{ textAlign: 'right'}}>
-                    <Button type="primary" onClick={onSignIn} shape="round" icon={<LoginOutlined />}>Sign In</Button>
+                    <Button style={{width: 100}} type="primary" onClick={onSignIn} shape="round" icon={<LoginOutlined />}>Sign In</Button>
                     {/* <Button type="danger" onClick={() => console.log(tableData)}>Table Data</Button>
                     <Button type="danger" onClick={() => console.log(queryForm.getFieldsValue())}>Form getFieldsValue</Button>
                     <Button type="danger" onClick={() => console.log(calcsForm.getFieldsValue())}>Calc getFieldsValue</Button> */}

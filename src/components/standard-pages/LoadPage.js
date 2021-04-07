@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Radio, Row, Col, Typography, Select, Divider, message, Image, Card, List, Avatar, Menu, Spin, Button } from 'antd';
 import { UserOutlined, LoadingOutlined, FormOutlined } from '@ant-design/icons';
-import { useParams, useHistory} from 'react-router-dom';
+import { useParams, useHistory, Redirect} from 'react-router-dom';
 import { addRenderSorterToTable, listOfRowTypes} from '../helper-functions'
 
 const {Paragraph, Text} = Typography
@@ -20,8 +20,8 @@ export default function LoadPage(props) {
     useEffect(() => {
         loadStandardPage(props.type, id)
         const cleanUp = () => {
-            // props.setTableData({})
             document.title = 'NFL Table'
+            // props.setTableData({})
         }
         return cleanUp
     }, [id])

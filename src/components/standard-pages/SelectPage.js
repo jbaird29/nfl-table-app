@@ -26,7 +26,8 @@ export default function SelectPage(props) {
 
     const getLoadPageEl = (type) => (
         <LoadPage type={type} openStandardInCustomQuery={props.openStandardInCustomQuery} setTableData={props.setTableData} 
-            setSavedCalcsFields={props.setSavedCalcsFields} setSavedQueryFields={props.setSavedQueryFields} />
+            setSavedCalcsFields={props.setSavedCalcsFields} setSavedQueryFields={props.setSavedQueryFields} 
+        />
     )
 
     return (<>
@@ -44,22 +45,22 @@ export default function SelectPage(props) {
         <Col span={24}>
             <Switch>
                 <Route path="/pages/players/"
-                    children={() => <Select onChange={onPlayerSelect} style={selectStyle} showSearch={true} allowClear={true} placeholder='Players' options={playerList} optionFilterProp="label"/>}
+                    component={() => <Select onChange={onPlayerSelect} style={selectStyle} showSearch={true} allowClear={true} placeholder='Players' options={playerList} optionFilterProp="label"/>}
                 />
                 <Route path="/pages/teams/"
-                    children={() => <Select onChange={onTeamSelect} style={selectStyle} showSearch={true} allowClear={true} placeholder='Teams' options={teamList} optionFilterProp="label"/>}
+                    component={() => <Select onChange={onTeamSelect} style={selectStyle} showSearch={true} allowClear={true} placeholder='Teams' options={teamList} optionFilterProp="label"/>}
                 />
             </Switch>
         </Col>
         </Row>
 
         <Switch>
-            <Route path="/pages/players/:id" 
-                children={() => getLoadPageEl('player')}
-            /> 
-            <Route path="/pages/teams/:id" 
-                children={() => getLoadPageEl('team')}
-            /> 
+            <Route path="/pages/players/:id" >
+                {getLoadPageEl('player')}
+            </Route>
+            <Route path="/pages/teams/:id" >
+                {getLoadPageEl('team')}
+            </Route>
         </Switch>
  
     </>);
