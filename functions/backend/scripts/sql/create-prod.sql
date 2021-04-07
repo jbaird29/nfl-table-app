@@ -67,8 +67,8 @@ AS (
     `nfl-table.main.games` AS games
   ON
     stats.game_id = games.id
-  JOIN
+  LEFT JOIN
     `nfl-table.main.player_info` AS player_info
   ON
-    stats.player_id = player_info.sportradar_id
+    stats.player_reference = player_info.player_gsis_id
 )

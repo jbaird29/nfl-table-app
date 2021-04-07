@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 import 'antd/dist/antd.css';
-import {Layout, Button, Drawer, message, Divider, Row, Col, Form, Modal, Steps, Spin, Alert, Image, Tabs, Typography, Menu } from 'antd';
-import { DownloadOutlined, CloudUploadOutlined, CopyOutlined, LoginOutlined, } from '@ant-design/icons';
+import {Layout, Button, Drawer, message, Divider, Row, Col, Form, Modal, Steps, Spin, Alert, Image, Tabs, Typography, Menu, notification } from 'antd';
+import { DownloadOutlined, CloudUploadOutlined, CopyOutlined, QuestionCircleOutlined, } from '@ant-design/icons';
 import Table from './Table'
 import ColumnTabs from './query-fields/Column-Tabs'
 import RowForm from './query-fields/Row-Form'
@@ -253,9 +253,16 @@ function App() {
         document.body.removeChild(link);
     }
 
-    function onSignIn() {
-        message.info({content: `That feature is coming soon!`, duration: 2.5, style: {fontSize: '1rem'} })
-    }
+    function onHelp() {
+        notification.open({
+            message: 'Need Help?',
+            duration: 4,
+            description:
+              "Click Edit Query Fields in the left-hand menu to build a custom query. Select a Row Type, then Add Columns "
+              +"to choose statistics and filters."
+              ,
+        });
+    };
 
     const fieldDrawerProps = {
         title: 'Edit Query Fields',
@@ -350,7 +357,7 @@ function App() {
                     <Image style={{padding: '8px 0px', }} width={200} src={logo} alt='logo' />
                 </Col>
                 <Col span={12} style={{ textAlign: 'right'}}>
-                    <Button style={{width: 100}} type="primary" onClick={onSignIn} shape="round" icon={<LoginOutlined />}>Sign In</Button>
+                    <Button style={{width: 120, }} size='large' onClick={onHelp} shape="round" icon={<QuestionCircleOutlined />}>Help</Button>
                     {/* <Button type="danger" onClick={() => console.log(tableData)}>Table Data</Button>
                     <Button type="danger" onClick={() => console.log(queryForm.getFieldsValue())}>Form getFieldsValue</Button>
                     <Button type="danger" onClick={() => console.log(calcsForm.getFieldsValue())}>Calc getFieldsValue</Button> */}

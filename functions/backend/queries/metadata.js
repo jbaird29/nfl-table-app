@@ -59,8 +59,8 @@ tbls.player_info = new Table({
     sqlName: '`nfl-table.main.player_info`',
     sqlJoin: {
         toTable: tbls.stats,
-        toTableField: 'player_id',
-        fromTableField: 'sportradar_id'
+        toTableField: 'player_reference',
+        fromTableField: 'player_gsis_id'
     }
 })
 tbls.player_stats = new Table({

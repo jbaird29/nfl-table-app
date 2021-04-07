@@ -21,7 +21,7 @@ function getCreationSQL() {
     sql += `    ${tbls.games.buildSQL()}\n`
     sql += '  ON\n'
     sql += `    ${tbls.games.buildJoinSQL()}\n`
-    sql += `  JOIN\n`
+    sql += `  LEFT JOIN\n`
     sql += `    ${tbls.player_info.buildSQL()}\n`
     sql += '  ON\n'
     sql += `    ${tbls.player_info.buildJoinSQL()}\n`
