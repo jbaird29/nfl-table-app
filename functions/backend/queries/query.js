@@ -105,7 +105,9 @@ module.exports.Query = class Query {
         const rowTypes = ['season_year', 'player_gsis_id', 'team_id']
         rowTypes.forEach(rowName => {
             const filter = this.buildFilterForRowType(rowName)
-            filter ?  whereArr.push(filter) : null
+            if (filter) {
+                whereArr.push(filter)
+            }
         })
 
         // append stat_type filter based on what is in the columns

@@ -1,5 +1,5 @@
 const assert = require('assert');
-const {dims, aggs, fltrs, tbls} = require('../queries/metadata')
+const {dims, aggs, tbls} = require('../queries/metadata')
 const bq = require('../queries/bigquery');
 
 // Test that all 'alias' fields are equal to the property names on agg
