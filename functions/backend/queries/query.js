@@ -81,34 +81,36 @@ module.exports.Query = class Query {
                 .filter(([name, values]) => values && (Array.isArray(values) ? values.length > 0 : true))
                 .map(([name, values]) => this.buildFilterSQL(name, values))
 
-        // append season_year filter based on what is in the columns
-        const yearsWithDuplicates = Object.entries(this.columns)
-            .filter(([colIndex, column]) => column.filters.season_year)
-            .map(([colIndex, column]) => column.filters.season_year)
-        const years = Array.from(new Set(yearsWithDuplicates))
-        years.length > 0 ? whereArr.push(this.buildFilterSQL('season_year', years)) : null
+        const columnsCount = Object.keys(this.columns).length
 
-        // append player_name filter based on what is in the columns
-        const playersWithDuplicates = Object.entries(this.columns)
-            .filter(([colIndex, column]) => column.filters.player_gsis_id)
+        // append season_year filter based on what is in the columns ONLY IF every column includes a filter for that
+        const years = Object.entries(this.columns).filter(([colIndex, column]) => column.filters.season_year)
+            .map(([colIndex, column]) => column.filters.season_year)
+        if (years.length === columnsCount) {
+            whereArr.push(this.buildFilterSQL('season_year', Array.from(new Set(years)) ))
+        }
+        
+        // append player_name filter based on what is in the columns ONLY IF every column includes a filter for that
+        const players = Object.entries(this.columns).filter(([colIndex, column]) => column.filters.player_gsis_id)
             .map(([colIndex, column]) => column.filters.player_gsis_id)
-        const players = Array.from(new Set(playersWithDuplicates))
-        players.length > 0 ? whereArr.push(this.buildFilterSQL('player_gsis_id', players)) : null
+        if (players.length === columnsCount) {
+            whereArr.push(this.buildFilterSQL('player_gsis_id', Array.from(new Set(players)) ))
+        }
     
-        // append team_name filter based on what is in the columns
-        const teamsWithDuplicates = Object.entries(this.columns)
-            .filter(([colIndex, column]) => column.filters.team_id)
+        // append team_name filter based on what is in the columns ONLY IF every column includes a filter for that
+        const teams = Object.entries(this.columns).filter(([colIndex, column]) => column.filters.team_id)
             .map(([colIndex, column]) => column.filters.team_id)
-        const teams = Array.from(new Set(teamsWithDuplicates))
-        teams.length > 0 ? whereArr.push(this.buildFilterSQL('team_id', teams)) : null
+        if (teams.length === columnsCount) {
+            whereArr.push(this.buildFilterSQL('team_id', Array.from(new Set(teams)) ))
+        }
 
         // append stat_type filter based on what is in the columns
         //   if the stat field is an "info" type, then no stat_type filter is appended
         const hasInfoAgg = Object.entries(this.columns).filter(([colIndex, column]) => column.field.slice(0, 4) === 'info').length > 0
         if (!hasInfoAgg) {
             const statsWithDuplicates = Object.entries(this.columns)
-                                    .filter(([colIndex, column]) => ['pass', 'rush', 'recv'].includes(column.field.slice(0, 4)))
-                                    .map(([colIndex, column]) => `${column.field.slice(0, 4)}`)
+                .filter(([colIndex, column]) => ['pass', 'rush', 'recv'].includes(column.field.slice(0, 4)))
+                .map(([colIndex, column]) => `${column.field.slice(0, 4)}`)
             const stats = Array.from(new Set(statsWithDuplicates))
             whereArr.push(this.buildFilterSQL('stat_type', stats))
         }

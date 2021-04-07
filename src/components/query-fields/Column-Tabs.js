@@ -6,27 +6,28 @@ const { TabPane } = Tabs;
 
   
 class ColumnTabs extends React.Component {
-    
-    tabIndex = Math.max(...this.props.initialQueryPanes.map(pane => pane.key));
-  
-    state = {
-        activeKey: this.props.initialQueryPanes[0].key,
-        panes: this.props.initialQueryPanes,
-    };
 
     tabButtons = {
         right: <Button type="default" onClick={() => this.onDuplicate()}>Duplicate Tab</Button>,
     };
 
     onDuplicate = () => {
-        const currentKey = this.state.activeKey
-        const fieldsToDuplicate = this.props.queryForm.getFieldsValue().columns[`col${currentKey}`]
-        const newKey = this.add()
-        this.props.queryForm.setFieldsValue({columns: {[`col${newKey}`]: fieldsToDuplicate }}) 
+        const { panes, activeKey, newTabIndex } = this.props.state;
+        const fieldsToDuplicate = this.props.queryForm.getFieldsValue().columns[`col${activeKey}`]
+
+        const newPanes = [...panes];
+        newPanes.push({ title: `Col ${newTabIndex}`, key: `${newTabIndex}` });
+        this.props.setState({
+            panes: newPanes,
+            activeKey: `${newTabIndex}`,
+            newTabIndex: newTabIndex + 1 
+        });
+
+        this.props.queryForm.setFieldsValue({columns: {[`col${newTabIndex}`]: fieldsToDuplicate }}) 
     }
   
     onChange = activeKey => {
-        this.setState({ activeKey });
+        this.props.setState(prev => ({...prev, activeKey}));
     };
   
     onEdit = (targetKey, action) => {
@@ -34,20 +35,18 @@ class ColumnTabs extends React.Component {
     };
   
     add = () => {
-        this.tabIndex++
-        const { panes } = this.state;
-        const activeKey = `${this.tabIndex}`;
+        const { panes, newTabIndex } = this.props.state;
         const newPanes = [...panes];
-        newPanes.push({ title: `Col ${this.tabIndex}`, key: activeKey });
-        this.setState({
+        newPanes.push({ title: `Col ${newTabIndex}`, key: `${newTabIndex}` });
+        this.props.setState({
             panes: newPanes,
-            activeKey,
+            activeKey: `${newTabIndex}`,
+            newTabIndex: newTabIndex + 1 
         });
-        return this.tabIndex
     };
   
     remove = targetKey => {
-        const { panes, activeKey } = this.state;
+        const { panes, activeKey } = this.props.state;
         let newActiveKey = activeKey;
         let lastIndex;
         panes.forEach((pane, i) => {
@@ -65,15 +64,16 @@ class ColumnTabs extends React.Component {
             }
         }
 
-        this.setState({
+        this.props.setState(prev => ({
+            ...prev,
             panes: newPanes,
             activeKey: newActiveKey,
-        });
+        }));
 
     };
   
     render() {
-        const { panes, activeKey } = this.state;
+        const { panes, activeKey } = this.props.state;
         return (
             <Tabs
                 type="editable-card"
@@ -87,8 +87,8 @@ class ColumnTabs extends React.Component {
             >
             
             {panes.map(pane => (
-                <TabPane tab={pane.title} key={pane.key}>
-                    <ColumnForm queryForm={this.props.queryForm} colIndex={`col${pane.key}`}/>
+                <TabPane forceRender={true} tab={pane.title} key={pane.key}>
+                    <ColumnForm key={`col${pane.key}`} queryForm={this.props.queryForm} colIndex={`col${pane.key}`}/>
                 </TabPane>
             ))}
             

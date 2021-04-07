@@ -26,8 +26,10 @@ function App() {
     const [calcsForm] = Form.useForm()
     const [savedQueryFields, setSavedQueryFields] = useState(null)  // ensures ShareableURL matches what the user sees in table
     const [savedCalcsFields, setSavedCalcsFields] = useState(null)  // ensures ShareableURL matches what the user sees in table
-    const [initialQueryPanes, setInitialQueryPanes] = useState([])
     const [initialCalcsPanes, setInitialCalcsPanes] = useState([])
+    // panes state
+    const [queryPanes, setQueryPanes] = useState({ panes: [{ title: 'Col 1', key: '1' }], activeKey: '1', newTabIndex: 2 })
+    const [calcsPanes, setCalcsPanes] = useState({ panes: [{ title: 'Calc 1', key: '1' }], activeKey: '1', newTabIndex: 2 })
     // table state
     const [tableData, setTableData] = useState({});
     const [tableInfo, setTableInfo] = useState( {sorter: {field: null, order: null},  filters: {} })
@@ -54,10 +56,7 @@ function App() {
         const sid = url.searchParams.get('sid')
         if (sid) {
             loadState(sid)
-        } else {
-            setInitialQueryPanes([{ title: 'Col 1', key: '1' }])
-            setInitialCalcsPanes([{ title: 'Calc 1', key: '1' }])
-        }
+        } 
     }, []);    
 
     // ?sid=a~j-X0qNUJmB9SjtujjB        = basic test with cols and calcs
@@ -86,7 +85,9 @@ function App() {
         // newColumns.splice(0, 0, tableData.columns[0])
         // // step 3: update the state
         // setTableData({columns: newColumns, dataSource: tableData.dataSource})
-        setInitialQueryPanes(Object.keys(queryFields.columns).map(colIndex => ({ title: `Col ${colIndex.slice(3)}`, key: `${colIndex.slice(3)}` })))
+        const panes = Object.keys(queryFields.columns).map(colIndex => ({ title: `Col ${colIndex.slice(3)}`, key: `${colIndex.slice(3)}` }))
+        setQueryPanes({panes: panes, activeKey: '1', newTabIndex: panes.length+1})
+        queryForm.resetFields();
         queryForm.setFieldsValue(queryFields)
         setSavedQueryFields(queryFields)
         setIsFieldDrawerVisible(true)
@@ -107,11 +108,10 @@ function App() {
             const data = await response.json()
             const {tableInfo, queryFields, calcsFields, tableData } = data
             if (queryFields) {
-                setInitialQueryPanes(Object.keys(queryFields.columns).map(colIndex => ({ title: `Col ${colIndex.slice(3)}`, key: `${colIndex.slice(3)}` })))
+                const panes = Object.keys(queryFields.columns).map(colIndex => ({ title: `Col ${colIndex.slice(3)}`, key: `${colIndex.slice(3)}` }))
+                setQueryPanes({panes: panes, activeKey: '1', newTabIndex: panes.length+1})
                 queryForm.setFieldsValue(queryFields)
                 setSavedQueryFields(queryFields)
-            } else {
-                setInitialQueryPanes([{ title: 'Col 1', key: '1' }])
             }
             if (calcsFields) {
                 setInitialCalcsPanes(Object.keys(calcsFields).map(calcIndex => ({ title: `Calc ${calcIndex.slice(4)}`, key: `${calcIndex.slice(4)}` })))
@@ -234,7 +234,7 @@ function App() {
     }
     
     function resetQueryForm() { 
-        setInitialQueryPanes([{ title: 'Col 1', key: '1' }]); 
+        setQueryPanes({ panes: [{ title: 'Col 1', key: '1' }], activeKey: '1', newTabIndex: 2 }); 
         queryForm.resetFields();
         setResetQuery(resetQuery+1);
         setTableData({})
@@ -388,7 +388,7 @@ function App() {
                             <RowForm />
                         </div>
                         <div style={step === 1 ? {} : { display: 'none' } } >
-                            <ColumnTabs initialQueryPanes={initialQueryPanes}  queryForm={queryForm} />
+                            <ColumnTabs state={queryPanes} setState={setQueryPanes} queryForm={queryForm} />
                         </div>
                         <div style={step === 2 ? {} : { display: 'none' } } >
                             <WhereForm />

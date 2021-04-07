@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {Form, Slider, Select, InputNumber, Divider, Input, Row, Col, } from 'antd';
 import { InfoCircleOutlined } from '@ant-design/icons';
 import statsInputs from '../../inputs/statsInputs.json'
@@ -8,10 +8,11 @@ import teamList from '../../inputs/teamList.json'
 import playerList from '../../inputs/playerList.json'
 import {renderFilterObject} from './render-filter'
 
-const yearsList = [{value: '2020'}, {value: '2019'}, {value: '2018'}, {value: '2017'}, {value: '2016'}]
+const yearsList = [{label: '2020', value: '2020'}, {label: '2019', value: '2019'}, 
+    {label: '2018', value: '2018'}, {label: '2017', value: '2017'}, {label: '2016', value: '2016'}]
 
 export default function ColumnForm(props) {
-
+    
     const selectProps = {
         placeholder: "Stat Type",
         align: 'center',
