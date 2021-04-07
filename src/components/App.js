@@ -46,7 +46,6 @@ function App() {
     const [urlText, setURLText] = useState('')
 
     const location = useLocation();
-    const history = useHistory();
 
 
     // when the page is first loaded, check to see if a ?sid= state is included
@@ -92,8 +91,6 @@ function App() {
         setIsFieldDrawerVisible(true)
         setStep(1)
     }
-
-    // other bug - when I click on the button, the rotue changes but the Menu item doesnt
 
     async function loadState(sid) {
         const hide = message.loading({content: 'Loading the data', style: {fontSize: '1rem'}}, 0)
@@ -320,7 +317,7 @@ function App() {
         <Sider width={300} style={{backgroundColor: '#FFF', textAlign: 'center'}}>
         <Spin spinning={loadingPage}>
             
-            <Menu defaultSelectedKeys={location.pathname.includes('pages') ? 'pages' : 'query'} mode="horizontal" style={{lineHeight: '2.5rem', marginBottom: 12}}>
+            <Menu selectedKeys={location.pathname.includes('pages') ? ['pages'] : ['query']} mode="horizontal" style={{lineHeight: '2.5rem', marginBottom: 12}}>
                 <Menu.Item key="query"><Link to="/">Custom Query</Link></Menu.Item>
                 <Menu.Item key="pages"><Link to="/pages">Standard Pages</Link></Menu.Item>
             </Menu>
