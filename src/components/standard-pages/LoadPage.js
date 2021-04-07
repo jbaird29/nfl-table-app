@@ -20,7 +20,7 @@ export default function LoadPage(props) {
     useEffect(() => {
         loadStandardPage(props.type, id)
         const cleanUp = () => {
-            props.setTableData({})
+            // props.setTableData({})
             document.title = 'NFL Table'
         }
         return cleanUp

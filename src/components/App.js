@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 import 'antd/dist/antd.css';
 import {Layout, Button, Drawer, message, Divider, Row, Col, Form, Modal, Steps, Spin, Alert, Image, Tabs, Typography, Menu } from 'antd';
-import { DownloadOutlined, CloudUploadOutlined, CopyOutlined,  } from '@ant-design/icons';
+import { DownloadOutlined, CloudUploadOutlined, CopyOutlined, LoginOutlined, } from '@ant-design/icons';
 import Table from './Table'
 import ColumnTabs from './query-fields/Column-Tabs'
 import RowForm from './query-fields/Row-Form'
@@ -74,16 +74,16 @@ function App() {
             .map((column, i) => ( {['col'+(i+1)]: { field : column.dataIndex }} )))
         const queryFields = {row: row, where: where, columns: columns}
         // skipped for now - I need to figure out how to prevent the LoadPage cleanup which empties tableData
-        // // step 2: add 'Col' headers to the tableData
-        // const newColumns = tableData.columns.slice(1).map((column, index) => ({
-        //     title: `Col ${index+1}`, 
-        //     align: 'center', 
-        //     key: `wrapper_col${index+1}`,
-        //     children: [column]
-        // }))
-        // newColumns.splice(0, 0, tableData.columns[0])
-        // // step 3: update the state
-        // setTableData({columns: newColumns, dataSource: tableData.dataSource})
+        // step 2: add 'Col' headers to the tableData
+        const newColumns = tableData.columns.slice(1).map((column, index) => ({
+            title: `Col ${index+1}`, 
+            align: 'center', 
+            key: `wrapper_col${index+1}`,
+            children: [column]
+        }))
+        newColumns.splice(0, 0, tableData.columns[0])
+        // step 3: update the state
+        setTableData({columns: newColumns, dataSource: tableData.dataSource})
         const panes = Object.keys(queryFields.columns).map(colIndex => ({ title: `Col ${colIndex.slice(3)}`, key: `${colIndex.slice(3)}` }))
         setQueryPanes({panes: panes, activeKey: '1', newTabIndex: panes.length+1})
         queryForm.resetFields();
@@ -92,10 +92,6 @@ function App() {
         setIsFieldDrawerVisible(true)
         setStep(1)
     }
-    // note the initial query pane methodology currently DOESNT WORK
-    // if you open a couple tabs, then hit this method, it only shows those 2 tabs
-    // I should refactor the 'initial query panes' method to be a state-setting method on the tabs
-    // I think I can then do a force render on the queryDrawer
 
     // other bug - when I click on the button, the rotue changes but the Menu item doesnt
 
@@ -260,6 +256,10 @@ function App() {
         document.body.removeChild(link);
     }
 
+    function onSignIn() {
+        message.info({content: `That feature is coming soon!`, duration: 2.5, style: {fontSize: '1rem'} })
+    }
+
     const fieldDrawerProps = {
         title: 'Edit Query Fields',
         width: '55%',
@@ -348,13 +348,14 @@ function App() {
 
             <Header style={{backgroundColor: '#FFF', margin: '5px', padding: '0 10px'}}>
                 <Row>
-                <Col span={6}>
+                <Col span={12} style={{textAlign: 'left'}}>
                     <Image style={{padding: '8px 0px', }} width={200} src={logo} alt='logo' />
                 </Col>
-                <Col span={18} style={{ textAlign: 'right'}}>
-                    <Button type="danger" onClick={() => console.log(tableData)}>Table Data</Button>
+                <Col span={12} style={{ textAlign: 'right'}}>
+                    <Button type="primary" onClick={onSignIn} shape="round" icon={<LoginOutlined />}>Sign In</Button>
+                    {/* <Button type="danger" onClick={() => console.log(tableData)}>Table Data</Button>
                     <Button type="danger" onClick={() => console.log(queryForm.getFieldsValue())}>Form getFieldsValue</Button>
-                    <Button type="danger" onClick={() => console.log(calcsForm.getFieldsValue())}>Calc getFieldsValue</Button>
+                    <Button type="danger" onClick={() => console.log(calcsForm.getFieldsValue())}>Calc getFieldsValue</Button> */}
                 </Col>
                 </Row>
             </Header>
