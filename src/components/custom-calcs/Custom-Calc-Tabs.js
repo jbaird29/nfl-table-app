@@ -6,16 +6,9 @@ const { TabPane } = Tabs;
 
   
 export default class CustomCalcTabs extends React.Component {
-
-    tabIndex = Math.max(...this.props.initialCalcsPanes.map(pane => pane.key));
-  
-    state = {
-        activeKey: this.props.initialCalcsPanes[0].key,
-        panes: this.props.initialCalcsPanes,
-    };
   
     onChange = activeKey => {
-        this.setState({ activeKey });
+        this.props.setState(prev => ({...prev, activeKey}));
     };
   
     onEdit = (targetKey, action) => {
@@ -23,19 +16,19 @@ export default class CustomCalcTabs extends React.Component {
     };
   
     add = () => {
-        this.tabIndex++
-        const { panes } = this.state;
-        const activeKey = `${this.tabIndex}`;
+        const { panes, newTabIndex } = this.props.state;
         const newPanes = [...panes];
-        newPanes.push({ title: `Calc ${this.tabIndex}`, key: activeKey });
-        this.setState({
+        newPanes.push({ title: `Calc ${newTabIndex}`, key: `${newTabIndex}` });
+        this.props.setState({
             panes: newPanes,
-            activeKey,
+            activeKey: `${newTabIndex}`,
+            newTabIndex: newTabIndex + 1 
         });
     };
+
   
     remove = targetKey => {
-        const { panes, activeKey } = this.state;
+        const { panes, activeKey } = this.props.state;
         let newActiveKey = activeKey;
         let lastIndex;
         panes.forEach((pane, i) => {
@@ -53,14 +46,16 @@ export default class CustomCalcTabs extends React.Component {
             }
         }
 
-        this.setState({
+        this.props.setState(prev => ({
+            ...prev,
             panes: newPanes,
             activeKey: newActiveKey,
-        });
+        }));
+
     };
   
     render() {
-        const { panes, activeKey } = this.state;
+        const { panes, activeKey } = this.props.state;
         return (
         <Tabs
             type="editable-card"
@@ -70,7 +65,7 @@ export default class CustomCalcTabs extends React.Component {
         >
         {panes.map(pane => (
             <TabPane forceRender={true} tab={pane.title} key={pane.key}>
-              <CustomCalcForm calcsForm={this.props.calcsForm} tableData={this.props.tableData} calcIndex={`calc${pane.key}`} />
+              <CustomCalcForm key={`calc${pane.key}`}  calcsForm={this.props.calcsForm} tableData={this.props.tableData} calcIndex={`calc${pane.key}`} />
             </TabPane>
         ))}
         </Tabs>

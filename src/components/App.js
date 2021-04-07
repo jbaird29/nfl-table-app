@@ -26,7 +26,6 @@ function App() {
     const [calcsForm] = Form.useForm()
     const [savedQueryFields, setSavedQueryFields] = useState(null)  // ensures ShareableURL matches what the user sees in table
     const [savedCalcsFields, setSavedCalcsFields] = useState(null)  // ensures ShareableURL matches what the user sees in table
-    const [initialCalcsPanes, setInitialCalcsPanes] = useState([])
     // panes state
     const [queryPanes, setQueryPanes] = useState({ panes: [{ title: 'Col 1', key: '1' }], activeKey: '1', newTabIndex: 2 })
     const [calcsPanes, setCalcsPanes] = useState({ panes: [{ title: 'Calc 1', key: '1' }], activeKey: '1', newTabIndex: 2 })
@@ -114,12 +113,11 @@ function App() {
                 setSavedQueryFields(queryFields)
             }
             if (calcsFields) {
-                setInitialCalcsPanes(Object.keys(calcsFields).map(calcIndex => ({ title: `Calc ${calcIndex.slice(4)}`, key: `${calcIndex.slice(4)}` })))
+                const panes = Object.keys(calcsFields).map(calcIndex => ({ title: `Calc ${calcIndex.slice(4)}`, key: `${calcIndex.slice(4)}` }))
+                setCalcsPanes({panes: panes, activeKey: '1', newTabIndex: panes.length+1})
                 calcsForm.setFieldsValue(calcsFields)   
                 addCalcsToTable(tableData, calcsFields)
                 setSavedCalcsFields(calcsFields)
-            } else {
-                setInitialCalcsPanes([{ title: 'Calc 1', key: '1' }])
             }
             addRenderSorterToTable(tableData, tableInfo)
             setTableData(tableData)
@@ -241,7 +239,7 @@ function App() {
     }
 
     function resetCalcsForm() { 
-        setInitialCalcsPanes([{ title: 'Calc 1', key: '1' }]); 
+        setCalcsPanes({ panes: [{ title: 'Calc 1', key: '1' }], activeKey: '1', newTabIndex: 2 }); 
         calcsForm.resetFields(); 
         setResetCalcs(resetCalcs+1) 
     }
@@ -406,7 +404,7 @@ function App() {
                 }>
                     <Form  {...calcsFormProps} key={`calcsForm_reset_${resetCalcs}`}>
                         {tableData.columns && tableData.columns.length > 0 ?
-                        <CustomCalcTabs initialCalcsPanes={initialCalcsPanes} tableData={tableData} calcsForm={calcsForm} />
+                        <CustomCalcTabs state={calcsPanes} setState={setCalcsPanes}  tableData={tableData} calcsForm={calcsForm} />
                         : <p>Please select fields first</p>}
                     </Form>
                 </Modal>
