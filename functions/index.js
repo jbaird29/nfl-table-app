@@ -9,7 +9,7 @@ const meta = require('./backend/queries/metadata');
 const createSID = require('./backend/utils/create-sid')
 
 
-exports.runQuery = functions.https.onRequest(async function(req, res){
+exports.runQuery = functions.region('us-central1').https.onRequest(async function(req, res){
     functions.logger.log(JSON.stringify(req.body))
     try {
         const query = new Query(meta, req.body)
@@ -26,7 +26,7 @@ exports.runQuery = functions.https.onRequest(async function(req, res){
     }
 })
 
-exports.saveState = functions.https.onRequest(async function(req, res){
+exports.saveState = functions.region('us-central1').https.onRequest(async function(req, res){
     const saveData = req.body
     functions.logger.log(saveData)
     const {queryFormV, calcsFormV, tableInfo, queryFields, calcsFields} = saveData
@@ -49,7 +49,7 @@ exports.saveState = functions.https.onRequest(async function(req, res){
     }
 })
 
-exports.loadState = functions.https.onRequest(async function(req, res){
+exports.loadState = functions.region('us-central1').https.onRequest(async function(req, res){
     const stateID = req.query.sid
     functions.logger.log("Attempting to load stateID: ", stateID)
     try {
@@ -84,7 +84,7 @@ exports.loadState = functions.https.onRequest(async function(req, res){
 })
 
 
-exports.loadStandardPage = functions.https.onRequest(async function(req, res){
+exports.loadStandardPage = functions.region('us-central1').https.onRequest(async function(req, res){
     const {type, id} = req.query
     const sqlID        = type === 'player' ? 'player_gsis_id'               : 'team_id'
     const sqlDimension = type === 'player' ? 'player_name_with_position'    : 'team_name'
