@@ -15,20 +15,26 @@ export default function SelectPage(props) {
     const onPlayerSelect = (id) => history.push(`/pages/players/${encodeURI(id)}`)
     const onTeamSelect   = (id) => history.push(`/pages/teams/${encodeURI(id)}`)
 
-    const selectStyle = { width: '85%' }
+    const selectProps = { 
+        style: { width: '85%' },
+        showSearch: true,
+        allowClear: true,
+        optionFilterProp: 'label'
+    }
+
 
     const menu = (
         <Menu style={{textAlign: 'center', width: '85%', margin: 'auto', }}>
           <Menu.Item key="players"><Link to="/pages/players/">Player Stats</Link></Menu.Item>
           <Menu.Item key="teams"><Link to="/pages/teams/">Team Stats</Link></Menu.Item>
         </Menu>
-      );      
+    );
 
     const getLoadPageEl = (type) => (
         <LoadPage type={type} openStandardInCustomQuery={props.openStandardInCustomQuery} setTableData={props.setTableData} 
             setSavedCalcsFields={props.setSavedCalcsFields} setSavedQueryFields={props.setSavedQueryFields} 
         />
-    )
+    );
 
     return (<>
         <Row gutter={[0, 18]}>
@@ -45,10 +51,10 @@ export default function SelectPage(props) {
         <Col span={24}>
             <Switch>
                 <Route path="/pages/players/"
-                    component={() => <Select onChange={onPlayerSelect} style={selectStyle} showSearch={true} allowClear={true} placeholder='Players' options={playerList} optionFilterProp="label"/>}
+                    component={() => <Select {...selectProps} onChange={onPlayerSelect} placeholder='Players' options={playerList} />}
                 />
                 <Route path="/pages/teams/"
-                    component={() => <Select onChange={onTeamSelect} style={selectStyle} showSearch={true} allowClear={true} placeholder='Teams' options={teamList} optionFilterProp="label"/>}
+                    component={() => <Select {...selectProps} onChange={onTeamSelect} placeholder='Teams' options={teamList} />}
                 />
             </Switch>
         </Col>

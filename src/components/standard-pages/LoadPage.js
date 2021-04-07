@@ -115,7 +115,7 @@ export default function LoadPage(props) {
         <Card.Grid hoverable={false} style={{padding: 6, width: '100%', textAlign: 'left', lineHeight: 1.5, }}>
             <Paragraph style={paragraphStyle}><Text strong>Coach:</Text> {info.coach}</Paragraph>
             <Divider style={dividerStyle} />
-            <Paragraph style={paragraphStyle}><Text strong>General Manager:</Text> {info.general_manager}</Paragraph>
+            <Paragraph style={paragraphStyle}><Text strong>GM:</Text> {info.general_manager}</Paragraph>
             <Divider style={dividerStyle} />
             <Paragraph style={paragraphStyle}><Text strong>Owners:</Text> {info.owners}</Paragraph>
             <Divider style={dividerStyle} />

@@ -18,7 +18,7 @@ AS (
     player_info.player_gsis_id AS player_gsis_id,
     CASE WHEN stats.team_name = 'Redskins' THEN 'Football Team' ELSE stats.team_name END AS team_name,
     player_info.team_abbreviation AS team_abbreviation,
-    stats.team_id AS team_id,
+    CASE WHEN stats.team_id = '9dbb9060-ba0f-4920-829e-16d4d9246b5d' THEN '1f6dcffb-9823-43cd-9ff4-e7a8466749b5' WHEN stats.team_id = '1c1cec48-6352-4556-b789-35304c1a6ae1' THEN '7d4fcc64-9cb5-4d1b-8e75-8a906d1e1576' WHEN stats.team_id = '39f349de-6463-4803-ad70-f1e0f144f5ed' THEN '2eff2a03-54d4-46ba-890e-2bc3925548f3' ELSE stats.team_id END AS team_id,
     stats.inside_20 AS inside_20,
     stats.goaltogo AS goaltogo,
     stats.nullified AS nullified,

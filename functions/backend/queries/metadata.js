@@ -323,10 +323,14 @@ dims.team_abbreviation = new Dimension({
 // ------------------------------------------------------------------------------------------------------------
 dims.team_id = new Dimension({
     sql: 'team_id',
-    creationSQL: `${tbls.stats.name}.team_id`,
+    chargers: `WHEN ${tbls.stats.name}.team_id = '9dbb9060-ba0f-4920-829e-16d4d9246b5d' THEN '1f6dcffb-9823-43cd-9ff4-e7a8466749b5'`,
+    raiders: `WHEN ${tbls.stats.name}.team_id = '1c1cec48-6352-4556-b789-35304c1a6ae1' THEN '7d4fcc64-9cb5-4d1b-8e75-8a906d1e1576'`,
+    rams: `WHEN ${tbls.stats.name}.team_id = '39f349de-6463-4803-ad70-f1e0f144f5ed' THEN '2eff2a03-54d4-46ba-890e-2bc3925548f3'`,
+    get creationSQL() {return `CASE ${this.chargers} ${this.raiders} ${this.rams} ELSE ${tbls.stats.name}.team_id END`},
+    // creationSQL: `${tbls.stats.name}.team_id`,
     statType: 'general',
     title: 'Team ID',
-    description: 'NOTE: Chargers and Raiders have two different IDs when they change cities.',
+    description: 'NOTE: Chargers, Raiders, Rams have different IDs when they change cities.',
     dataType: 'string',
 })
 

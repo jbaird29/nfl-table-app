@@ -94,9 +94,9 @@ function writeTeamStats() {
 }
 
 async function executeQueries() {
-    // const creationSQL = getCreationSQL()
-    // const result1 = await bq.runQuery(creationSQL)
-    // console.log(result1)
+    const creationSQL = getCreationSQL()
+    const result1 = await bq.runQuery(creationSQL)
+    console.log(result1)
 
     const playerStatsSQL = getPlayerStats()
     const result2 = await bq.runQuery(playerStatsSQL)
