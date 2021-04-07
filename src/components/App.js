@@ -68,7 +68,7 @@ function App() {
     function openStandardInCustomQuery(type, id) {
         // step 1: transform the tableData into queryFields object
         const row = { field: tableData.columns[0].dataIndex}
-        const where = type === 'player' ? { player_gsis_id: id} : { team_id : id}
+        const where = type === 'player' ? { player_gsis_id: [id]} : { team_id : [id]}
         const columns = Object.assign({}, ...tableData.columns.slice(1)
             .map((column, i) => ( {['col'+(i+1)]: { field : column.dataIndex }} )))
         const queryFields = {row: row, where: where, columns: columns}

@@ -11,6 +11,11 @@ const {Title, Paragraph} = Typography
 
 export default function WhereForm(props) {
 
+    // renderFilterObject takes filter, name, key as parameters
+    const renderWhereFilterObject = (filter) => (
+        renderFilterObject(filter, ['where', filter.name], `where_${filter.name}`)    
+    )
+    
 
     return (<>
             <Paragraph style={{textAlign: 'center'}}>Global filters are optional. These filters will be applied to ALL columns.</Paragraph>
@@ -30,7 +35,7 @@ export default function WhereForm(props) {
                 <Select mode="multiple" showSearch={true} allowClear={true} placeholder='Players' options={playerList} optionFilterProp="label"/>
             </Form.Item>
 
-            {filtersWhere.map(filter => renderFilterObject(filter))}
+            {filtersWhere.map(filter => renderWhereFilterObject(filter))}
 
         </>
     );

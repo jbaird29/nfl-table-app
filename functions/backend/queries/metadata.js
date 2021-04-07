@@ -1050,29 +1050,6 @@ aggs.recv_yards_after_contact_sum = new Aggregate({
 */
 
 /** -----------------------------------------------------------------------------------------------------------
- * WHERE filters
- * ------------------------------------------------------------------------------------------------------------
- */
-fltrs.player_position = new Filter(dims.player_position, {
-    name: 'player_position',
-    placement: 'where',
-    formProps: {
-        label: 'Player Position',
-        labelCol: {span: 12}, 
-        wrapperCol: {span: 12}
-    }, ui: {
-    type: 'select',
-    props: {
-        placeholder: "Position",
-        // need to add " " around the value; in order to ensure it goes into request as a string
-        options: [
-        {align: 'left', label: 'QB', value: 'QB', key: 'QB'}, {align: 'left', label: 'RB', value: 'RB', key: 'RB'},
-        {align: 'left', label: 'WR', value: 'WR', key: 'WR'}, {align: 'left', label: 'TE', value: 'TE', key: 'TE'},
-        ]}
-    },
-})
-
-/** -----------------------------------------------------------------------------------------------------------
  * "Recommended" filters (Row-type filters)
  * ------------------------------------------------------------------------------------------------------------
  */
@@ -1385,4 +1362,30 @@ fltrs.recv_was_catchable = new Filter(dims.recv_was_catchable, {
             ]
         }
     }
+})
+
+
+/** -----------------------------------------------------------------------------------------------------------
+ * WHERE filters
+ * ------------------------------------------------------------------------------------------------------------
+ */
+ fltrs.player_position = new Filter(dims.player_position, {
+    name: 'player_position',
+    placement: 'where',
+    formProps: {
+        label: 'Player Position',
+        labelCol: {span: 12}, 
+        wrapperCol: {span: 12}
+    }, ui: {
+    type: 'select',
+    props: {
+        placeholder: "Position",
+        mode: 'multiple',
+        showSearch: true,
+        allowClear: true,
+        options: [
+        {align: 'left', label: 'QB', value: 'QB', key: 'QB'}, {align: 'left', label: 'RB', value: 'RB', key: 'RB'},
+        {align: 'left', label: 'WR', value: 'WR', key: 'WR'}, {align: 'left', label: 'TE', value: 'TE', key: 'TE'},
+        ]}
+    },
 })

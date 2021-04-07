@@ -71,6 +71,27 @@ module.exports.Query = class Query {
         return `${this.dims[rowName].sql}`
     }
 
+    /** Given an row type field name (i.e. season_year, player_gsis_id, etc.), conditionally builds a SQL string filter
+     *  This helps to filter the data, especially for season_year (bc the table is partitioned on that)
+     *    filter will only be built if both of the below are true:
+     *    (1) every column includes a filter for that field
+     *    (2) there is no WHERE filter for that field already
+     *    otherwise it will return an empty string
+    */
+    buildFilterForRowType(rowName) {
+        const allValues = Object.entries(this.columns)
+            .filter(([colIndex, column]) => column.filters[rowName])    // filter to only columns which include this filter
+            .map(([colIndex, column]) => column.filters[rowName])       // return array of all values, i.e [2018, 2019]
+        const columnsCount = Object.keys(this.columns).length           // returns length of columns, i.e. 3
+        if (allValues.length !== columnsCount) {                        // check condition (1)
+            return ''
+        } else if (Object.keys(this.where).includes(rowName)) {         // check condition (2)
+            return ''
+        } else {
+            return this.buildFilterSQL(rowName, Array.from(new Set(allValues)) )    // Set() will remove duplicates
+        }
+    }
+
     /** Given an API request, builds an array of the WHERE portion of the SQL statement
      *    returns a SQL array => [`season_year IN (2019, 2020)`, `stat_type IN ('pass', 'rush')`...]
     */ 
@@ -81,28 +102,11 @@ module.exports.Query = class Query {
                 .filter(([name, values]) => values && (Array.isArray(values) ? values.length > 0 : true))
                 .map(([name, values]) => this.buildFilterSQL(name, values))
 
-        const columnsCount = Object.keys(this.columns).length
-
-        // append season_year filter based on what is in the columns ONLY IF every column includes a filter for that
-        const years = Object.entries(this.columns).filter(([colIndex, column]) => column.filters.season_year)
-            .map(([colIndex, column]) => column.filters.season_year)
-        if (years.length === columnsCount) {
-            whereArr.push(this.buildFilterSQL('season_year', Array.from(new Set(years)) ))
-        }
-        
-        // append player_name filter based on what is in the columns ONLY IF every column includes a filter for that
-        const players = Object.entries(this.columns).filter(([colIndex, column]) => column.filters.player_gsis_id)
-            .map(([colIndex, column]) => column.filters.player_gsis_id)
-        if (players.length === columnsCount) {
-            whereArr.push(this.buildFilterSQL('player_gsis_id', Array.from(new Set(players)) ))
-        }
-    
-        // append team_name filter based on what is in the columns ONLY IF every column includes a filter for that
-        const teams = Object.entries(this.columns).filter(([colIndex, column]) => column.filters.team_id)
-            .map(([colIndex, column]) => column.filters.team_id)
-        if (teams.length === columnsCount) {
-            whereArr.push(this.buildFilterSQL('team_id', Array.from(new Set(teams)) ))
-        }
+        const rowTypes = ['season_year', 'player_gsis_id', 'team_id']
+        rowTypes.forEach(rowName => {
+            const filter = this.buildFilterForRowType(rowName)
+            filter ?  whereArr.push(filter) : null
+        })
 
         // append stat_type filter based on what is in the columns
         //   if the stat field is an "info" type, then no stat_type filter is appended
