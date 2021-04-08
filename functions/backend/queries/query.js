@@ -9,7 +9,7 @@ module.exports.Query = class Query {
         this.tbls = meta.tbls
         this.row = queryForm.row
         this.columns = queryForm.columns
-        this.where = queryForm.where
+        this.where = queryForm.where || {}
     }
 
 
@@ -82,12 +82,12 @@ module.exports.Query = class Query {
     */
     buildFilterForRowType(rowName) {
         const allValues = Object.entries(this.columns)
-            .filter(([colIndex, column]) => column.filters[rowName])    // filter to only columns which include this filter
-            .map(([colIndex, column]) => column.filters[rowName])       // return array of all values, i.e [2018, 2019]
-        const columnsCount = Object.keys(this.columns).length           // returns length of columns, i.e. 3
-        if (allValues.length !== columnsCount) {                        // check condition (1)
+            .filter(([colIndex, column]) => column.filters && column.filters[rowName])  // filter to only columns which include this filter
+            .map(([colIndex, column]) => column.filters[rowName])                       // return array of all values, i.e [2018, 2019]
+        const columnsCount = Object.keys(this.columns).length                           // returns length of columns, i.e. 3
+        if (allValues.length !== columnsCount) {                                        // check condition (1)
             return ''
-        } else if (Object.keys(this.where).includes(rowName)) {         // check condition (2)
+        } else if (Object.keys(this.where).includes(rowName)) {                         // check condition (2)
             return ''
         } else {
             return this.buildFilterSQL(rowName, Array.from(new Set(allValues)) )    // Set() will remove duplicates
@@ -171,7 +171,7 @@ module.exports.Query = class Query {
      **   returns a tableProps object => {dataIndex, title, width ...}
     */ 
     buildColumnTableProps(colIndex, column) {
-        const {field, title, filters} = column
+        const {field, title, filters={}} = column
         const {shortTitle, width, dataType, format, } = this.aggs[field]
         // default title will include year if year is selected
         const seasonYear = !filters.season_year ? '' : ` (${filters.season_year})`
