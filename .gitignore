@@ -33,3 +33,4 @@ firestore.rules
 .firebaserc
 .firebase
 firebaseconfig.js
+firebase-debug.1.log

@@ -16,7 +16,7 @@ import logo from '../images/logo.png'
 const { Header, Sider, Content, Footer } = Layout;
 const { Step } = Steps;
 const { TabPane } = Tabs
-const { Paragraph } = Typography
+const { Title, Paragraph } = Typography
 const queryFormV = 1
 const calcsFormV = 1
 
@@ -253,14 +253,19 @@ function App() {
         document.body.removeChild(link);
     }
 
+    const helpMessage = (<>
+        <Title level={5}>About</Title>
+        <Paragraph style={{marginBottom: 4}}>NFL Table is a site for slicing and dicing football statistics on a play-by-play level.</Paragraph>
+        <Paragraph>Interact with the data, rather being stuck with a static page.</Paragraph>
+        <Title level={5}>Help</Title>
+        <Paragraph style={{marginBottom: 4}}>Click Edit Query Fields in the left-hand menu to build a custom query.</Paragraph>
+        <Paragraph>Select a Row Type, then Add Columns to choose statistics and filters.</Paragraph>
+    </>)
+
     function onHelp() {
         notification.open({
-            message: 'Need Help?',
-            duration: 4,
-            description:
-              "Click Edit Query Fields in the left-hand menu to build a custom query. Select a Row Type, then Add Columns "
-              +"to choose statistics and filters."
-              ,
+            duration: 2,
+            description: helpMessage
         });
     };
 
@@ -357,7 +362,7 @@ function App() {
                     <Image style={{padding: '8px 0px', }} width={200} src={logo} alt='logo' />
                 </Col>
                 <Col span={12} style={{ textAlign: 'right'}}>
-                    <Button style={{width: 120, }} size='large' onClick={onHelp} shape="round" icon={<QuestionCircleOutlined />}>Help</Button>
+                    <Button style={{width: 120, }} size='large' onClick={onHelp} shape="round" icon={<QuestionCircleOutlined />}>About</Button>
                     {/* <Button type="danger" onClick={() => console.log(tableData)}>Table Data</Button>
                     <Button type="danger" onClick={() => console.log(queryForm.getFieldsValue())}>Form getFieldsValue</Button>
                     <Button type="danger" onClick={() => console.log(calcsForm.getFieldsValue())}>Calc getFieldsValue</Button> */}
