@@ -15,7 +15,7 @@ exports.runQuery = functions.region('us-central1').https.onRequest(async functio
         const query = new Query(meta, req.body)
         const sql = query.buildSQL()
         functions.logger.log(sql)
-        console.log(sql)
+        // console.log(sql)
         const queryPromise = bq.runQuery(sql)
         const tableProps = query.buildTableProps()
         const queryResult = await queryPromise    // this begins execution of tableProps while awaiting resolution of the Promise
@@ -109,8 +109,8 @@ exports.loadStandardPage = functions.region('us-central1').https.onRequest(async
 
     functions.logger.log(querySQL)
     functions.logger.log(infoSQL)
-    console.log(querySQL)
-    console.log(infoSQL)
+    // console.log(querySQL)
+    // console.log(infoSQL)
     
     const queryPromise = bq.runQuery(querySQL)
     const infoPromise  = bq.runQuery(infoSQL)
