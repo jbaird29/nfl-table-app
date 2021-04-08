@@ -44,15 +44,17 @@ module.exports.Query = class Query {
     buildColumnSQL(column) {
         const {field, filters} = column
         const {sql} = this.aggs[field]
+        if (!filters) {
+            return sql
+        }
         const filtersSQLArray = Object.entries(filters)
                                 .filter(([name, values]) => values && (Array.isArray(values) ? values.length > 0 : true))
                                 .map(([name, values]) => (this.buildFilterSQL(name, values)))
-        if (filtersSQLArray.length > 0) {
-            const filtersSQLString = filtersSQLArray.join(' AND ')
-            return sql.replace(/true/g, `true AND ${filtersSQLString}`)  //TODO- use replaceAll
-        } else {
+        if (filtersSQLArray.length === 0) {
             return sql
         }
+        const filtersSQLString = filtersSQLArray.join(' AND ')
+        return sql.replace(/true/g, `true AND ${filtersSQLString}`)  //TODO- use replaceAll
     }
 
     /** Given an object of columns --> {col1: {field, filters}, col2: {field, filters} }
