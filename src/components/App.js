@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 import 'antd/dist/antd.css';
 import {Layout, Button, Drawer, message, Divider, Row, Col, Form, Modal, Steps, Spin, Image, Tabs, Typography, Menu, notification } from 'antd';
-import { DownloadOutlined, CloudUploadOutlined, CopyOutlined, QuestionCircleOutlined, } from '@ant-design/icons';
+import { DownloadOutlined, CloudUploadOutlined, CopyOutlined, QuestionCircleOutlined, HomeOutlined, UserOutlined, TeamOutlined, MonitorOutlined } from '@ant-design/icons';
 import Table from './Table'
 import ColumnTabs from './query-fields/Column-Tabs'
 import RowForm from './query-fields/Row-Form'
@@ -324,113 +324,126 @@ function App() {
     return (
     <>
     
-    <Layout style={{ minHeight: '100vh' }}>    
-    
-        <Sider width={300} style={{backgroundColor: '#FFF', textAlign: 'center'}}>
-        <Spin spinning={loadingPage}>
-            
-            <Menu selectedKeys={location.pathname.includes('pages') ? ['pages'] : ['query']} mode="horizontal" style={{lineHeight: '2.5rem', marginBottom: 12}}>
-                <Menu.Item key="query"><Link to="/">Custom Query</Link></Menu.Item>
-                <Menu.Item key="pages"><Link to="/pages">Standard Pages</Link></Menu.Item>
-            </Menu>
+    <Layout style={{ minHeight: '100vh' }}>
 
-            <Switch>
-                <Route exact path="/">
+        <Header style={{backgroundColor: '#FFF', borderBottom: '1px solid #d8d9dc', padding: '0 10px'}}>
+            <Row>
+            <Col span={4} style={{textAlign: 'left', padding: '10px 0px', }}>
+                <Image preview={false} width={180} src={logo} alt='logo' />
+            </Col>
+            <Col span={16}  >
+                <Menu defaultSelectedKeys="home" mode="horizontal" style={{ backgroundColor: 'inherit', textAlign: 'center', fontSize: '1rem' }}>
+                    <Menu.Item key="home" icon={<HomeOutlined />}><Link to="/">Home</Link></Menu.Item>
+                    <Menu.Item key="query" icon={<MonitorOutlined />}><Link to="/query">Custom Query</Link></Menu.Item>
+                    {/* <Menu.Item key="pages"><Link to="/pages">Standard Pages</Link></Menu.Item> */}
+                    <Menu.Item key="player" icon={<UserOutlined />}><Link to="/player">Player Stats</Link></Menu.Item>
+                    <Menu.Item key="team" icon={<TeamOutlined />}><Link to="/team">Team Stats</Link></Menu.Item>
+                </Menu>
+            </Col>
+            <Col span={4} style={{ textAlign: 'right'}}>
+                <Button style={{width: 120, }} size='large' onClick={onHelp} shape="round" icon={<QuestionCircleOutlined />}>About</Button>
+                {/* <Button type="danger" onClick={() => console.log(tableData)}>Table Data</Button>
+                <Button type="danger" onClick={() => console.log(queryForm.getFieldsValue())}>Form getFieldsValue</Button>
+                <Button type="danger" onClick={() => console.log(calcsForm.getFieldsValue())}>Calc getFieldsValue</Button> */}
+            </Col>
+            </Row>
+        </Header>
+
+        <Layout>
+        <Switch>
+
+            <Route exact path="/">
+                <p>Welcome home.</p>
+            </Route>
+
+            <Route path="/query">
+                <Sider width={300} style={{backgroundColor: '#FFF', textAlign: 'center', borderRight: '1px solid #d8d9dc', }}>
+                <Spin spinning={loadingPage}>
                     <Row style={{padding: '6px 12px'}}><Button block type="primary" onClick={() => setIsFieldDrawerVisible(true)}>Edit Query Fields</Button></Row>
                     <Row style={{padding: '6px 12px'}}><Button block onClick={handleShowCalc}>Edit Custom Calcs</Button></Row>
                     <Divider />
                     <Row style={{padding: '6px 12px'}}><Button block onClick={onShareURL} shape="round" icon={<CloudUploadOutlined />}>Generate URL</Button></Row>
                     <Row style={{padding: '6px 12px'}}><Button block onClick={onDownload} shape="round" icon={<DownloadOutlined />}>Download Data</Button></Row>
-                </Route>
-                <Route path="/pages">
+                </Spin>
+                </Sider>
+                <Content style={{margin: '0 5px'}}>
+                    {!tableData.columns 
+                    ? <Footer style={{ textAlign: 'center', height: '22', padding: '20px 0px'}}>NFL Table ©{new Date().getFullYear()} Created by Jon Baird</Footer>
+                    : <Table setTableInfo={setTableInfo} tableData={tableData} />
+                    }
+                </Content>
+            </Route>
+
+            <Route path="/player">
+                <Sider width={300} style={{backgroundColor: '#FFF', textAlign: 'center', borderRight: '1px solid #d8d9dc', }}>
                     <SelectPage openStandardInCustomQuery={openStandardInCustomQuery} setTableData={setTableData} 
-                        setSavedCalcsFields={setSavedCalcsFields} setSavedQueryFields={setSavedQueryFields}
-                        />
-                </Route>
+                                setSavedCalcsFields={setSavedCalcsFields} setSavedQueryFields={setSavedQueryFields}
+                    />
+                </Sider>
+                <Content style={{margin: '0 5px'}}>
+                    {!tableData.columns 
+                    ? <Footer style={{ textAlign: 'center', height: '22', padding: '20px 0px'}}>NFL Table ©{new Date().getFullYear()} Created by Jon Baird</Footer>
+                    : <Table setTableInfo={setTableInfo} tableData={tableData} />
+                    }
+                </Content>
+            </Route>
+        
             </Switch>
-        
-            </Spin>
-        </Sider>
-        
 
-        <Layout >
-        
-
-            <Header style={{backgroundColor: '#FFF', margin: '5px', padding: '0 10px'}}>
-                <Row>
-                <Col span={12} style={{textAlign: 'left'}}>
-                    <Image style={{padding: '8px 0px', }} width={200} src={logo} alt='logo' />
-                </Col>
-                <Col span={12} style={{ textAlign: 'right'}}>
-                    <Button style={{width: 120, }} size='large' onClick={onHelp} shape="round" icon={<QuestionCircleOutlined />}>About</Button>
-                    {/* <Button type="danger" onClick={() => console.log(tableData)}>Table Data</Button>
-                    <Button type="danger" onClick={() => console.log(queryForm.getFieldsValue())}>Form getFieldsValue</Button>
-                    <Button type="danger" onClick={() => console.log(calcsForm.getFieldsValue())}>Calc getFieldsValue</Button> */}
-                </Col>
-                </Row>
-            </Header>
-
-            <Content style={{margin: '0 5px'}}>
-                {!tableData.columns 
-                ? <Footer style={{ textAlign: 'center', height: '22', padding: '20px 0px'}}>NFL Table ©{new Date().getFullYear()} Created by Jon Baird</Footer>
-                : <Table setTableInfo={setTableInfo} tableData={tableData} />
-                }
-                
-
-                <Drawer {...fieldDrawerProps} footer={
-                    <div style={{textAlign: 'right',}}>
-                    <Button danger onClick={resetQueryForm} style={{ marginRight: 8 }}>Reset</Button>
-                    <Button onClick={() => setIsFieldDrawerVisible(false)} style={{ marginRight: 8 }}> Close </Button>
-                    <Button  type="primary" onClick={() => onSubmit()}> Submit </Button> {/*onClick={submitQueryFields}*/}
-                    </div>
-                }>
-
-                    <Steps type="navigation" current={step} onChange={(current) => setStep(current)}
-                                size="small" className="site-navigation-steps" >
-                        <Step status={step === 0 ? "process" : "wait"}  title="Select Row Type" />
-                        <Step status={step === 1 ? "process" : "wait"} title="Add Columns"/>
-                        <Step status={step === 2 ? "process" : "wait"} title="Global Filters"/>
-                    </Steps>
-
-                    <Form {...queryFormProps} key={`queryForm_reset_${resetQuery}`}>
-                        <div style={step === 0 ? {} : { display: 'none' } } >
-                            <RowForm />
-                        </div>
-                        <div style={step === 1 ? {} : { display: 'none' } } >
-                            <ColumnTabs state={queryPanes} setState={setQueryPanes} queryForm={queryForm} />
-                        </div>
-                        <div style={step === 2 ? {} : { display: 'none' } } >
-                            <WhereForm />
-                        </div>
-                    </Form>
-
-                </Drawer>
-
-                <Modal {...calcModalProps} footer={
-                    <div style={{textAlign: 'right',}}>
-                    <Button danger onClick={resetCalcsForm} style={{ marginRight: 2 }}>Reset</Button>
-                    <Button onClick={() => setIsCalcVisible(false)} style={{ marginRight: 2 }}> Close </Button>
-                    <Button  type="primary" onClick={submitCustomCalcs}>Submit</Button> {/*onClick={submitQueryFields}*/}
-                    </div>
-                }>
-                    <Form  {...calcsFormProps} key={`calcsForm_reset_${resetCalcs}`}>
-                        {tableData.columns && tableData.columns.length > 0 ?
-                        <CustomCalcTabs state={calcsPanes} setState={setCalcsPanes}  tableData={tableData} calcsForm={calcsForm} />
-                        : <p>Please select fields first</p>}
-                    </Form>
-                </Modal>
-
-                <Modal {...urlModalProps}>
-                    <Spin spinning={loadingURL}>
-                        <Row><Paragraph style={{color: 'grey', fontSize: '0.9rem', margin: 'auto'}} keyboard 
-                            copyable={{icon: <CopyOutlined style={{paddingLeft: 4, fontSize: '1.1rem'}} key="copy-icon" />,}}
-                        >{urlText}</Paragraph></Row>
-                    </Spin>         
-
-                </Modal>
             
-            </Content>
+            <Drawer {...fieldDrawerProps} footer={
+                <div style={{textAlign: 'right',}}>
+                <Button danger onClick={resetQueryForm} style={{ marginRight: 8 }}>Reset</Button>
+                <Button onClick={() => setIsFieldDrawerVisible(false)} style={{ marginRight: 8 }}> Close </Button>
+                <Button  type="primary" onClick={() => onSubmit()}> Submit </Button> {/*onClick={submitQueryFields}*/}
+                </div>
+            }>
+
+                <Steps type="navigation" current={step} onChange={(current) => setStep(current)}
+                            size="small" className="site-navigation-steps" >
+                    <Step status={step === 0 ? "process" : "wait"}  title="Select Row Type" />
+                    <Step status={step === 1 ? "process" : "wait"} title="Add Columns"/>
+                    <Step status={step === 2 ? "process" : "wait"} title="Global Filters"/>
+                </Steps>
+
+                <Form {...queryFormProps} key={`queryForm_reset_${resetQuery}`}>
+                    <div style={step === 0 ? {} : { display: 'none' } } >
+                        <RowForm />
+                    </div>
+                    <div style={step === 1 ? {} : { display: 'none' } } >
+                        <ColumnTabs state={queryPanes} setState={setQueryPanes} queryForm={queryForm} />
+                    </div>
+                    <div style={step === 2 ? {} : { display: 'none' } } >
+                        <WhereForm />
+                    </div>
+                </Form>
+
+            </Drawer>
+
+            <Modal {...calcModalProps} footer={
+                <div style={{textAlign: 'right',}}>
+                <Button danger onClick={resetCalcsForm} style={{ marginRight: 2 }}>Reset</Button>
+                <Button onClick={() => setIsCalcVisible(false)} style={{ marginRight: 2 }}> Close </Button>
+                <Button  type="primary" onClick={submitCustomCalcs}>Submit</Button> {/*onClick={submitQueryFields}*/}
+                </div>
+            }>
+                <Form  {...calcsFormProps} key={`calcsForm_reset_${resetCalcs}`}>
+                    {tableData.columns && tableData.columns.length > 0 ?
+                    <CustomCalcTabs state={calcsPanes} setState={setCalcsPanes}  tableData={tableData} calcsForm={calcsForm} />
+                    : <p>Please select fields first</p>}
+                </Form>
+            </Modal>
+
+            <Modal {...urlModalProps}>
+                <Spin spinning={loadingURL}>
+                    <Row><Paragraph style={{color: 'grey', fontSize: '0.9rem', margin: 'auto'}} keyboard 
+                        copyable={{icon: <CopyOutlined style={{paddingLeft: 4, fontSize: '1.1rem'}} key="copy-icon" />,}}
+                    >{urlText}</Paragraph></Row>
+                </Spin>         
+
+            </Modal>
             
+        
         </Layout>
     </Layout>
     
