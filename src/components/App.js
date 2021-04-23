@@ -4,9 +4,10 @@ import 'antd/dist/antd.css';
 import {Layout, Button, Drawer, message, Divider, Row, Col, Form, Modal, Steps, Spin, Image, Tabs, Typography, Menu, notification } from 'antd';
 import { DownloadOutlined, CloudUploadOutlined, CopyOutlined, QuestionCircleOutlined, HomeOutlined, UserOutlined, TeamOutlined, MonitorOutlined } from '@ant-design/icons';
 import QueryPage from './QueryPage'
-import StandardPage from './StandardPage'
 import { Switch, Route, Link, useLocation, } from 'react-router-dom';
 import logo from '../images/logo.png'
+import PlayerPage from './PlayerPage'
+import TeamPage from './TeamPage'
 
 const { Header, Sider, Content, Footer } = Layout;
 const { Step } = Steps;
@@ -65,11 +66,11 @@ function App() {
             </Route>
 
             <Route path="/player">
-                <StandardPage pageType="player" />
+                <PlayerPage />
             </Route>
 
             <Route path="/team">
-                <StandardPage pageType="team" />
+                <TeamPage />
             </Route>
 
         </Switch>     

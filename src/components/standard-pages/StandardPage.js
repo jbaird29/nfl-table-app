@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import './App.css';
-import 'antd/dist/antd.css';
 import {Select, Layout, Button, Drawer, message, Divider, Row, Col, Form, Modal, Steps, Spin, Image, Tabs, Typography, Menu, notification } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
 import { Switch, Route, Link, useHistory, } from 'react-router-dom';
-import Table from './Table'
-import LoadPage from './standard-pages/LoadPage'
-import teamList from '../inputs/teamList.json'
-import playerList from '../inputs/playerList.json'
+import Table from '../Table'
+import LoadPage from './LoadPage'
+import teamList from '../../inputs/teamList.json'
+import playerList from '../../inputs/playerList.json'
 
 const { Header, Sider, Content, Footer } = Layout;
 const { Step } = Steps;
@@ -46,10 +44,10 @@ function StandardPage(props) {
 
                 <Switch>
                     <Route path="/player/:id" >
-                        <LoadPage pageType={'player'} setTableData={props.setTableData} />
+                        <LoadPage pageType={'player'} setTableData={setTableData} />
                     </Route>
                     <Route path="/team/:id" >
-                        <LoadPage pageType={'team'} setTableData={props.setTableData} />
+                        <LoadPage pageType={'team'} setTableData={setTableData} />
                     </Route>
                 </Switch>
             </Sider>
