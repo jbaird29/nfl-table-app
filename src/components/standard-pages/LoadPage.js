@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Radio, Row, Col, Typography, Divider, message, Image, Card, Avatar, Spin, Button } from 'antd';
-import { UserOutlined, LoadingOutlined, FormOutlined } from '@ant-design/icons';
-import { useParams, useHistory, Redirect} from 'react-router-dom';
+import { UserOutlined, LoadingOutlined, FormOutlined, MonitorOutlined, } from '@ant-design/icons';
+import { useParams, useHistory, } from 'react-router-dom';
 import { addRenderSorterToTable, listOfRowTypes} from '../helper-functions'
 
 const {Paragraph, Text} = Typography
@@ -72,16 +72,7 @@ export default function LoadPage(props) {
     }, [allPlayerData, statType])
 
 
-    const handleOpenCustomQueryClick = () => {
-        // TBU
-        <Redirect to={{
-            pathname: "/query",
-            // state: { referrer: currentLocation }
-        }}/>
-        // history.push('/')
-        // props.openStandardInCustomQuery(type, id)
-    }
-
+    const handleOpenCustomQueryClick = () => props.setRedirect(true)
 
     const paragraphStyle = { margin: '4px 0'}
     const dividerStyle = { margin: '0'}
@@ -153,7 +144,7 @@ export default function LoadPage(props) {
     const button = (
     <Spin spinning={cardLoading}>
         <Row style={{marginTop: 12}}>
-            <Button style={{width: 250, margin: 'auto'}} block onClick={handleOpenCustomQueryClick} shape="round" icon={<FormOutlined />}>Open in Custom Query</Button>
+            <Button style={{width: 250, margin: 'auto'}} block onClick={handleOpenCustomQueryClick} shape="round" icon={<MonitorOutlined />}>Open in Custom Query</Button>
         </Row>
     </Spin>
     )
@@ -164,5 +155,6 @@ export default function LoadPage(props) {
         {cardLoading && getLoadingCard()}
         {infoCard && !cardLoading && getInfoCard(type, infoCard)}
         {infoCard && !cardLoading && button}
+        
     </>);
 };

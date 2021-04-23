@@ -18,7 +18,7 @@ const { Title, Paragraph } = Typography
 const queryFormV = 1
 const calcsFormV = 1
 
-function QueryPage() {
+function QueryPage(props) {
     // application state
     const [queryForm] = Form.useForm()
     const [calcsForm] = Form.useForm()
@@ -48,31 +48,18 @@ function QueryPage() {
 
     // when the page is first loaded, check to see if a ?sid= state is included
     useEffect(() => {
-        const url = new URL(window.location)
-        const sid = url.searchParams.get('sid')
+        const sid = new URL(window.location).searchParams.get('sid')
         if (sid) {
             loadState(sid)
-        } 
+        }
+        const isRedirectFromStandardPage = location.state && location.state.queryFields
+        if (isRedirectFromStandardPage) {
+            loadStandardInCustomQuery()
+        }
     }, []);    
 
-    function openStandardInCustomQuery(type, id) {
-        // step 1: transform the tableData into queryFields object
-        const row = { field: tableData.columns[0].dataIndex}
-        const where = type === 'player' ? { player_gsis_id: [id]} : { team_id : [id]}
-        const columns = Object.assign({}, ...tableData.columns.slice(1)
-            .map((column, i) => ( {['col'+(i+1)]: { field : column.dataIndex }} )))
-        const queryFields = {row: row, where: where, columns: columns}
-        // skipped for now - I need to figure out how to prevent the LoadPage cleanup which empties tableData
-        // step 2: add 'Col' headers to the tableData
-        const newColumns = tableData.columns.slice(1).map((column, index) => ({
-            title: `Col ${index+1}`, 
-            align: 'center', 
-            key: `wrapper_col${index+1}`,
-            children: [column]
-        }))
-        newColumns.splice(0, 0, tableData.columns[0])
-        // step 3: update the state
-        setTableData({columns: newColumns, dataSource: tableData.dataSource})
+    function loadStandardInCustomQuery() {
+        const {queryFields} = location.state
         const panes = Object.keys(queryFields.columns).map(colIndex => ({ title: `Col ${colIndex.slice(3)}`, key: `${colIndex.slice(3)}` }))
         setQueryPanes({panes: panes, activeKey: '1', newTabIndex: panes.length+1})
         queryForm.resetFields();
@@ -270,7 +257,6 @@ function QueryPage() {
         wrapperCol: { span: 12 },
         labelAlign: 'left',
         colon: false,
-
     }
 
     const calcModalProps = {
@@ -291,9 +277,6 @@ function QueryPage() {
         width: 550,
         style: {top: 150}
     }
-
-    const siderWidth = 300
-
 
     return (
     <>
