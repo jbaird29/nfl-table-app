@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Radio, Row, Col, Typography, Divider, message, Image, Card, Avatar, Spin, Button } from 'antd';
 import { UserOutlined, LoadingOutlined, FormOutlined } from '@ant-design/icons';
-import { useParams, useHistory, } from 'react-router-dom';
+import { useParams, useHistory, Redirect} from 'react-router-dom';
 import { addRenderSorterToTable, listOfRowTypes} from '../helper-functions'
 
 const {Paragraph, Text} = Typography
@@ -12,13 +12,13 @@ export default function LoadPage(props) {
 
     const history = useHistory();
     const {id} = useParams()
-    const type = props.type   // 'player' or 'team'
+    const type = props.pageType   // 'player' or 'team'
 
     const [allPlayerData, setAllPlayerData] = useState(null)
     const [statType, setStatType] = useState(null)
 
     useEffect(() => {
-        loadStandardPage(props.type, id)
+        loadStandardPage(props.pageType, id)
         const cleanUp = () => {
             document.title = 'NFL Table'
             // props.setTableData({})
@@ -41,9 +41,9 @@ export default function LoadPage(props) {
             addRenderSorterToTable(tableData, defaultTableInfo)
             setAllPlayerData(tableData)
             setStatType(defaultStatType)
-            props.setSavedCalcsFields(null)
-            props.setSavedQueryFields(null)
-            document.title = props.type === 'player' ? `${info.full_name} Stats` : `${info.team_name} Stats`
+            // props.setSavedCalcsFields(null)
+            // props.setSavedQueryFields(null)
+            document.title = props.pageType === 'player' ? `${info.full_name} Stats` : `${info.team_name} Stats`
             hide()
             setCardLoading(false)
             setInfoCard(info)
@@ -60,7 +60,7 @@ export default function LoadPage(props) {
 
     const filterRow = (row, statType) => Object.fromEntries(
         Object.entries(row).filter(([dataIndex, value]) => shouldInclude(dataIndex, statType))
-    ) 
+    )
 
     // when the user selects a different stat type, filter the tableData based on that stat type
     useEffect(() => {
@@ -73,8 +73,13 @@ export default function LoadPage(props) {
 
 
     const handleOpenCustomQueryClick = () => {
-        history.push('/')
-        props.openStandardInCustomQuery(type, id)
+        // TBU
+        <Redirect to={{
+            pathname: "/query",
+            // state: { referrer: currentLocation }
+        }}/>
+        // history.push('/')
+        // props.openStandardInCustomQuery(type, id)
     }
 
 
@@ -88,7 +93,7 @@ export default function LoadPage(props) {
 
     const getPlayerCard = info => (
         <Card loading={false} size='small' style={{ width: 250, margin: 'auto', }}
-        cover={<Image alt={info.full_name} src={info.headshot_url} />} >
+            cover={<Image alt={info.full_name} src={info.headshot_url} />} >
         <Card.Meta title={info.full_name} description={`${info.team_name} (${info.team_abbreviation})`} 
             style={{marginBottom: 8, marginTop: 4, lineHeight: 1.2}}
         />
@@ -108,7 +113,7 @@ export default function LoadPage(props) {
 
     const getTeamCard = info => (
         <Card loading={false} size='small' style={{ width: 250, margin: 'auto', }}
-        cover={<Image alt={info.team_name} src={info.logo_url} />} >
+            cover={<Image alt={info.team_name} src={info.logo_url} />} >
         <Card.Meta title={info.team_name} description={`(${info.team_abbreviation})`} 
             style={{marginBottom: 8, marginTop: 4, lineHeight: 1.2}}
         />
