@@ -232,7 +232,7 @@ function QueryPage(props) {
 
     const fieldDrawerProps = {
         title: 'Edit Query Fields',
-        width: '55%',
+        width: '80%',
         visible: isFieldDrawerVisible,
         placement: 'left',
         onClose: () => setIsFieldDrawerVisible(false),

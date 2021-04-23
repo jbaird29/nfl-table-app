@@ -9,7 +9,6 @@ function Table(props) {
 
   const handleChange = (pagination, filters, sorter, extra) => {
     props.setTableInfo({filters, sorter})
-    console.log({filters, sorter})
   }
 
   // if the first column is the rnk, use the second column, otherwise use first coumn
@@ -17,7 +16,7 @@ function Table(props) {
 
   return (
     <AntTable
-      style={{ overflow: 'initial'}}
+      style={{ paddingTop: '5px', overflow: 'initial'}}
       onChange={handleChange}
       dataSource={dataSource}
       columns={columns}
