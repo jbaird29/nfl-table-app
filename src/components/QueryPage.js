@@ -8,10 +8,8 @@ import ColumnTabs from './query-fields/Column-Tabs'
 import RowForm from './query-fields/Row-Form'
 import WhereForm from './query-fields/Where-Form'
 import CustomCalcTabs from './custom-calcs/Custom-Calc-Tabs'
-import SelectPage from './standard-pages/SelectPage'
 import { toCSV, copyTableWithoutCalcs, addCalcsToTable, addRenderSorterToTable} from './helper-functions'
 import { Switch, Route, Link, useLocation, } from 'react-router-dom';
-import logo from '../images/logo.png'
 
 const { Header, Sider, Content, Footer } = Layout;
 const { Step } = Steps;
