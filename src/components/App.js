@@ -7,6 +7,7 @@ import QueryPage from './QueryPage'
 import { Switch, Route, Link, useLocation, } from 'react-router-dom';
 import logo from '../images/logo.png'
 import StandardPage from './standard-pages/StandardPage'
+import QueryColumn from './query-form/QueryColumn';
 
 const { Header, Sider, Content, Footer } = Layout;
 const { Step } = Steps;
@@ -54,6 +55,7 @@ function App() {
                     <Menu.Item key="query" icon={<MonitorOutlined />}><Link to="/query">Custom Query</Link></Menu.Item>
                     <Menu.Item key="player" icon={<UserOutlined />}><Link to="/player">Player Stats</Link></Menu.Item>
                     <Menu.Item key="team" icon={<TeamOutlined />}><Link to="/team">Team Stats</Link></Menu.Item>
+                    <Menu.Item key="test" icon={<TeamOutlined />}><Link to="/test">Test QueryForm</Link></Menu.Item>
                 </Menu>
             </Col>
             <Col span={4} style={{ textAlign: 'right'}}>
@@ -78,6 +80,11 @@ function App() {
             <Route path="/team">
                 <StandardPage key='team-page' pageType='team' />
             </Route>
+
+            <Route path="/test">
+                <QueryColumn key='test'/>
+            </Route>
+
 
         </Switch>
         
