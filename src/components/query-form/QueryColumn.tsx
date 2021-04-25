@@ -81,10 +81,6 @@ export default function QueryColumn(props: any) {
         </Form.Item>
     );
 
-    const onFinish = (values: object) => {
-        console.log(values);
-    };
-
     const statInputSelectProps = {
         placeholder: "Stat Type",
         align: "center",
@@ -217,7 +213,7 @@ export default function QueryColumn(props: any) {
                             </div>
                         ))}
                         <Form.Item>
-                            <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
+                            <Button onClick={() => add()} block icon={<PlusOutlined />}>
                                 Add Column
                             </Button>
                         </Form.Item>

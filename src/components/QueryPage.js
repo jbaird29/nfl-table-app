@@ -39,6 +39,7 @@ import { Switch, Route, Link, useLocation } from "react-router-dom";
 import QueryColumn from "./query-form/QueryColumn";
 import QueryRow from "./query-form/QueryRow";
 import QueryRowFilter from "./query-form/QueryRowFilter";
+import { TableData, TableColumn, TableRow } from "./types/MainTypes";
 
 const { Header, Sider, Content, Footer } = Layout;
 const { Step } = Steps;
@@ -47,7 +48,7 @@ const { Title, Paragraph } = Typography;
 const queryFormV = 1;
 const calcsFormV = 1;
 
-function QueryPage(props) {
+function QueryPage() {
     // application state
     const [queryForm] = Form.useForm();
     const [calcsForm] = Form.useForm();
@@ -57,7 +58,7 @@ function QueryPage(props) {
     const [queryPanes, setQueryPanes] = useState({ panes: [{ title: "Col 1", key: "1" }], activeKey: "1", newTabIndex: 2 });
     const [calcsPanes, setCalcsPanes] = useState({ panes: [{ title: "Calc 1", key: "1" }], activeKey: "1", newTabIndex: 2 });
     // table state
-    const [tableData, setTableData] = useState({});
+    const [tableData, setTableData] = useState({ columns: [], dataSource: [] });
     const [tableInfo, setTableInfo] = useState({ sorter: { field: null, order: null }, filters: {} });
     // reset helpers
     const [resetQuery, setResetQuery] = useState(1);
@@ -76,7 +77,7 @@ function QueryPage(props) {
 
     // when the page is first loaded, check to see if a ?sid= state is included
     useEffect(() => {
-        const sid = new URL(window.location).searchParams.get("sid");
+        const sid = new URL(window.location.toString()).searchParams.get("sid");
         if (sid) {
             loadState(sid);
         }
@@ -140,9 +141,9 @@ function QueryPage(props) {
                 style: { fontSize: "1rem" },
             });
         }
-        const url = new URL(window.location);
+        const url = new URL(window.location.toString());
         url.searchParams.delete("sid");
-        window.history.pushState({}, "", url);
+        window.history.pushState({}, "", url.toString());
     }
 
     async function saveState() {
@@ -183,7 +184,7 @@ function QueryPage(props) {
         // FIRST: validate that every colIndex is in tableData
         const allColIndexes = tableData.columns
             .filter((column) => column.title.startsWith("Col"))
-            .map((column) => column.children[0].dataIndex);
+            .map((column) => column.children?.[0].dataIndex);
         const hasInvalidCol = Object.entries(calcsForm.getFieldsValue()).some(
             ([calcIndex, calc]) =>
                 (calc.colIndex1.startsWith("col") && !allColIndexes.includes(calc.colIndex1)) ||

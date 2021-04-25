@@ -29,11 +29,10 @@ import {
     TeamOutlined,
     MonitorOutlined,
 } from "@ant-design/icons";
-import QueryPage from "./QueryPage";
+import QueryPage from "./QueryPage.tsx";
 import { Switch, Route, Link, useLocation } from "react-router-dom";
 import logo from "../images/logo.png";
 import StandardPage from "./standard-pages/StandardPage";
-import QueryColumn from "./query-form/QueryColumn";
 
 const { Header, Sider, Content, Footer } = Layout;
 const { Step } = Steps;
