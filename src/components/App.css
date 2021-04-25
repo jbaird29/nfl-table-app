@@ -1,47 +1,47 @@
 body {
-  overscroll-behavior-x: none;
+    overscroll-behavior-x: none;
 }
 
 /* this sets the style for the navigation steps in the queryForm*/
 .site-navigation-steps {
-  padding-top: 0px !important;
-  margin-bottom: 18px !important;
-  box-shadow: 0px -1px 0 0 #e8e8e8 inset;
+    padding-top: 0px !important;
+    margin-bottom: 18px !important;
+    box-shadow: 0px -1px 0 0 #e8e8e8 inset;
 }
 
 /* this sets the styling for the tabs*/
 /* makes the font color for the inactive tabs grey instead of black */
 .ant-tabs-tab-with-remove {
-  color: grey !important; 
+    color: grey !important;
 }
 
 /* this sets the padding for the "Collapse Panels" */
 .ant-collapse-header {
-  padding-top: 7px !important;
-  padding-bottom: 7px !important;
+    padding-top: 7px !important;
+    padding-bottom: 7px !important;
 }
 .ant-collapse-arrow {
-  padding-top: 7px !important;
+    padding-top: 7px !important;
 }
 .ant-collapse-content-box {
-  padding: 7px !important;
+    padding: 7px !important;
 }
 
 /* this sets the format for the form items */
 .ant-form-item {
- margin-bottom: 14px !important;
+    margin-bottom: 0px !important;
 }
 
 /* this sets styles for the table */
 .custom-table-row {
-  font-size: small;
+    font-size: small;
 }
 
 .ant-table-cell {
-  padding: 3px 8px !important;
+    padding: 3px 8px !important;
 }
 
 /* this sets the format for the custom calculations in the table */
 .custom-calc {
-  background-color: #f3faf2 !important;
+    background-color: #f3faf2 !important;
 }

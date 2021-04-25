@@ -36,6 +36,9 @@ import WhereForm from "./query-fields/Where-Form";
 import CustomCalcTabs from "./custom-calcs/Custom-Calc-Tabs";
 import { toCSV, copyTableWithoutCalcs, addCalcsToTable, addRenderSorterToTable } from "./helper-functions";
 import { Switch, Route, Link, useLocation } from "react-router-dom";
+import QueryColumn from "./query-form/QueryColumn";
+import QueryRow from "./query-form/QueryRow";
+import QueryRowFilter from "./query-form/QueryRowFilter";
 
 const { Header, Sider, Content, Footer } = Layout;
 const { Step } = Steps;
@@ -305,9 +308,6 @@ function QueryPage(props) {
         form: queryForm,
         name: "query",
         initialValues: { row: { field: "player_name_with_position" } },
-        labelAlign: "left",
-        labelCol: { span: 10 },
-        wrapperCol: { span: 14 },
         colon: false,
     };
 
@@ -399,32 +399,13 @@ function QueryPage(props) {
                                 {" "}
                                 Submit{" "}
                             </Button>{" "}
-                            {/*onClick={submitQueryFields}*/}
                         </div>
                     }
                 >
-                    <Steps
-                        type="navigation"
-                        current={step}
-                        onChange={(current) => setStep(current)}
-                        size="small"
-                        className="site-navigation-steps"
-                    >
-                        <Step status={step === 0 ? "process" : "wait"} title="Select Row Type" />
-                        <Step status={step === 1 ? "process" : "wait"} title="Add Columns" />
-                        <Step status={step === 2 ? "process" : "wait"} title="Global Filters" />
-                    </Steps>
-
                     <Form {...queryFormProps} key={`queryForm_reset_${resetQuery}`}>
-                        <div style={step === 0 ? {} : { display: "none" }}>
-                            <RowForm />
-                        </div>
-                        <div style={step === 1 ? {} : { display: "none" }}>
-                            <ColumnTabs state={queryPanes} setState={setQueryPanes} queryForm={queryForm} />
-                        </div>
-                        <div style={step === 2 ? {} : { display: "none" }}>
-                            <WhereForm />
-                        </div>
+                        <QueryRow />
+                        <QueryRowFilter />
+                        <QueryColumn form={queryForm} />
                     </Form>
                 </Drawer>
 

@@ -1,13 +1,23 @@
 import React from "react";
-import { Form, Input, Button, Space, Select, Row, Divider, Slider, InputNumber } from "antd";
-import { MinusCircleOutlined, PlusOutlined, CaretUpOutlined, ArrowUpOutlined, ArrowDownOutlined } from "@ant-design/icons";
+import { Form, Input, Button, Space, Select, Row, Col, Divider, Slider, InputNumber, Typography, Tooltip } from "antd";
+import {
+    MinusCircleOutlined,
+    PlusOutlined,
+    CaretUpOutlined,
+    ArrowUpOutlined,
+    ArrowDownOutlined,
+    InfoCircleOutlined,
+} from "@ant-design/icons";
 import statsInputs from "../../inputs/statsInputs.json";
 import filterComponents from "../../inputs/filterComponents.json";
 import filterInputs from "../../inputs/filterInputs.json";
 import { NamePath } from "rc-field-form/lib/interface";
+import QuerySectionHeader from "./QuerySectionHeader";
+const { Paragraph } = Typography;
 
-export default function QueryColumn() {
+export default function QueryColumn(props: any) {
     const [columnForm] = Form.useForm();
+    const { queryForm } = props;
 
     interface FilterInput {
         label: string | "Passing" | "Rushing" | "Receiving" | "General";
@@ -19,8 +29,12 @@ export default function QueryColumn() {
         statType: string | "pass" | "rush" | "recv" | "general";
         formProps: {
             label: string;
-            labelCol: object;
-            wrapperCol: object;
+            labelCol: {
+                span: number;
+            };
+            wrapperCol: {
+                span: number;
+            };
         };
         ui: {
             type: string | "select" | "inputNumber" | "slider";
@@ -32,15 +46,20 @@ export default function QueryColumn() {
 
     const renderFilterComponent = (filter: FilterComponent, name: NamePath) => {
         return (
-            <Form.Item {...filter.formProps} name={name} fieldKey={name} preserve={false}>
-                {filter.ui.type === "select" ? (
-                    <Select {...filter.ui.props} />
-                ) : filter.ui.type === "slider" ? (
-                    <Slider {...filter.ui.props} />
-                ) : filter.ui.type === "inputNumber" ? (
-                    <InputNumber {...filter.ui.props} />
-                ) : null}
-            </Form.Item>
+            <>
+                <Col span={8}>
+                    <Form.Item name={name} fieldKey={name} preserve={false}>
+                        {filter.ui.type === "select" ? (
+                            <Select placeholder={filter.formProps.label} {...filter.ui.props} />
+                        ) : filter.ui.type === "slider" ? (
+                            <Slider {...filter.ui.props} />
+                        ) : filter.ui.type === "inputNumber" ? (
+                            <InputNumber {...filter.ui.props} />
+                        ) : null}
+                    </Form.Item>
+                </Col>
+                <Col span={8}></Col>
+            </>
         );
     };
 
@@ -67,7 +86,6 @@ export default function QueryColumn() {
     };
 
     const statInputSelectProps = {
-        style: { width: 200 },
         placeholder: "Stat Type",
         align: "center",
         showSearch: true,
@@ -76,86 +94,120 @@ export default function QueryColumn() {
     };
 
     const filterTypeSelectProps = {
-        style: { width: 200 },
         placeholder: "Select Filter Type",
         align: "center",
         options: filterInputs, // changing the inputs based on colField was too difficult
     };
 
-    const testSetFields = {
-        columns: [
-            {
-                field: "pass_completions_sum",
-                title: "COMP",
-                filters: [
-                    {
-                        field: "season_year",
-                        value: "2020",
-                    },
-                ],
-            },
-            {
-                field: "pass_incompletions_sum",
-                title: "IN COMP",
-            },
-        ],
-    };
-
-    const testFields = () => {
-        columnForm.setFieldsValue(testSetFields);
+    const headerStyle = {
+        color: "black",
+        // border: "1px solid grey",
+        // backgroundColor: "lightgrey",
     };
 
     return (
-        <Form form={columnForm} name="dynamic_form_nest_item" onFinish={onFinish} autoComplete="off">
+        <>
+            <QuerySectionHeader spaceAbove title="Add Columns" description="Each corresponds to a column in the table" />
+            <Row gutter={[10, 0]} style={{ marginBottom: 10, textAlign: "center" }}>
+                <Col style={headerStyle} flex="80px">
+                    <span># </span>
+                </Col>
+                <Col style={headerStyle} flex="1 1 120px">
+                    <span>Select Stat Type </span>
+                    <Tooltip title="prompt text">
+                        <InfoCircleOutlined />
+                    </Tooltip>
+                </Col>
+                <Col style={headerStyle} flex="1 1 120px">
+                    <span>Enter Column Title </span>
+                    <Tooltip title="prompt text">
+                        <InfoCircleOutlined />
+                    </Tooltip>
+                </Col>
+                <Col style={headerStyle} flex="130px">
+                    <span>Minimum Value </span>
+                    <Tooltip title="prompt text">
+                        <InfoCircleOutlined />
+                    </Tooltip>
+                </Col>
+                <Col style={headerStyle} flex="185px">
+                    <span>Actions </span>
+                    <Tooltip title="prompt text">
+                        <InfoCircleOutlined />
+                    </Tooltip>
+                </Col>
+            </Row>
             <Form.List name="columns">
                 {(fields, { add, remove, move }) => (
                     <>
                         {fields.map(({ key, name: colNum, fieldKey, ...restField }) => (
-                            <div key={key}>
-                                <Space style={{ marginTop: 8 }} align="baseline">
-                                    <Form.Item
-                                        {...restField}
-                                        name={[colNum, "field"]}
-                                        fieldKey={[fieldKey, "field"]}
-                                        rules={[{ required: true, message: "Missing stat type" }]}
-                                        label={`Column ${colNum + 1}`}
-                                    >
-                                        <Select {...statInputSelectProps} />
-                                    </Form.Item>
-                                    <Form.Item {...restField} name={[colNum, "title"]} fieldKey={[fieldKey, "title"]}>
-                                        <Input placeholder="Column Title (Optional)" autoComplete="off" />
-                                    </Form.Item>
-                                    <Form.Item {...restField} name={[colNum, "having"]} fieldKey={[fieldKey, "having"]}>
-                                        <InputNumber placeholder="Min (Optional)" />
-                                    </Form.Item>
+                            <div style={{ position: "relative" }} key={key}>
+                                <Row style={{ marginTop: 8, marginRight: 100 }} align="middle" gutter={[10, 10]}>
+                                    <Col flex="80px">
+                                        <Paragraph style={{ marginBottom: 0 }}>Column {colNum + 1}:</Paragraph>
+                                    </Col>
+                                    <Col flex="1 1 120px">
+                                        <Form.Item
+                                            {...restField}
+                                            name={[colNum, "field"]}
+                                            fieldKey={[fieldKey, "field"]}
+                                            rules={[{ required: true, message: "Missing stat type" }]}
+                                        >
+                                            <Select style={{ width: "100%" }} {...statInputSelectProps} />
+                                        </Form.Item>
+                                    </Col>
+                                    <Col flex="1 1 120px">
+                                        <Form.Item {...restField} name={[colNum, "title"]} fieldKey={[fieldKey, "title"]}>
+                                            <Input style={{ width: "100%" }} placeholder="optional" autoComplete="off" />
+                                        </Form.Item>
+                                    </Col>
+                                    <Col flex="130px">
+                                        <Form.Item {...restField} name={[colNum, "having"]} fieldKey={[fieldKey, "having"]}>
+                                            <InputNumber style={{ width: "100%" }} placeholder="optional" />
+                                        </Form.Item>
+                                    </Col>
+                                    <Col flex="80px">
+                                        <Space>
+                                            <ArrowUpOutlined onClick={() => move(colNum, colNum - 1)} />
+                                            <ArrowDownOutlined onClick={() => move(colNum, colNum + 1)} />
+                                            <MinusCircleOutlined onClick={() => remove(colNum)} />
+                                        </Space>
+                                    </Col>
+                                </Row>
 
-                                    <ArrowUpOutlined onClick={() => move(colNum, colNum - 1)} />
-                                    <ArrowDownOutlined onClick={() => move(colNum, colNum + 1)} />
-                                    <MinusCircleOutlined onClick={() => remove(colNum)} />
-                                </Space>
                                 <Form.List name={[colNum, "filters"]}>
                                     {(fields, { add, remove }) => (
                                         <>
                                             <Form.Item noStyle>
-                                                <Button type="dashed" onClick={() => add()} icon={<PlusOutlined />}>
+                                                <Button
+                                                    style={{ position: "absolute", right: "0px", top: "6px" }}
+                                                    type="dashed"
+                                                    onClick={() => add()}
+                                                    icon={<PlusOutlined />}
+                                                >
                                                     Filter
                                                 </Button>
                                             </Form.Item>
                                             {fields.map(({ key, name: filterNum, fieldKey, ...restField }) => (
                                                 <div key={key}>
-                                                    <Space style={{ marginLeft: 62 }} align="baseline">
-                                                        <MinusCircleOutlined onClick={() => remove(filterNum)} />
-                                                        <Form.Item
-                                                            {...restField}
-                                                            name={[filterNum, "activeFilter"]}
-                                                            fieldKey={[fieldKey, "activeFilter"]}
-                                                        >
-                                                            <Select {...filterTypeSelectProps} />
-                                                        </Form.Item>
+                                                    <Row style={{ margin: "0 220px 0 80px" }} align="middle" gutter={[5, 5]}>
+                                                        <MinusCircleOutlined
+                                                            style={{ position: "absolute", left: 60 }}
+                                                            onClick={() => remove(filterNum)}
+                                                        />
+                                                        <Col span={8}>
+                                                            <Form.Item
+                                                                {...restField}
+                                                                name={[filterNum, "activeFilter"]}
+                                                                fieldKey={[fieldKey, "activeFilter"]}
+                                                            >
+                                                                <Select {...filterTypeSelectProps} />
+                                                            </Form.Item>
+                                                        </Col>
                                                         {filterComponents.map((FilterComponent: FilterComponent) =>
                                                             conditionallyRenderFilterComponent(colNum, filterNum, FilterComponent)
                                                         )}
-                                                    </Space>
+                                                    </Row>
                                                 </div>
                                             ))}
                                         </>
@@ -172,12 +224,6 @@ export default function QueryColumn() {
                     </>
                 )}
             </Form.List>
-            <Form.Item>
-                <Button type="primary" htmlType="submit">
-                    Submit
-                </Button>
-            </Form.Item>
-            <Button onClick={testFields}>Test</Button>
-        </Form>
+        </>
     );
 }
