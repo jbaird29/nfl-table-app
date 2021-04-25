@@ -41,7 +41,7 @@ import QueryColumn from "./query-form/QueryColumn";
 import QueryRow from "./query-form/QueryRow";
 import QueryRowFilter from "./query-form/QueryRowFilter";
 import { TableData, TableColumn, TableRow } from "./types/MainTypes";
-import Query from "./query-form/Query";
+import QueryForm from "./query-form/QueryForm";
 
 const { Header, Sider, Content, Footer } = Layout;
 const { Step } = Steps;
@@ -95,7 +95,7 @@ function QueryPage() {
                     <Table setTableInfo={setTableInfo} tableData={tableData} />
                 </Content>
 
-                <Query
+                <QueryForm
                     isVisible={isFieldDrawerVisible}
                     setIsVisible={setIsFieldDrawerVisible}
                     setTableData={setTableData}

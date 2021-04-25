@@ -13,7 +13,7 @@ interface QueryProps {
     initialTableData: TableData;
 }
 
-export default function Query(props: QueryProps) {
+export default function QueryForm(props: QueryProps) {
     const { isVisible, setIsVisible, setTableData, initialTableData } = props;
     const defaultTableInfo = { sorter: { field: null, order: null }, filters: {} };
 
