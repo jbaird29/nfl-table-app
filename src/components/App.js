@@ -29,6 +29,8 @@ import {
     UserOutlined,
     TeamOutlined,
     MonitorOutlined,
+    MenuFoldOutlined,
+    MenuUnfoldOutlined,
 } from "@ant-design/icons";
 import QueryPage from "./QueryPage.tsx";
 import { Switch, Route, Link, useLocation } from "react-router-dom";
@@ -42,6 +44,7 @@ const { Title, Paragraph } = Typography;
 
 function App() {
     const location = useLocation();
+    const [collapsed, setCollapsed] = useState(false);
 
     // use this for the Home page instead
     function onHelp() {
@@ -74,16 +77,24 @@ function App() {
 
     const siderProps = {
         width: 300,
-        breakpoint: "xs",
-        // collapsible: true,
-        // collapsedWidth: 10,
+        collapsible: true,
+        collapsed: collapsed,
+        onCollapse: (collapsed, type) => setCollapsed(collapsed),
+        collapsedWidth: 0,
+        theme: "light",
+        trigger: collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />,
         style: { backgroundColor: "#FFF", textAlign: "center", borderRight: "1px solid #d8d9dc" },
+        zeroWidthTriggerStyle: {
+            backgroundColor: "#FFF",
+            border: "1px solid #d8d9dc",
+            top: "92%",
+        },
     };
 
     return (
         <>
             <Layout style={{ minHeight: "100vh" }}>
-                <Header style={{ backgroundColor: "#FFF", borderBottom: "1px solid #d8d9dc" }}>
+                <Header style={{ backgroundColor: "#FFF", borderBottom: "1px solid #d8d9dc", padding: "0 10px" }}>
                     <Row align="middle">
                         <Col span={4} xs={0} sm={4} style={{ textAlign: "left", lineHeight: "1px" }}>
                             <Image preview={false} src={logo} alt="logo" />
