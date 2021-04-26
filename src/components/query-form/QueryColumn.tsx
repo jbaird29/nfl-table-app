@@ -109,13 +109,13 @@ export default function QueryColumn(props: any) {
                 <Col style={headerStyle} flex="80px">
                     <span># </span>
                 </Col>
-                <Col style={headerStyle} flex="1 1 120px">
+                <Col style={headerStyle} flex="3 3 120px">
                     <span>Select Stat Type </span>
                     <Tooltip title="prompt text">
                         <InfoCircleOutlined />
                     </Tooltip>
                 </Col>
-                <Col style={headerStyle} flex="1 1 120px">
+                <Col style={headerStyle} flex="2 2 120px">
                     <span>Enter Column Title </span>
                     <Tooltip title="prompt text">
                         <InfoCircleOutlined />
@@ -143,7 +143,7 @@ export default function QueryColumn(props: any) {
                                     <Col flex="80px">
                                         <Paragraph style={{ marginBottom: 0 }}>Column {colNum + 1}:</Paragraph>
                                     </Col>
-                                    <Col flex="1 1 120px">
+                                    <Col flex="3 3 120px">
                                         <Form.Item
                                             {...restField}
                                             name={[colNum, "field"]}
@@ -153,7 +153,7 @@ export default function QueryColumn(props: any) {
                                             <Select style={{ width: "100%" }} {...statInputSelectProps} />
                                         </Form.Item>
                                     </Col>
-                                    <Col flex="1 1 120px">
+                                    <Col flex="2 2 120px">
                                         <Form.Item {...restField} name={[colNum, "title"]} fieldKey={[fieldKey, "title"]}>
                                             <Input style={{ width: "100%" }} placeholder="optional" autoComplete="off" />
                                         </Form.Item>

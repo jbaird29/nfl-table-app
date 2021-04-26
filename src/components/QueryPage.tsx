@@ -16,7 +16,12 @@ const { Title, Paragraph } = Typography;
 const queryFormV = 1;
 const calcsFormV = 1;
 
-function QueryPage() {
+interface QueryPageProps {
+    siderProps: any;
+}
+
+function QueryPage(props: QueryPageProps) {
+    const { siderProps } = props;
     // tableData
     const initialTableData: TableData = { columns: [], dataSource: [] };
     const initialTableInfo = { sorter: { field: null, order: null }, filters: {} };
@@ -42,7 +47,7 @@ function QueryPage() {
     return (
         <>
             <Layout>
-                <Sider width={300} style={{ backgroundColor: "#FFF", textAlign: "center", borderRight: "1px solid #d8d9dc" }}>
+                <Sider {...siderProps}>
                     <Spin spinning={loadingPage}>
                         <Row style={{ padding: "6px 12px" }}>
                             <Button block type="primary" onClick={() => setIsFieldDrawerVisible(true)}>

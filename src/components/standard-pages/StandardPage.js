@@ -31,6 +31,8 @@ const { TabPane } = Tabs;
 const { Title, Paragraph } = Typography;
 
 function StandardPage(props) {
+    const { siderProps, pageType } = props;
+
     // const initialTableData: TableData = { columns: [], dataSource: [] };
     const initialTableData = { columns: [], dataSource: [] };
     const [tableData, setTableData] = useState(initialTableData);
@@ -42,7 +44,7 @@ function StandardPage(props) {
 
     const onIDSelect = (pageID) => {
         if (pageID) {
-            history.push(`/${props.pageType}/${encodeURI(pageID)}`);
+            history.push(`/${pageType}/${encodeURI(pageID)}`);
             setPageID(pageID);
         } else {
             setPageID(null);
@@ -65,7 +67,7 @@ function StandardPage(props) {
     const getQueryFieldsForRedirect = () => {
         // transform the tableData into queryFields object
         const row = { field: tableData.columns[0].dataIndex };
-        const where = props.pageType === "player" ? { player_gsis_id: [pageID] } : { team_id: [pageID] };
+        const where = pageType === "player" ? { player_gsis_id: [pageID] } : { team_id: [pageID] };
         const columns = Object.assign(
             {},
             ...tableData.columns.slice(1).map((column, i) => ({ ["col" + (i + 1)]: { field: column.dataIndex } }))
@@ -79,10 +81,10 @@ function StandardPage(props) {
     return (
         <>
             <Layout>
-                <Sider width={300} style={{ backgroundColor: "#FFF", textAlign: "center", borderRight: "1px solid #d8d9dc" }}>
+                <Sider {...siderProps}>
                     <Row gutter={[0, 18]}>
                         <Col span={24}>
-                            {props.pageType === "player" ? (
+                            {pageType === "player" ? (
                                 <Select {...selectProps} onChange={onIDSelect} placeholder="Search for Players" options={playerList} />
                             ) : (
                                 <Select {...selectProps} onChange={onIDSelect} placeholder="Search for Teams" options={teamList} />

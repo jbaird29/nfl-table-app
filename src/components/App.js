@@ -18,6 +18,7 @@ import {
     Typography,
     Menu,
     notification,
+    Space,
 } from "antd";
 import {
     DownloadOutlined,
@@ -31,7 +32,7 @@ import {
 } from "@ant-design/icons";
 import QueryPage from "./QueryPage.tsx";
 import { Switch, Route, Link, useLocation } from "react-router-dom";
-import logo from "../images/logo.png";
+import logo from "../images/logo-site-header.png";
 import StandardPage from "./standard-pages/StandardPage";
 
 const { Header, Sider, Content, Footer } = Layout;
@@ -42,6 +43,7 @@ const { Title, Paragraph } = Typography;
 function App() {
     const location = useLocation();
 
+    // use this for the Home page instead
     function onHelp() {
         notification.open({
             duration: 2,
@@ -70,19 +72,27 @@ function App() {
         ? ["team"]
         : ["home"];
 
+    const siderProps = {
+        width: 300,
+        breakpoint: "xs",
+        // collapsible: true,
+        // collapsedWidth: 10,
+        style: { backgroundColor: "#FFF", textAlign: "center", borderRight: "1px solid #d8d9dc" },
+    };
+
     return (
         <>
             <Layout style={{ minHeight: "100vh" }}>
-                <Header style={{ backgroundColor: "#FFF", borderBottom: "1px solid #d8d9dc", padding: "0 10px" }}>
-                    <Row>
-                        <Col span={4} style={{ textAlign: "left", padding: "10px 0px" }}>
-                            <Image preview={false} width={180} src={logo} alt="logo" />
+                <Header style={{ backgroundColor: "#FFF", borderBottom: "1px solid #d8d9dc" }}>
+                    <Row align="middle">
+                        <Col span={4} xs={0} sm={4} style={{ textAlign: "left", lineHeight: "1px" }}>
+                            <Image preview={false} src={logo} alt="logo" />
                         </Col>
-                        <Col span={16}>
+                        <Col span={20} xs={24} sm={20}>
                             <Menu
                                 selectedKeys={selectedKeys}
                                 mode="horizontal"
-                                style={{ backgroundColor: "inherit", textAlign: "center", fontSize: "1rem" }}
+                                style={{ backgroundColor: "inherit", textAlign: "center", fontSize: "0.85rem" }}
                             >
                                 <Menu.Item key="home" icon={<HomeOutlined />}>
                                     <Link to="/">Home</Link>
@@ -98,11 +108,6 @@ function App() {
                                 </Menu.Item>
                             </Menu>
                         </Col>
-                        <Col span={4} style={{ textAlign: "right" }}>
-                            <Button style={{ width: 120 }} size="large" onClick={onHelp} shape="round" icon={<QuestionCircleOutlined />}>
-                                About
-                            </Button>
-                        </Col>
                     </Row>
                 </Header>
 
@@ -112,15 +117,16 @@ function App() {
                     </Route>
 
                     <Route path="/query">
-                        <QueryPage />
+                        <QueryPage siderProps={siderProps} />
                     </Route>
 
                     <Route path="/player">
-                        <StandardPage key="player-page" pageType="player" /> {/* key ensures re-render between route changes */}
+                        <StandardPage siderProps={siderProps} key="player-page" pageType="player" />{" "}
+                        {/* key ensures re-render between route changes */}
                     </Route>
 
                     <Route path="/team">
-                        <StandardPage key="team-page" pageType="team" />
+                        <StandardPage siderProps={siderProps} key="team-page" pageType="team" />
                     </Route>
                 </Switch>
             </Layout>

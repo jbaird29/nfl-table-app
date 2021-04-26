@@ -23,7 +23,7 @@ export default function QueryForm(props: QueryProps) {
 
     const fieldDrawerProps: DrawerProps = {
         title: "Edit Query Fields",
-        width: "80%",
+        width: "min(100%, 900px)",
         visible: isVisible,
         placement: "left",
         onClose: () => setIsVisible(false),
