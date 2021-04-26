@@ -45,4 +45,11 @@ export interface QueryColumnFilter {
     [key: string]: string | string[] | number | number[] | undefined; // player_position: ["QB"] | inside_20: "1"
 }
 
-export interface CustomCalc {}
+export interface CustomCalcObj {
+    calcIndex: string; // 'calc1'
+    colIndex1: string; // col1
+    operation: "+" | "-" | "*" | "/";
+    colIndex2: string; // col2
+    format: "percent" | "dec_0" | "dec_1" | "dec_2";
+    title: string;
+}
