@@ -48,7 +48,7 @@ export default function QueryColumn(props: any) {
         return (
             <>
                 <Col span={8}>
-                    <Form.Item name={name} fieldKey={name} preserve={false}>
+                    <Form.Item name={name} fieldKey={name} preserve={true} rules={[{ required: true, message: "Missing filter value" }]}>
                         {filter.ui.type === "select" ? (
                             <Select placeholder={filter.formProps.label} {...filter.ui.props} />
                         ) : filter.ui.type === "slider" ? (
@@ -73,7 +73,7 @@ export default function QueryColumn(props: any) {
             shouldUpdate={(prev, current) => checkFilterComponentUpdate(prev, current, colNum, filterNum)}
         >
             {({ getFieldValue }) => {
-                console.log("updated filters");
+                // console.log("updated filters");
                 return getFieldValue(["columns", colNum, "filters", filterNum, "activeFilter"]) !== filter.name
                     ? null
                     : renderFilterComponent(filter, [filterNum, filter.name]);
@@ -92,6 +92,7 @@ export default function QueryColumn(props: any) {
     const filterTypeSelectProps = {
         placeholder: "Select Filter Type",
         align: "center",
+        showSearch: true,
         options: filterInputs, // changing the inputs based on colField was too difficult
     };
 
@@ -166,7 +167,7 @@ export default function QueryColumn(props: any) {
                                         <Space>
                                             <ArrowUpOutlined onClick={() => move(colNum, colNum - 1)} />
                                             <ArrowDownOutlined onClick={() => move(colNum, colNum + 1)} />
-                                            <MinusCircleOutlined onClick={() => remove(colNum)} />
+                                            {fields.length > 1 ? <MinusCircleOutlined onClick={() => remove(colNum)} /> : null}
                                         </Space>
                                     </Col>
                                 </Row>
@@ -196,6 +197,7 @@ export default function QueryColumn(props: any) {
                                                                 {...restField}
                                                                 name={[filterNum, "activeFilter"]}
                                                                 fieldKey={[fieldKey, "activeFilter"]}
+                                                                rules={[{ required: true, message: "Missing filter type" }]}
                                                             >
                                                                 <Select {...filterTypeSelectProps} />
                                                             </Form.Item>

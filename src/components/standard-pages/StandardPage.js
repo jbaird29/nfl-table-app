@@ -41,8 +41,12 @@ function StandardPage(props) {
     const history = useHistory();
 
     const onIDSelect = (pageID) => {
-        history.push(`/${props.pageType}/${encodeURI(pageID)}`);
-        setPageID(pageID);
+        if (pageID) {
+            history.push(`/${props.pageType}/${encodeURI(pageID)}`);
+            setPageID(pageID);
+        } else {
+            setPageID(null);
+        }
     };
 
     // const onPlayerSelect = (id) => history.push(`/player/${encodeURI(id)}`)
@@ -54,7 +58,7 @@ function StandardPage(props) {
             marginTop: "12px",
         },
         showSearch: true,
-        allowClear: true,
+        allowClear: false,
         optionFilterProp: "label",
     };
 

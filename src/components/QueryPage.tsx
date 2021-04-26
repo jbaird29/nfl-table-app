@@ -53,8 +53,9 @@ const calcsFormV = 1;
 function QueryPage() {
     // tableData
     const initialTableData: TableData = { columns: [], dataSource: [] };
+    const initialTableInfo = { sorter: { field: null, order: null }, filters: {} };
     const [tableData, setTableData] = useState<TableData>(initialTableData);
-    const [tableInfo, setTableInfo] = useState({ sorter: { field: null, order: null }, filters: {} });
+    const [tableInfo, setTableInfo] = useState(initialTableInfo);
     // queryForm
     const [savedQueryFields, setSavedQueryFields] = useState(null); // ensures ShareableURL matches what the user sees in table
     // UI render
@@ -100,6 +101,7 @@ function QueryPage() {
                     setIsVisible={setIsFieldDrawerVisible}
                     setTableData={setTableData}
                     initialTableData={initialTableData}
+                    initialTableInfo={initialTableInfo}
                 />
             </Layout>
         </>

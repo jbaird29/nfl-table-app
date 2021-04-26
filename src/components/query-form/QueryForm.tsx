@@ -11,11 +11,11 @@ interface QueryProps {
     setIsVisible: (arg0: boolean) => void;
     setTableData: (arg0: TableData) => void;
     initialTableData: TableData;
+    initialTableInfo: any;
 }
 
 export default function QueryForm(props: QueryProps) {
-    const { isVisible, setIsVisible, setTableData, initialTableData } = props;
-    const defaultTableInfo = { sorter: { field: null, order: null }, filters: {} };
+    const { isVisible, setIsVisible, setTableData, initialTableData, initialTableInfo } = props;
 
     // queryForm
     const [queryForm] = Form.useForm<Query>();
@@ -33,7 +33,7 @@ export default function QueryForm(props: QueryProps) {
     const queryFormProps = {
         form: queryForm,
         name: "query",
-        initialValues: { row: { field: "player_name_with_position" } },
+        initialValues: { row: { field: "player_name_with_position" }, columns: [{}] },
         colon: false,
     };
 
@@ -46,10 +46,11 @@ export default function QueryForm(props: QueryProps) {
     const onSubmit = async () => {
         queryForm
             .validateFields()
+            // .then((values: Query) => console.log(values))
             .then((values: Query) => submitQueryAndSetData(values))
             .catch((errorInfo) => {
-                // console.log(errorInfo);
-                message.error({ content: "Ensure every column has a stat type selected.", duration: 2.5, style: { fontSize: "1rem" } });
+                console.log(errorInfo);
+                message.error({ content: "Enter required values, or remove fields.", duration: 2.5, style: { fontSize: "1rem" } });
             });
     };
 
@@ -83,6 +84,7 @@ export default function QueryForm(props: QueryProps) {
     };
 
     const submitQueryAndSetData = async (query: Query) => {
+        console.log(query);
         const hide = message.loading({ content: "Loading the data", style: { fontSize: "1rem" } }, 0);
         const { tableData, error } = await submitQuery(query);
         hide();
@@ -90,7 +92,7 @@ export default function QueryForm(props: QueryProps) {
             showErrorMessage();
             console.log(error);
         } else if (tableData) {
-            addRenderSorterToTable(tableData, defaultTableInfo);
+            addRenderSorterToTable(tableData, initialTableInfo);
             setTableData(tableData);
             setIsVisible(false);
             // setSavedCalcsFields(null);

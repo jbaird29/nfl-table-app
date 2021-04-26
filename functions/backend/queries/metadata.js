@@ -181,7 +181,6 @@ class Filter {
     ) {
         // takes a Dimension object as a paramater
         // requires at least a operator (e.g. >=) and joiner (e.g. 'BETWEEN') for multiple values
-        // for an 'undefined' value, set value = ''; i.e. if selections are {yes: 1, no: 0, either: ''}
         assert(typeof dimension !== "undefined", "Missing dimension");
         assert(typeof name !== "undefined", "Missing name");
         assert(["general", "pass", "rush", "recv"].includes(dimension.statType), "Invalid statType");
@@ -1160,7 +1159,6 @@ fltrs.inside_20 = new Filter(dims.inside_20, {
             optionFilterProp: "label",
             allowClear: true,
             options: [
-                { align: "left", title: "Either", label: "Either", value: "", key: "either" },
                 { align: "left", title: "Yes", label: "Yes", value: "1", key: "1" },
                 { align: "left", title: "No", label: "No", value: "0", key: "0" },
             ],
@@ -1181,7 +1179,6 @@ fltrs.goaltogo = new Filter(dims.goaltogo, {
             optionFilterProp: "label",
             allowClear: true,
             options: [
-                { align: "left", title: "Either", label: "Either", value: "", key: "either" },
                 { align: "left", title: "Yes", label: "Yes", value: "1", key: "1" },
                 { align: "left", title: "No", label: "No", value: "0", key: "0" },
             ],
@@ -1260,7 +1257,6 @@ fltrs.pass_was_hurried = new Filter(dims.pass_was_hurry, {
             optionFilterProp: "label",
             allowClear: true,
             options: [
-                { align: "left", title: "Either", label: "Either", value: "", key: "either" },
                 { align: "left", title: "Yes", label: "Yes", value: "1", key: "1" },
                 { align: "left", title: "No", label: "No", value: "0", key: "0" },
             ],
@@ -1281,7 +1277,6 @@ fltrs.pass_was_blitzed = new Filter(dims.pass_was_blitzed, {
             optionFilterProp: "label",
             allowClear: true,
             options: [
-                { align: "left", title: "Either", label: "Either", value: "", key: "either" },
                 { align: "left", title: "Yes", label: "Yes", value: "1", key: "1" },
                 { align: "left", title: "No", label: "No", value: "0", key: "0" },
             ],
@@ -1302,7 +1297,6 @@ fltrs.pass_was_sack = new Filter(dims.pass_was_sack, {
             optionFilterProp: "label",
             allowClear: true,
             options: [
-                { align: "left", title: "Either", label: "Either", value: "", key: "either" },
                 { align: "left", title: "Yes", label: "Yes", value: "1", key: "1" },
                 { align: "left", title: "No", label: "No", value: "0", key: "0" },
             ],
@@ -1323,7 +1317,6 @@ fltrs.pass_was_batted = new Filter(dims.pass_was_batted, {
             optionFilterProp: "label",
             allowClear: true,
             options: [
-                { align: "left", title: "Either", label: "Either", value: "", key: "either" },
                 { align: "left", title: "Yes", label: "Yes", value: "1", key: "1" },
                 { align: "left", title: "No", label: "No", value: "0", key: "0" },
             ],
@@ -1344,7 +1337,6 @@ fltrs.pass_was_on_target = new Filter(dims.pass_was_on_target, {
             optionFilterProp: "label",
             allowClear: true,
             options: [
-                { align: "left", title: "Either", label: "Either", value: "", key: "either" },
                 { align: "left", title: "Yes", label: "Yes", value: "1", key: "1" },
                 { align: "left", title: "No", label: "No", value: "0", key: "0" },
             ],
@@ -1384,7 +1376,6 @@ fltrs.rush_was_scramble = new Filter(dims.rush_was_scramble, {
             optionFilterProp: "label",
             allowClear: true,
             options: [
-                { align: "left", title: "Either", label: "Either", value: "", key: "either" },
                 { align: "left", title: "Yes", label: "Yes", value: "1", key: "1" },
                 { align: "left", title: "No", label: "No", value: "0", key: "0" },
             ],
@@ -1409,7 +1400,6 @@ fltrs.recv_was_catchable = new Filter(dims.recv_was_catchable, {
             optionFilterProp: "label",
             allowClear: true,
             options: [
-                { align: "left", title: "Either", label: "Either", value: "", key: "either" },
                 { align: "left", title: "Yes", label: "Yes", value: "1", key: "1" },
                 { align: "left", title: "No", label: "No", value: "0", key: "0" },
             ],
