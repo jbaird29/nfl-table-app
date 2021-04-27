@@ -39,12 +39,18 @@ export default function CustomCalcForm(props: CustomCalcProps) {
         setTableData(newTableData);
     };
 
+    const onSubmit = () => {
+        calcsForm
+            .validateFields()
+            .then((values) => setCustomCalcsData(values.calculations || []))
+            .catch((errorInfo) => {
+                console.log(errorInfo);
+                message.error({ content: "Enter required values, or remove fields.", duration: 2.5, style: { fontSize: "1rem" } });
+            });
+    };
+
     // TODO - form validation (that all required fields are filled out)
-    const submitCustomCalcs = () => {
-        const calculations = calcsForm.getFieldValue(["calculations"]) as CustomCalcObj[];
-        if (!calculations) {
-            return;
-        }
+    const setCustomCalcsData = (calculations: CustomCalcObj[] | []) => {
         console.log(calculations);
         // FIRST: validate that every colIndex is in tableData
         const allColIndexes = tableData.columns
@@ -90,7 +96,7 @@ export default function CustomCalcForm(props: CustomCalcProps) {
                         {" "}
                         Close{" "}
                     </Button>
-                    <Button type="primary" onClick={() => submitCustomCalcs()}>
+                    <Button type="primary" onClick={() => onSubmit()}>
                         Submit
                     </Button>{" "}
                     {/*onClick={submitQueryFields}*/}

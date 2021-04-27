@@ -69,92 +69,80 @@ export default function CustomCalcFields(props: CustomCalcFieldsProps) {
         <Form.List name="calculations">
             {(fields, { add, remove, move }) => (
                 <>
-                    {fields.map(({ key, name: calcNum, fieldKey, ...restField }) => (
-                        <div key={key}>
-                            <Space align="baseline" style={{ marginBottom: 8 }}>
-                                <MinusCircleOutlined onClick={() => remove(calcNum)} />
-                                <Typography.Title level={5}>{`Calculation ${calcNum + 1}`}</Typography.Title>
-                            </Space>
-                            <Form.Item
-                                required
-                                rules={[{ required: true, message: "Missing column choice" }]}
-                                name={[calcNum, "colIndex1"]}
-                                fieldKey={[fieldKey, "colIndex1"]}
-                                label="Select First Column"
-                                {...restField}
-                            >
-                                <Select
-                                    {...colSelectProps}
-                                    options={colsInTableForSelect.concat(
-                                        calcsForm
-                                            .getFieldValue(["calculations"])
-                                            ?.filter((calc: CustomCalcObj, index: number) => index < calcNum)
-                                            ?.map((calc: CustomCalcObj, index: number) => ({
-                                                label: `Calc ${index + 1}: ${calc.title}`,
-                                                value: `calc${index + 1}`,
-                                            }))
-                                    )}
-                                    // .concat(calcsForm.getFieldsValue(['calculations']))
-                                />
-                            </Form.Item>
+                    {fields.map(({ key, name: calcNum, fieldKey, ...restField }) => {
+                        const calculations = (calcsForm.getFieldValue(["calculations"]) as CustomCalcObj[]) || [];
+                        const selectOptions = colsInTableForSelect.concat(
+                            calculations
+                                .filter((calc: CustomCalcObj | undefined, index: number) => index < calcNum && calc && calc.title)
+                                .map((calc: CustomCalcObj, index: number) => ({
+                                    label: `Calc ${index + 1}: ${calc.title}`,
+                                    value: `calc${index + 1}`,
+                                }))
+                        );
+                        return (
+                            <div key={key}>
+                                <Space align="baseline" style={{ marginBottom: 8 }}>
+                                    <MinusCircleOutlined onClick={() => remove(calcNum)} />
+                                    <Typography.Title level={5}>{`Calculation ${calcNum + 1}`}</Typography.Title>
+                                </Space>
+                                <Form.Item
+                                    required
+                                    rules={[{ required: true, message: "Missing column choice" }]}
+                                    name={[calcNum, "colIndex1"]}
+                                    fieldKey={[fieldKey, "colIndex1"]}
+                                    label="Select First Column"
+                                    {...restField}
+                                >
+                                    <Select {...colSelectProps} options={selectOptions} />
+                                </Form.Item>
 
-                            <Form.Item
-                                required
-                                rules={[{ required: true, message: "Missing operation" }]}
-                                name={[calcNum, "operation"]}
-                                fieldKey={[fieldKey, "operation"]}
-                                label="Select Operation type"
-                                {...restField}
-                            >
-                                <Select {...operationSelectProps} />
-                            </Form.Item>
+                                <Form.Item
+                                    required
+                                    rules={[{ required: true, message: "Missing operation" }]}
+                                    name={[calcNum, "operation"]}
+                                    fieldKey={[fieldKey, "operation"]}
+                                    label="Select Operation type"
+                                    {...restField}
+                                >
+                                    <Select {...operationSelectProps} />
+                                </Form.Item>
 
-                            <Form.Item
-                                required
-                                rules={[{ required: true, message: "Missing column choice" }]}
-                                name={[calcNum, "colIndex2"]}
-                                fieldKey={[fieldKey, "colIndex2"]}
-                                label="Select Second Column"
-                                {...restField}
-                            >
-                                <Select
-                                    {...colSelectProps}
-                                    options={colsInTableForSelect.concat(
-                                        calcsForm
-                                            .getFieldValue(["calculations"])
-                                            ?.filter((calc: CustomCalcObj, index: number) => index < calcNum)
-                                            ?.map((calc: CustomCalcObj, index: number) => ({
-                                                label: `Calc ${index + 1}: ${calc.title}`,
-                                                value: `calc${index + 1}`,
-                                            }))
-                                    )}
-                                />
-                            </Form.Item>
+                                <Form.Item
+                                    required
+                                    rules={[{ required: true, message: "Missing column choice" }]}
+                                    name={[calcNum, "colIndex2"]}
+                                    fieldKey={[fieldKey, "colIndex2"]}
+                                    label="Select Second Column"
+                                    {...restField}
+                                >
+                                    <Select {...colSelectProps} options={selectOptions} />
+                                </Form.Item>
 
-                            <Form.Item
-                                required
-                                rules={[{ required: true, message: "Missing format" }]}
-                                name={[calcNum, "format"]}
-                                fieldKey={[fieldKey, "format"]}
-                                label="Select Formatting Type"
-                                {...restField}
-                            >
-                                <Select {...formatSelectProps} />
-                            </Form.Item>
+                                <Form.Item
+                                    required
+                                    rules={[{ required: true, message: "Missing format" }]}
+                                    name={[calcNum, "format"]}
+                                    fieldKey={[fieldKey, "format"]}
+                                    label="Select Formatting Type"
+                                    {...restField}
+                                >
+                                    <Select {...formatSelectProps} />
+                                </Form.Item>
 
-                            <Form.Item
-                                required
-                                rules={[{ required: true, message: "Missing title" }]}
-                                name={[calcNum, "title"]}
-                                fieldKey={[fieldKey, "title"]}
-                                label="Input a Name"
-                                {...restField}
-                            >
-                                <Input autoComplete="off" placeholder="column title" style={{ textAlign: "center" }} />
-                            </Form.Item>
-                            <Divider />
-                        </div>
-                    ))}
+                                <Form.Item
+                                    required
+                                    rules={[{ required: true, message: "Missing title" }]}
+                                    name={[calcNum, "title"]}
+                                    fieldKey={[fieldKey, "title"]}
+                                    label="Input a Name"
+                                    {...restField}
+                                >
+                                    <Input autoComplete="off" placeholder="column title" style={{ textAlign: "center" }} />
+                                </Form.Item>
+                                <Divider />
+                            </div>
+                        );
+                    })}
                     <Button onClick={() => add()} block icon={<PlusOutlined />}>
                         Add Calculation
                     </Button>
