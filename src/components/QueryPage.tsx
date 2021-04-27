@@ -7,7 +7,7 @@ import Table from "./Table";
 import { Switch, Route, Link, useLocation } from "react-router-dom";
 import { TableData, TableColumn, TableRow } from "./types/MainTypes";
 import QueryForm from "./query-form/QueryForm";
-import CustomCalc from "./custom-calcs/CustomCalc";
+import CustomCalcForm from "./custom-calcs/CustomCalcForm";
 
 const { Header, Sider, Content, Footer } = Layout;
 const { Step } = Steps;
@@ -84,7 +84,7 @@ function QueryPage(props: QueryPageProps) {
                     initialTableInfo={initialTableInfo}
                 />
 
-                <CustomCalc
+                <CustomCalcForm
                     isVisible={isCalcVisible}
                     setIsVisible={setIsCalcVisible}
                     tableData={tableData}

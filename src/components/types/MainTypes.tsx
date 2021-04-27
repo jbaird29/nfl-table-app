@@ -46,7 +46,6 @@ export interface QueryColumnFilter {
 }
 
 export interface CustomCalcObj {
-    calcIndex: string; // 'calc1'
     colIndex1: string; // col1
     operation: "+" | "-" | "*" | "/";
     colIndex2: string; // col2

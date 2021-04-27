@@ -88,6 +88,7 @@ function App() {
             backgroundColor: "#FFF",
             border: "1px solid #d8d9dc",
             top: "92%",
+            zIndex: 3,
         },
     };
 
