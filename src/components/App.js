@@ -97,10 +97,10 @@ function App() {
             <Layout style={{ minHeight: "100vh" }}>
                 <Header style={{ backgroundColor: "#FFF", borderBottom: "1px solid #d8d9dc", padding: "0 10px" }}>
                     <Row align="middle">
-                        <Col span={4} xs={0} sm={4} style={{ textAlign: "left", lineHeight: "1px" }}>
+                        <Col xs={0} sm={3} style={{ textAlign: "left", lineHeight: "1px" }}>
                             <Image preview={false} src={logo} alt="logo" />
                         </Col>
-                        <Col span={20} xs={24} sm={20}>
+                        <Col xs={24} sm={21}>
                             <Menu
                                 selectedKeys={selectedKeys}
                                 mode="horizontal"

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Button, Drawer, message, Form, DrawerProps } from "antd";
+import { Button, Drawer, message, Form, DrawerProps, FormInstance } from "antd";
 import QueryColumn from "./QueryColumn";
 import QueryRow from "./QueryRow";
 import QueryRowFilter from "./QueryRowFilter";
@@ -12,13 +12,13 @@ interface QueryProps {
     setTableData: (arg0: TableData) => void;
     initialTableData: TableData;
     initialTableInfo: any;
+    queryForm: FormInstance;
 }
 
 export default function QueryForm(props: QueryProps) {
-    const { isVisible, setIsVisible, setTableData, initialTableData, initialTableInfo } = props;
+    const { isVisible, setIsVisible, setTableData, initialTableData, initialTableInfo, queryForm } = props;
 
     // queryForm
-    const [queryForm] = Form.useForm<Query>();
     const [resetQuery, setResetQuery] = useState(1);
 
     const fieldDrawerProps: DrawerProps = {

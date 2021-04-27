@@ -1,4 +1,4 @@
-import { Button, Drawer, DrawerProps, Form, message, Modal } from "antd";
+import { Button, Drawer, DrawerProps, Form, FormInstance, message, Modal } from "antd";
 import React, { useState } from "react";
 import { addCalcsToTable, addRenderSorterToTable, copyTableWithoutCalcs } from "../helper-functions";
 import { TableData } from "../types/MainTypes";
@@ -12,11 +12,11 @@ interface CustomCalcProps {
     tableData: TableData;
     setTableData: (arg0: TableData) => void;
     tableInfo: any;
+    calcsForm: FormInstance;
 }
 
 export default function CustomCalcForm(props: CustomCalcProps) {
-    const { isVisible, setIsVisible, tableData, setTableData, tableInfo } = props;
-    const [calcsForm] = Form.useForm();
+    const { isVisible, setIsVisible, tableData, setTableData, tableInfo, calcsForm } = props;
     const [resetCalcs, setResetCalcs] = useState(1);
 
     type labelAlign = "left" | "right" | undefined; // TS yells at me if I don't do this; problem with antD lib
@@ -49,7 +49,6 @@ export default function CustomCalcForm(props: CustomCalcProps) {
             });
     };
 
-    // TODO - form validation (that all required fields are filled out)
     const setCustomCalcsData = (calculations: CustomCalcObj[] | []) => {
         console.log(calculations);
         // FIRST: validate that every colIndex is in tableData

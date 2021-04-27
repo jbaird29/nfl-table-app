@@ -68,10 +68,7 @@ function StandardPage(props) {
         // transform the tableData into queryFields object
         const row = { field: tableData.columns[0].dataIndex };
         const where = pageType === "player" ? { player_gsis_id: [pageID] } : { team_id: [pageID] };
-        const columns = Object.assign(
-            {},
-            ...tableData.columns.slice(1).map((column, i) => ({ ["col" + (i + 1)]: { field: column.dataIndex } }))
-        );
+        const columns = tableData.columns.slice(1).map((column) => ({ field: column.dataIndex }));
         return { row: row, where: where, columns: columns };
     };
     // NOTE: I originally tried to pass the tableData to redirect as well; the problem is that you cannot pass

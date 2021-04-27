@@ -19,7 +19,7 @@ export default function QuerySectionHeader({ title, description, spaceAbove }: Q
         marginBottom: "12px",
         marginTop: spaceAbove ? "36px" : "0px",
         padding: "2px",
-        backgroundColor: "lightgrey",
+        backgroundColor: "#d8d9dc",
         border: "1px solid grey",
     };
 

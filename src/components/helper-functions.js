@@ -217,3 +217,15 @@ export function toCSV(tableData) {
 
     return `${headerOneString}\n${headerTwoString}\n${rowStringArray.join("\n")}`;
 }
+
+export function downloadData(tableData) {
+    const blob = new Blob([toCSV(tableData)], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.style.visibility = "hidden";
+    link.setAttribute("href", url);
+    link.setAttribute("download", "datatable.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
