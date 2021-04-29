@@ -9,6 +9,7 @@ import { TableData, TableColumn, TableRow, QueryFields, CalcsFields, TableInfo, 
 import QueryForm from "./query-form/QueryForm";
 import CustomCalcForm from "./custom-calcs/CustomCalcForm";
 import { addRenderSorterToTable, downloadData, messageDisplay } from "./helper-functions";
+import SaveQuery from "./save-query/SaveQuery";
 
 const { Header, Sider, Content, Footer } = Layout;
 const { Step } = Steps;
@@ -29,7 +30,7 @@ interface LocationRedirect extends Location {
 export default function QueryPage(props: QueryPageProps) {
     const { siderProps } = props;
     // tableData
-    const initialTableData: TableData = { columns: [], dataSource: [] };
+    const initialTableData: TableData = { columns: [], dataSource: [], queryTitle: undefined };
     const initialTableInfo: TableInfo = { sorter: { field: undefined, order: undefined }, filters: {} };
     const [tableData, setTableData] = useState<TableData>(initialTableData);
     const [tableInfo, setTableInfo] = useState<TableInfo>(initialTableInfo);
@@ -43,11 +44,8 @@ export default function QueryPage(props: QueryPageProps) {
     // UI render
     const [isFieldDrawerVisible, setIsFieldDrawerVisible] = useState(false);
     const [isCalcsDrawerVisible, setIsCalcsDrawerVisible] = useState(false);
+    const [isSaveQueryVisible, setIsSaveQueryVisible] = useState(false);
     const [loadingPage, setLoadingPage] = useState(false);
-    // shareable URL
-    const [isURLVisible, setIsURLVisible] = useState(false);
-    const [urlText, setURLText] = useState("");
-    const [loadingURL, setLoadingURL] = useState(false);
 
     const location = useLocation<LocationRedirect>();
     const history = useHistory();
@@ -68,13 +66,20 @@ export default function QueryPage(props: QueryPageProps) {
         }
     }, []);
 
-    async function loadQuery(saveID: string) {
+    const generateQueryTitle = (queryTitle: TableData["queryTitle"], timestamp: SaveData["timestamp"]) => {
+        const dateString = timestamp ? ` (Query generated on ${new Date(timestamp).toLocaleDateString()})` : "";
+        const titleString = queryTitle ? queryTitle : "";
+        return `${titleString}${dateString}`;
+    };
+
+    const loadQuery = async (saveID: string) => {
         const hide = message.loading({ content: "Loading the data", style: { fontSize: "1rem" } }, 0);
         setLoadingPage(true);
         const response = await fetch(`/loadQuery?saveID=${saveID}`, { method: "GET" });
         if (response.ok) {
             const data: SaveData = await response.json();
-            const { queryFormV, calcsFormV, tableInfo, tableData, queryFields, calcsFields } = data;
+            const { queryFormV, calcsFormV, tableInfo, tableData, queryFields, calcsFields, timestamp } = data;
+            tableData.queryTitle = generateQueryTitle(tableData.queryTitle, timestamp);
             loadQueryForm(queryFields);
             loadCalcsForm(calcsFields);
             addRenderSorterToTable(tableData, tableInfo);
@@ -88,36 +93,6 @@ export default function QueryPage(props: QueryPageProps) {
         }
         hide();
         setLoadingPage(false);
-    }
-
-    const saveQuery = async (saveData: SaveData) => {
-        const response = await fetch(`/saveQuery`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(saveData),
-        });
-        const data = await response.json();
-        return response.ok ? { success: true, saveID: data.saveID } : { success: false, error: response.statusText };
-    };
-
-    const onShareURL = async () => {
-        if (!tableData.columns || tableData.columns.length === 0) {
-            messageDisplay("error", `Please run a query before generating a shareable URL.`);
-            return;
-        }
-        setLoadingURL(true);
-        setIsURLVisible(true);
-        const saveData = { queryFormV, calcsFormV, tableInfo, tableData, queryFields: savedQueryFields, calcsFields: savedCalcsFields };
-        const save = await saveQuery(saveData);
-        if (save.success) {
-            setLoadingURL(false);
-            setURLText(`${window.origin}/saves/${save.saveID}`);
-        } else {
-            console.log(save.error);
-            messageDisplay("error", `There was an error. Please refresh the page to try again.`);
-            setLoadingURL(false);
-            setIsURLVisible(false);
-        }
     };
 
     const loadQueryForm = (queryFields: QueryFields | null) => {
@@ -128,6 +103,34 @@ export default function QueryPage(props: QueryPageProps) {
     const loadCalcsForm = (calcsFields: CalcsFields | null) => {
         calcsForm.setFieldsValue(calcsFields as any);
         setSavedCalcsFields(calcsFields);
+    };
+
+    const saveQuery = async (queryTitle: string): Promise<{ success: boolean; saveID?: string; error?: string }> => {
+        tableData.queryTitle = queryTitle;
+        const saveData: SaveData = {
+            queryFormV,
+            calcsFormV,
+            tableInfo,
+            tableData,
+            queryFields: savedQueryFields,
+            calcsFields: savedCalcsFields,
+        };
+        const response = await fetch(`/saveQuery`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(saveData),
+        });
+        const data = await response.json();
+        return response.ok ? { success: true, saveID: data.saveID } : { success: false, error: response.statusText };
+    };
+
+    const handleShareURL = async () => {
+        if (!tableData.columns || tableData.columns.length === 0) {
+            messageDisplay("error", `Please run a query before generating a shareable URL.`);
+            return;
+        } else {
+            setIsSaveQueryVisible(true);
+        }
     };
 
     const handleEditCustomCalcsClick = () => {
@@ -144,22 +147,6 @@ export default function QueryPage(props: QueryPageProps) {
         } else {
             downloadData(tableData);
         }
-    };
-
-    const urlModalProps = {
-        title: "Shareable URL",
-        visible: isURLVisible,
-        footer: null,
-        onCancel: () => {
-            setIsURLVisible(false);
-            setURLText("");
-        },
-        onOk: () => {
-            setIsURLVisible(false);
-            setURLText("");
-        },
-        width: 550,
-        style: { top: 150 },
     };
 
     return (
@@ -184,22 +171,8 @@ export default function QueryPage(props: QueryPageProps) {
                             </Button>
                         </Row>
                         <Row style={{ padding: "6px 12px" }}>
-                            <Button block onClick={() => onShareURL()} shape="round" icon={<CloudUploadOutlined />}>
+                            <Button block onClick={() => handleShareURL()} shape="round" icon={<CloudUploadOutlined />}>
                                 Save &#38; Share URL
-                            </Button>
-                        </Row>
-                        <Row style={{ padding: "6px 12px" }}>
-                            <Button
-                                block
-                                onClick={() => {
-                                    console.log(tableData);
-                                    console.log(tableInfo);
-                                    setResetTableCount((prev) => prev + 1);
-                                }}
-                                shape="round"
-                                icon={<CloudUploadOutlined />}
-                            >
-                                TableData
                             </Button>
                         </Row>
                     </Spin>
@@ -229,19 +202,7 @@ export default function QueryPage(props: QueryPageProps) {
                     setSavedCalcsFields={setSavedCalcsFields}
                 />
 
-                <Modal {...urlModalProps}>
-                    <Spin spinning={loadingURL}>
-                        <Row>
-                            <Paragraph
-                                style={{ color: "grey", fontSize: "0.9rem", margin: "auto" }}
-                                keyboard
-                                copyable={{ icon: <CopyOutlined style={{ paddingLeft: 4, fontSize: "1.1rem" }} key="copy-icon" /> }}
-                            >
-                                {urlText}
-                            </Paragraph>
-                        </Row>
-                    </Spin>
-                </Modal>
+                <SaveQuery isVisible={isSaveQueryVisible} setIsVisible={setIsSaveQueryVisible} saveQuery={saveQuery} />
             </Layout>
         </>
     );

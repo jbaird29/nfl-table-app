@@ -21,6 +21,7 @@ export interface TableColumn {
 export interface TableData {
     columns: TableColumn[];
     dataSource: TableRow[];
+    queryTitle?: string;
 }
 
 // export interface TableInfoSorter {
@@ -76,4 +77,5 @@ export interface SaveData {
     tableData: TableData;
     queryFields: QueryFields | null;
     calcsFields: CalcsFields | null;
+    timestamp?: number; // this fed in from server as UNIX milliseconds
 }

@@ -30,12 +30,13 @@ exports.runQuery = functions.region("us-central1").https.onRequest(async functio
 exports.saveQuery = functions.region("us-central1").https.onRequest(async function (req, res) {
     const saveData = req.body;
     functions.logger.log(saveData);
-    const { queryFormV, calcsFormV, tableInfo, tableData, queryFields, calcsFields } = saveData;
+    // const { queryFormV, calcsFormV, tableInfo, tableData, queryFields, calcsFields } = saveData;
     const saveID = createSID(JSON.stringify(saveData));
+    const FieldValue = admin.firestore.FieldValue;
     functions.logger.log("Attempting to store saveID: ", saveID);
     try {
         const docRef = db.collection("saves").doc(saveID);
-        await docRef.set(saveData);
+        await docRef.set({ ...saveData, timestamp: FieldValue.serverTimestamp() });
         functions.logger.log(`Saved ${saveID}`);
         res.status(201).send({ saveID: saveID });
     } catch (err) {
@@ -56,7 +57,8 @@ exports.loadQuery = functions.region("us-central1").https.onRequest(async functi
         } else {
             const saveData = doc.data();
             functions.logger.log("Successfully loaded saveID: ", saveID);
-            res.status(200).send(saveData);
+            const milliseconds = saveData.timestamp ? saveData.timestamp.toMillis() : null; // return UNIX milliseconds
+            res.status(200).send({ ...saveData, timestamp: milliseconds });
         }
     } catch (err) {
         functions.logger.warn(err);

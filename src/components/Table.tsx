@@ -3,16 +3,18 @@ import { Table as AntTable, Typography } from "antd";
 import "antd/dist/antd.css";
 import { TableData, TableColumn, TableRow, TableInfo } from "./types/MainTypes";
 import { SorterResult } from "antd/lib/table/interface";
-interface PassedTableProps {
+
+const { Text } = Typography;
+
+interface TableComponentProps {
     tableData: TableData;
     setTableInfo: (arg0: TableInfo) => void;
-    headerMessage?: string | undefined;
 }
 
-function Table(props: PassedTableProps) {
+function Table(props: TableComponentProps) {
     const dataSource = props.tableData.dataSource;
     const columns = props.tableData.columns;
-    const headerMessage = props.headerMessage;
+    const queryTitle = props.tableData.queryTitle;
 
     const handleChange = (pagination: any, filters: any, sorter: SorterResult<TableRow> | SorterResult<TableRow>[], extra: any) => {
         // not using filters yet but might in the future
@@ -29,7 +31,7 @@ function Table(props: PassedTableProps) {
                 onChange={handleChange}
                 dataSource={dataSource}
                 columns={columns}
-                title={headerMessage ? () => headerMessage : undefined}
+                title={queryTitle ? () => <Text strong>{queryTitle}</Text> : undefined}
                 pagination={{
                     // https://ant.design/components/pagination/#API
                     pageSize: 2000,
