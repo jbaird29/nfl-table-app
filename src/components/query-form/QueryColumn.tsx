@@ -116,7 +116,7 @@ export default function QueryColumn(props: any) {
                     </Tooltip>
                 </Col>
                 <Col style={headerStyle} flex="2 2 120px">
-                    <span>Enter Column Title </span>
+                    <span>Column Title (Optional) </span>
                     <Tooltip title="prompt text">
                         <InfoCircleOutlined />
                     </Tooltip>
@@ -155,12 +155,12 @@ export default function QueryColumn(props: any) {
                                     </Col>
                                     <Col flex="2 2 120px">
                                         <Form.Item {...restField} name={[colNum, "title"]} fieldKey={[fieldKey, "title"]}>
-                                            <Input style={{ width: "100%" }} placeholder="optional" autoComplete="off" />
+                                            <Input style={{ width: "100%" }} placeholder="title (optional)" autoComplete="off" />
                                         </Form.Item>
                                     </Col>
                                     <Col flex="130px">
                                         <Form.Item {...restField} name={[colNum, "having"]} fieldKey={[fieldKey, "having"]}>
-                                            <InputNumber style={{ width: "100%" }} placeholder="optional" />
+                                            <InputNumber style={{ width: "100%" }} placeholder="min (optional)" />
                                         </Form.Item>
                                     </Col>
                                     <Col flex="80px">
