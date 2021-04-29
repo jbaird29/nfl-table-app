@@ -2,7 +2,6 @@ import { Button, Drawer, DrawerProps, Form, FormInstance, message, Modal } from 
 import React, { useState } from "react";
 import { addCalcsToTable, addRenderSorterToTable, copyTableWithoutCalcs } from "../helper-functions";
 import { CalcsFields, TableData } from "../types/MainTypes";
-import CustomCalcTabs from "./Custom-Calc-Tabs";
 import { CustomCalcObj } from "../types/MainTypes";
 import CustomCalcFields from "./CustomCalcFields";
 
