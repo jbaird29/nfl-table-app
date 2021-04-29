@@ -3,7 +3,7 @@ import { Button, Drawer, message, Form, DrawerProps, FormInstance } from "antd";
 import QueryColumn from "./QueryColumn";
 import QueryRow from "./QueryRow";
 import QueryRowFilter from "./QueryRowFilter";
-import { Query, TableData, TableColumn, TableRow } from "../types/MainTypes";
+import { QueryFields, TableData, TableColumn, TableRow, CalcsFields } from "../types/MainTypes";
 import { addRenderSorterToTable } from "../helper-functions";
 
 interface QueryProps {
@@ -13,10 +13,13 @@ interface QueryProps {
     initialTableData: TableData;
     initialTableInfo: any;
     queryForm: FormInstance;
+    setSavedQueryFields: (arg0: QueryFields | null) => void;
+    setSavedCalcsFields: (arg0: CalcsFields | null) => void;
 }
 
 export default function QueryForm(props: QueryProps) {
-    const { isVisible, setIsVisible, setTableData, initialTableData, initialTableInfo, queryForm } = props;
+    const { isVisible, setIsVisible, setTableData, initialTableData, initialTableInfo } = props;
+    const { queryForm, setSavedQueryFields, setSavedCalcsFields } = props;
 
     // queryForm
     const [resetQuery, setResetQuery] = useState(1);
@@ -47,7 +50,7 @@ export default function QueryForm(props: QueryProps) {
         queryForm
             .validateFields()
             // .then((values: Query) => console.log(values))
-            .then((values: Query) => submitQueryAndSetData(values))
+            .then((values: QueryFields) => submitQueryAndSetData(values))
             .catch((errorInfo) => {
                 console.log(errorInfo);
                 message.error({ content: "Enter required values, or remove fields.", duration: 2.5, style: { fontSize: "1rem" } });
@@ -63,7 +66,7 @@ export default function QueryForm(props: QueryProps) {
     };
 
     const submitQuery = async (
-        query: Query
+        query: QueryFields
     ): Promise<{
         tableData?: TableData;
         error?: any;
@@ -83,20 +86,21 @@ export default function QueryForm(props: QueryProps) {
         }
     };
 
-    const submitQueryAndSetData = async (query: Query) => {
-        console.log(query);
+    const submitQueryAndSetData = async (query: QueryFields) => {
         const hide = message.loading({ content: "Loading the data", style: { fontSize: "1rem" } }, 0);
         const { tableData, error } = await submitQuery(query);
         hide();
         if (error) {
             showErrorMessage();
+            setTableData(initialTableData);
+            setSavedQueryFields(null);
             console.log(error);
         } else if (tableData) {
             addRenderSorterToTable(tableData, initialTableInfo);
             setTableData(tableData);
+            setSavedQueryFields(query);
+            setSavedCalcsFields(null);
             setIsVisible(false);
-            // setSavedCalcsFields(null);
-            // setSavedQueryFields(formFields);
         }
     };
 

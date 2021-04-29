@@ -33,7 +33,7 @@ import {
     MenuUnfoldOutlined,
 } from "@ant-design/icons";
 import QueryPage from "./QueryPage.tsx";
-import { Switch, Route, Link, useLocation } from "react-router-dom";
+import { Switch, Route, Link, useLocation, Redirect, useParams } from "react-router-dom";
 import logo from "../images/logo-site-header.png";
 import StandardPage from "./standard-pages/StandardPage";
 
@@ -140,6 +140,20 @@ function App() {
                     <Route path="/team">
                         <StandardPage siderProps={siderProps} key="team-page" pageType="team" />
                     </Route>
+
+                    <Route
+                        path="/saves/:saveID"
+                        render={({ match, location, history }) => (
+                            <Redirect
+                                to={{
+                                    pathname: "/query",
+                                    state: {
+                                        saveID: match.params.saveID,
+                                    },
+                                }}
+                            />
+                        )}
+                    />
                 </Switch>
             </Layout>
         </>

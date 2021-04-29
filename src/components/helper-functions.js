@@ -1,6 +1,6 @@
 import teamList from "../inputs/teamList.json";
 import playerList from "../inputs/playerList.json";
-import { Typography, Tooltip } from "antd";
+import { Typography, Tooltip, message } from "antd";
 const { Link } = Typography;
 
 // converts: [{value: gsis_id_1, label: player_name_1}]
@@ -39,6 +39,8 @@ export function addSorter(column, tableInfo) {
     const { field, order } = sorter;
     if (columnName === field) {
         column.defaultSortOrder = order;
+    } else {
+        column.defaultSortOrder = null;
     }
 }
 
@@ -228,4 +230,10 @@ export function downloadData(tableData) {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+}
+
+export function messageDisplay(type, messageText) {
+    if (type === "error") {
+        message.error({ content: messageText, duration: 2.5, style: { fontSize: "1rem" } });
+    }
 }

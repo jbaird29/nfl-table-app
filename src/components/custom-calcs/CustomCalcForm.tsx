@@ -1,7 +1,7 @@
 import { Button, Drawer, DrawerProps, Form, FormInstance, message, Modal } from "antd";
 import React, { useState } from "react";
 import { addCalcsToTable, addRenderSorterToTable, copyTableWithoutCalcs } from "../helper-functions";
-import { TableData } from "../types/MainTypes";
+import { CalcsFields, TableData } from "../types/MainTypes";
 import CustomCalcTabs from "./Custom-Calc-Tabs";
 import { CustomCalcObj } from "../types/MainTypes";
 import CustomCalcFields from "./CustomCalcFields";
@@ -13,10 +13,11 @@ interface CustomCalcProps {
     setTableData: (arg0: TableData) => void;
     tableInfo: any;
     calcsForm: FormInstance;
+    setSavedCalcsFields: (arg0: CalcsFields | null) => void;
 }
 
 export default function CustomCalcForm(props: CustomCalcProps) {
-    const { isVisible, setIsVisible, tableData, setTableData, tableInfo, calcsForm } = props;
+    const { isVisible, setIsVisible, tableData, setTableData, tableInfo, calcsForm, setSavedCalcsFields } = props;
     const [resetCalcs, setResetCalcs] = useState(1);
 
     type labelAlign = "left" | "right" | undefined; // TS yells at me if I don't do this; problem with antD lib
@@ -50,7 +51,6 @@ export default function CustomCalcForm(props: CustomCalcProps) {
     };
 
     const setCustomCalcsData = (calculations: CustomCalcObj[] | []) => {
-        console.log(calculations);
         // FIRST: validate that every colIndex is in tableData
         const allColIndexes = tableData.columns
             .filter((column) => column.title.startsWith("Col"))
@@ -70,8 +70,8 @@ export default function CustomCalcForm(props: CustomCalcProps) {
         addCalcsToTable(newTableData, calculations);
         addRenderSorterToTable(newTableData, tableInfo);
         setTableData(newTableData);
+        setSavedCalcsFields({ calculations: calculations });
         setIsVisible(false);
-        // setSavedCalcsFields(calcsForm.getFieldsValue());
     };
 
     const calcsDrawerProps: DrawerProps = {
