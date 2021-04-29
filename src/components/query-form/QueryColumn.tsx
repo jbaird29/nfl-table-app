@@ -103,11 +103,11 @@ export default function QueryColumn(props: any) {
     };
 
     const widths = {
-        colNum: 60,
-        statType: 230,
-        title: 120,
+        colNum: 80,
+        statType: 280,
+        title: 190,
         minValue: 100,
-        actions: 50,
+        actions: 70,
         filter: 95,
     };
 
@@ -117,6 +117,11 @@ export default function QueryColumn(props: any) {
         title: `2 2 ${widths.title}px`,
         minValue: `1 1 ${widths.minValue}px`,
         actions: `1 1 ${widths.actions}px`,
+    };
+
+    const colStyle = {
+        display: "inline-block",
+        padding: "5px 5px",
     };
 
     return (
@@ -156,75 +161,91 @@ export default function QueryColumn(props: any) {
                     <>
                         {fields.map(({ key, name: colNum, fieldKey, ...restField }) => (
                             <div key={key}>
-                                <div style={{ display: "inline-block", width: `calc(100% - ${widths.filter}px)` }}>
-                                    <Row style={{ marginTop: 8 }} align="middle" gutter={[10, 10]}>
-                                        <Col flex={wrappers.colNum}>
-                                            <Text strong style={{ marginBottom: 0 }}>
-                                                Column {colNum + 1}:
-                                            </Text>
-                                        </Col>
-                                        <Col flex={wrappers.statType}>
-                                            <Form.Item
-                                                label={colNum !== 0 ? null : "Stat Type"}
-                                                labelAlign="left"
-                                                labelCol={{ flex: wrappers.statType }}
-                                                wrapperCol={{ flex: wrappers.statType }}
-                                                {...restField}
-                                                name={[colNum, "field"]}
-                                                fieldKey={[fieldKey, "field"]}
-                                                rules={[{ required: true, message: "Missing stat type" }]}
-                                            >
-                                                <Select style={{ width: "100%" }} {...statInputSelectProps} />
-                                            </Form.Item>
-                                        </Col>
-                                        <Col flex={wrappers.title}>
-                                            <Form.Item
-                                                label={colNum !== 0 ? null : "Column Title"}
-                                                labelAlign="left"
-                                                labelCol={{ flex: wrappers.title }}
-                                                wrapperCol={{ flex: wrappers.title }}
-                                                {...restField}
-                                                name={[colNum, "title"]}
-                                                fieldKey={[fieldKey, "title"]}
-                                            >
-                                                <Input style={{ width: "100%" }} placeholder="(optional)" autoComplete="off" />
-                                            </Form.Item>
-                                        </Col>
-                                        <Col flex={wrappers.minValue}>
-                                            <Form.Item
-                                                label={colNum !== 0 ? null : "Min Value"}
-                                                labelAlign="left"
-                                                labelCol={{ flex: wrappers.minValue }}
-                                                wrapperCol={{ flex: wrappers.minValue }}
-                                                {...restField}
-                                                name={[colNum, "having"]}
-                                                fieldKey={[fieldKey, "having"]}
-                                            >
-                                                <InputNumber style={{ width: "100%" }} placeholder="(optional)" />
-                                            </Form.Item>
-                                        </Col>
-                                        <Col flex={wrappers.actions}>
-                                            <Form.Item
-                                                label={colNum !== 0 ? null : "Actions"}
-                                                labelAlign="left"
-                                                labelCol={{ flex: wrappers.actions }}
-                                                wrapperCol={{ flex: wrappers.actions }}
-                                            >
-                                                <Space>
-                                                    <ArrowUpOutlined onClick={() => move(colNum, colNum - 1)} />
-                                                    <ArrowDownOutlined onClick={() => move(colNum, colNum + 1)} />
-                                                    {fields.length > 1 ? <MinusCircleOutlined onClick={() => remove(colNum)} /> : null}
-                                                </Space>
-                                            </Form.Item>
-                                        </Col>
-                                    </Row>
+                                <div
+                                    style={{
+                                        ...colStyle,
+                                        width: widths.colNum,
+                                        verticalAlign: `${colNum !== 0 ? "middle" : "bottom"}`,
+                                        paddingBottom: `${colNum !== 0 ? 5 : 10}px`,
+                                    }}
+                                >
+                                    {/* verticalAlign: `${colNum !== 0 ? 0 : -180}%`  */}
+                                    {/* <Form.Item
+                                        label={colNum !== 0 ? null : "Column #"}
+                                        labelAlign="left"
+                                        labelCol={{ span: 24 }}
+                                        wrapperCol={{ span: 24 }}
+                                    > */}
+                                    <Text strong style={{ marginBottom: 0 }}>
+                                        Column {colNum + 1}:
+                                    </Text>
+                                    {/* </Form.Item> */}
+                                </div>
+                                <div style={{ ...colStyle, width: widths.statType }}>
+                                    <Form.Item
+                                        label={colNum !== 0 ? null : "Stat Type"}
+                                        labelAlign="left"
+                                        labelCol={{ span: 24 }}
+                                        wrapperCol={{ span: 24 }}
+                                        {...restField}
+                                        name={[colNum, "field"]}
+                                        fieldKey={[fieldKey, "field"]}
+                                        rules={[{ required: true, message: "Missing stat type" }]}
+                                    >
+                                        <Select style={{ width: "100%" }} {...statInputSelectProps} />
+                                    </Form.Item>
+                                </div>
+                                <div style={{ ...colStyle, width: widths.title }}>
+                                    <Form.Item
+                                        label={colNum !== 0 ? null : "Column Title"}
+                                        labelAlign="left"
+                                        labelCol={{ span: 24 }}
+                                        wrapperCol={{ span: 24 }}
+                                        {...restField}
+                                        name={[colNum, "title"]}
+                                        fieldKey={[fieldKey, "title"]}
+                                    >
+                                        <Input style={{ width: "100%" }} placeholder="(optional)" autoComplete="off" />
+                                    </Form.Item>
+                                </div>
+                                <div style={{ ...colStyle, width: widths.minValue }}>
+                                    <Form.Item
+                                        label={colNum !== 0 ? null : "Min Value"}
+                                        labelAlign="left"
+                                        labelCol={{ span: 24 }}
+                                        wrapperCol={{ span: 24 }}
+                                        {...restField}
+                                        name={[colNum, "having"]}
+                                        fieldKey={[fieldKey, "having"]}
+                                    >
+                                        <InputNumber style={{ width: "100%" }} placeholder="(optional)" />
+                                    </Form.Item>
+                                </div>
+                                <div style={{ ...colStyle, width: widths.actions }}>
+                                    <Form.Item
+                                        label={colNum !== 0 ? null : "Actions"}
+                                        labelAlign="left"
+                                        labelCol={{ span: 24 }}
+                                        wrapperCol={{ span: 24 }}
+                                    >
+                                        <Space>
+                                            <ArrowUpOutlined onClick={() => move(colNum, colNum - 1)} />
+                                            <ArrowDownOutlined onClick={() => move(colNum, colNum + 1)} />
+                                            {fields.length > 1 ? <MinusCircleOutlined onClick={() => remove(colNum)} /> : null}
+                                        </Space>
+                                    </Form.Item>
                                 </div>
 
                                 <Form.List name={[colNum, "filters"]}>
                                     {(fields, { add, remove }) => (
                                         <>
-                                            <div style={{ display: "inline-block", width: widths.filter }}>
-                                                <Form.Item noStyle>
+                                            <div style={{ ...colStyle, width: widths.filter }}>
+                                                <Form.Item
+                                                    label={colNum !== 0 ? null : "Add Filter"}
+                                                    labelAlign="left"
+                                                    labelCol={{ span: 24 }}
+                                                    wrapperCol={{ span: 24 }}
+                                                >
                                                     <Button type="dashed" onClick={() => add()} icon={<PlusOutlined />}>
                                                         Filter
                                                     </Button>
