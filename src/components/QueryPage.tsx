@@ -67,7 +67,7 @@ export default function QueryPage(props: QueryPageProps) {
     }, []);
 
     const generateQueryTitle = (queryTitle: TableData["queryTitle"], timestamp: SaveData["timestamp"]) => {
-        const dateString = timestamp ? ` (Query generated on ${new Date(timestamp).toLocaleDateString()})` : "";
+        const dateString = timestamp ? ` (Query saved on ${new Date(timestamp).toLocaleDateString()})` : "";
         const titleString = queryTitle ? queryTitle : "";
         return `${titleString}${dateString}`;
     };

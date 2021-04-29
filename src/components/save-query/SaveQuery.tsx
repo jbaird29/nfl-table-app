@@ -32,9 +32,14 @@ export default function SaveQuery(props: SaveQueryProps) {
         setLoadingURL(false);
     };
 
+    const closeDrawer = () => {
+        setIsVisible(false);
+        setURLText("");
+    };
+
     const footer = (
         <div style={{ textAlign: "right" }}>
-            <Button onClick={() => setIsVisible(false)} style={{ marginRight: 8 }}>
+            <Button onClick={() => closeDrawer()} style={{ marginRight: 8 }}>
                 {" "}
                 Close{" "}
             </Button>
@@ -46,7 +51,7 @@ export default function SaveQuery(props: SaveQueryProps) {
         width: "min(100%, 550px)",
         visible: isVisible,
         placement: "left",
-        onClose: () => setIsVisible(false),
+        onClose: () => closeDrawer(),
         bodyStyle: { paddingBottom: 24, paddingLeft: 12, paddingRight: 12 },
         footer: footer,
     };
@@ -70,7 +75,7 @@ export default function SaveQuery(props: SaveQueryProps) {
 
                 {urlText && (
                     <Paragraph>
-                        <Text strong>Copyable URL:</Text>
+                        <Text strong>Shareable URL:</Text>
                         <pre>
                             <Text
                                 style={{ fontSize: "0.75rem" }}
