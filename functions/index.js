@@ -29,7 +29,6 @@ exports.runQuery = functions.region("us-central1").https.onRequest(async functio
 
 exports.saveQuery = functions.region("us-central1").https.onRequest(async function (req, res) {
     const saveData = req.body;
-    functions.logger.log(saveData);
     // const { queryFormV, calcsFormV, tableInfo, tableData, queryFields, calcsFields } = saveData;
     const saveID = createSID(JSON.stringify(saveData));
     const FieldValue = admin.firestore.FieldValue;
