@@ -8,8 +8,6 @@ import QuerySectionHeader from "./QuerySectionHeader";
 const { Paragraph } = Typography;
 
 export default function QueryRowFilter() {
-    // renderFilterObject takes filter, name, key as parameters
-
     const formItemProps = {
         labelCol: { flex: "200px" },
         wrapperCol: { flex: "300px" },

@@ -1,45 +1,14 @@
-import React, { useState, useEffect } from "react";
+import { useState } from "react";
 import "./App.css";
 import "antd/dist/antd.css";
-import {
-    Layout,
-    Button,
-    Drawer,
-    message,
-    Divider,
-    Row,
-    Col,
-    Form,
-    Modal,
-    Steps,
-    Spin,
-    Image,
-    Tabs,
-    Typography,
-    Menu,
-    notification,
-    Space,
-} from "antd";
-import {
-    DownloadOutlined,
-    CloudUploadOutlined,
-    CopyOutlined,
-    QuestionCircleOutlined,
-    HomeOutlined,
-    UserOutlined,
-    TeamOutlined,
-    MonitorOutlined,
-    MenuFoldOutlined,
-    MenuUnfoldOutlined,
-} from "@ant-design/icons";
+import { Layout, Row, Col, Image, Typography, Menu, notification } from "antd";
+import { HomeOutlined, UserOutlined, TeamOutlined, MonitorOutlined, MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
 import QueryPage from "./QueryPage.tsx";
-import { Switch, Route, Link, useLocation, Redirect, useParams } from "react-router-dom";
+import { Switch, Route, Link, useLocation, Redirect } from "react-router-dom";
 import logo from "../images/logo-site-header.png";
 import StandardPage from "./standard-pages/StandardPage";
 
-const { Header, Sider, Content, Footer } = Layout;
-const { Step } = Steps;
-const { TabPane } = Tabs;
+const { Header } = Layout;
 const { Title, Paragraph } = Typography;
 
 function App() {
