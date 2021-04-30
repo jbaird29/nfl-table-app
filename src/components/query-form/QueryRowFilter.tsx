@@ -1,5 +1,4 @@
-import React from "react";
-import { Form, Select, Typography, Space, Row, Col } from "antd";
+import { Form, Select, Typography, Row, Col } from "antd";
 import teamList from "../../inputs/teamList.json";
 import playerList from "../../inputs/playerList.json";
 import { yearsList } from "../helper-functions";

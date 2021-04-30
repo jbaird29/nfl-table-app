@@ -1,5 +1,4 @@
-import React from "react";
-import { Button, Form, Input, Select, FormInstance, Divider, Space, Typography, Row } from "antd";
+import { Button, Form, Input, Select, FormInstance, Divider, Space, Typography } from "antd";
 import { CustomCalcObj, TableData, TableColumn } from "../types/MainTypes";
 import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 

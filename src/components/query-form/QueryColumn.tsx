@@ -1,13 +1,6 @@
-import React, { CSSProperties } from "react";
-import { Form, Input, Button, Space, Select, Row, Col, Divider, Slider, InputNumber, Typography, Tooltip } from "antd";
-import {
-    MinusCircleOutlined,
-    PlusOutlined,
-    CaretUpOutlined,
-    ArrowUpOutlined,
-    ArrowDownOutlined,
-    InfoCircleOutlined,
-} from "@ant-design/icons";
+import { CSSProperties } from "react";
+import { Form, Input, Button, Space, Select, Divider, Slider, InputNumber, Typography } from "antd";
+import { MinusCircleOutlined, PlusOutlined, ArrowUpOutlined, ArrowDownOutlined } from "@ant-design/icons";
 import statsInputs from "../../inputs/statsInputs.json";
 import filterComponents from "../../inputs/filterComponents.json";
 import filterInputs from "../../inputs/filterInputs.json";

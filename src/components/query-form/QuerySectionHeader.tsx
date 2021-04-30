@@ -1,8 +1,7 @@
-import React from "react";
-import { Form, Radio, Typography, Row, Col, Tooltip } from "antd";
+import { Typography, Row, Col, Tooltip } from "antd";
 import { InfoCircleOutlined } from "@ant-design/icons";
 
-const { Paragraph, Title } = Typography;
+const { Paragraph } = Typography;
 
 interface QuerySectionHeaderProps {
     title: string;

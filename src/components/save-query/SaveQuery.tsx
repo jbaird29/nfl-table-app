@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button, Divider, Form, Spin, Typography, FormInstance, Drawer, DrawerProps, Input } from "antd";
-import { DownloadOutlined, CloudUploadOutlined, CopyOutlined } from "@ant-design/icons";
-import { SaveData, TableData } from "../types/MainTypes";
+import { CopyOutlined } from "@ant-design/icons";
 import { messageDisplay } from "../helper-functions";
 
-const { Title, Paragraph, Text } = Typography;
+const { Paragraph, Text } = Typography;
 
 interface SaveQueryProps {
     isVisible: boolean;

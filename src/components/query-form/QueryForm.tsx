@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button, Drawer, message, Form, DrawerProps, FormInstance } from "antd";
 import QueryColumn from "./QueryColumn";
 import QueryRow from "./QueryRow";
 import QueryRowFilter from "./QueryRowFilter";
-import { QueryFields, TableData, TableColumn, TableRow, CalcsFields } from "../types/MainTypes";
+import { QueryFields, TableData, CalcsFields } from "../types/MainTypes";
 import { addRenderSorterToTable } from "../helper-functions";
 
 interface QueryProps {

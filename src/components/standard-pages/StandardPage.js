@@ -1,25 +1,6 @@
-import React, { useState, useEffect } from "react";
-import {
-    Select,
-    Layout,
-    Button,
-    Drawer,
-    message,
-    Divider,
-    Row,
-    Col,
-    Form,
-    Modal,
-    Steps,
-    Spin,
-    Image,
-    Tabs,
-    Typography,
-    Menu,
-    notification,
-} from "antd";
-import { DownOutlined } from "@ant-design/icons";
-import { Switch, Route, Link, useHistory, Redirect } from "react-router-dom";
+import { useState } from "react";
+import { Select, Layout, Row, Col, Steps, Tabs, Typography } from "antd";
+import { Switch, Route, useHistory, Redirect } from "react-router-dom";
 import Table from "../Table";
 import LoadPage from "./LoadPage";
 import teamList from "../../inputs/teamList.json";

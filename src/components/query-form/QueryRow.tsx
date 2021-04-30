@@ -1,8 +1,5 @@
-import React from "react";
-import { Form, Radio, Typography, Row, Col } from "antd";
+import { Form, Radio } from "antd";
 import QuerySectionHeader from "./QuerySectionHeader";
-
-const { Paragraph, Title } = Typography;
 
 export default function QueryRow() {
     return (

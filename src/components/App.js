@@ -1,7 +1,7 @@
 import { useState } from "react";
 import "./App.css";
 import "antd/dist/antd.css";
-import { Layout, Row, Col, Image, Typography, Menu, notification } from "antd";
+import { Layout, Row, Col, Image, Typography, Menu } from "antd";
 import { HomeOutlined, UserOutlined, TeamOutlined, MonitorOutlined, MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
 import QueryPage from "./QueryPage.tsx";
 import { Switch, Route, Link, useLocation, Redirect } from "react-router-dom";

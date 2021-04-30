@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import "./App.css";
 import "antd/dist/antd.css";
-import { Layout, Button, message, Divider, Row, Col, Form, Modal, Steps, Spin, Tabs, Typography, FormInstance } from "antd";
-import { DownloadOutlined, CloudUploadOutlined, CopyOutlined } from "@ant-design/icons";
+import { Layout, Button, message, Divider, Row, Form, Steps, Spin, Tabs, Typography, FormInstance } from "antd";
+import { DownloadOutlined, CloudUploadOutlined } from "@ant-design/icons";
 import Table from "./Table";
-import { Switch, Route, Link, useLocation, useHistory } from "react-router-dom";
-import { TableData, TableColumn, TableRow, QueryFields, CalcsFields, TableInfo, SaveData } from "./types/MainTypes";
+import { useLocation, useHistory } from "react-router-dom";
+import { TableData, QueryFields, CalcsFields, TableInfo, SaveData } from "./types/MainTypes";
 import QueryForm from "./query-form/QueryForm";
 import CustomCalcForm from "./custom-calcs/CustomCalcForm";
 import { addRenderSorterToTable, downloadData, messageDisplay } from "./helper-functions";

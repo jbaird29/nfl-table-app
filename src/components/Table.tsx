@@ -1,7 +1,6 @@
-import React from "react";
 import { Table as AntTable, Typography } from "antd";
 import "antd/dist/antd.css";
-import { TableData, TableColumn, TableRow, TableInfo } from "./types/MainTypes";
+import { TableData, TableRow, TableInfo } from "./types/MainTypes";
 import { SorterResult } from "antd/lib/table/interface";
 
 const { Text } = Typography;

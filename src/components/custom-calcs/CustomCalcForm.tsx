@@ -1,5 +1,5 @@
-import { Button, Drawer, DrawerProps, Form, FormInstance, message, Modal } from "antd";
-import React, { useState } from "react";
+import { Button, Drawer, DrawerProps, Form, FormInstance, message } from "antd";
+import { useState } from "react";
 import { addCalcsToTable, addRenderSorterToTable, copyTableWithoutCalcs } from "../helper-functions";
 import { CalcsFields, TableData } from "../types/MainTypes";
 import { CustomCalcObj } from "../types/MainTypes";

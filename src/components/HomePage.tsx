@@ -1,4 +1,3 @@
-import React from "react";
 import { Card, Col, Divider, Row, Statistic, Typography } from "antd";
 import { Link } from "react-router-dom";
 
