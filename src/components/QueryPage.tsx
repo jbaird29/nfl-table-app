@@ -60,7 +60,6 @@ export default function QueryPage(props: QueryPageProps) {
         }
         const isRedirectFromSave = location.state && location.state.saveID;
         if (isRedirectFromSave) {
-            console.log(location.state.saveID);
             loadQuery(location.state.saveID);
             history.push("/query", {});
         }
