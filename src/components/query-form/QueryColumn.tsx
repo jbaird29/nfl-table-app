@@ -78,7 +78,6 @@ export default function QueryColumn(props: any) {
             shouldUpdate={(prev, current) => checkFilterComponentUpdate(prev, current, colNum, filterNum)}
         >
             {({ getFieldValue }) => {
-                // console.log("updated filters");
                 return getFieldValue(["columns", colNum, "filters", filterNum, "activeFilter"]) !== filter.name
                     ? null
                     : renderFilterComponent(filter, [filterNum, filter.name]);

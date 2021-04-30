@@ -49,7 +49,6 @@ export default function QueryForm(props: QueryProps) {
     const onSubmit = async () => {
         queryForm
             .validateFields()
-            // .then((values: Query) => console.log(values))
             .then((values: QueryFields) => submitQueryAndSetData(values))
             .catch((errorInfo) => {
                 console.log(errorInfo);
