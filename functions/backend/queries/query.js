@@ -1,5 +1,5 @@
-const playerIDToNameMap = require("../lookups/playerIDToNameMap.json");
-const teamIDToNameMap = require("../lookups/teamIDToNameMap.json");
+// const playerIDToNameMap = require("../lookups/playerIDToNameMap.json");
+// const teamIDToNameMap = require("../lookups/teamIDToNameMap.json");
 
 module.exports.Query = class Query {
     constructor(meta, queryForm) {
@@ -173,7 +173,7 @@ module.exports.Query = class Query {
      **   returns a tableProps object => {dataIndex, title, width ...}
      */
     buildColumnTableProps(column, colIndex) {
-        const { field, title, filters = [] } = column;
+        const { field, title } = column;
         const { shortTitle, width, dataType, format } = this.aggs[field];
         // default title will include year if year is selected
         const defaultTitle = `${shortTitle}`;

@@ -406,7 +406,7 @@ dims.pass_attempt_air_yards = new Dimension({
     title: "Pass Attempt Yards",
     dataType: "number",
     description:
-        "I think this is the number of yards in the air that the ball traveled. " + "This has values whether the pass was complete or not.",
+        "I think this is the number of yards in the air that the ball traveled. This has values whether the pass was complete or not.",
 });
 // ------------------------------------------------------------------------------------------------------------
 dims.pass_air_yards = new Dimension({
