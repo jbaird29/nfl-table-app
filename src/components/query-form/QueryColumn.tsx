@@ -1,4 +1,4 @@
-import React from "react";
+import React, { CSSProperties } from "react";
 import { Form, Input, Button, Space, Select, Row, Col, Divider, Slider, InputNumber, Typography, Tooltip } from "antd";
 import {
     MinusCircleOutlined,
@@ -47,8 +47,14 @@ export default function QueryColumn(props: any) {
     const renderFilterComponent = (filter: FilterComponent, name: NamePath) => {
         return (
             <>
-                <Col span={8}>
-                    <Form.Item name={name} fieldKey={name} preserve={true} rules={[{ required: true, message: "Missing filter value" }]}>
+                <div style={{ display: "inline-block", verticalAlign: "middle" }}>
+                    <Form.Item
+                        style={{ display: "inline-block", width: 250, verticalAlign: "middle" }}
+                        name={name}
+                        fieldKey={name}
+                        preserve={true}
+                        rules={[{ required: true, message: "Missing filter value" }]}
+                    >
                         {filter.ui.type === "select" ? (
                             <Select placeholder={filter.formProps.label} {...filter.ui.props} />
                         ) : filter.ui.type === "slider" ? (
@@ -57,8 +63,7 @@ export default function QueryColumn(props: any) {
                             <InputNumber {...filter.ui.props} />
                         ) : null}
                     </Form.Item>
-                </Col>
-                <Col span={8}></Col>
+                </div>
             </>
         );
     };
@@ -94,6 +99,9 @@ export default function QueryColumn(props: any) {
         align: "center",
         showSearch: true,
         options: filterInputs, // changing the inputs based on colField was too difficult
+        style: {
+            width: 250,
+        },
     };
 
     const headerStyle = {
@@ -124,38 +132,19 @@ export default function QueryColumn(props: any) {
         padding: "5px 5px",
     };
 
+    const colDividerStyle: CSSProperties = {
+        margin: "12px 0",
+        borderTop: "1px solid rgba(0, 0, 0, 0.1)",
+    };
+
+    const filterDividerStyle: CSSProperties = {
+        margin: "0",
+        borderTop: "1px solid rgba(0, 0, 0, 0.1)",
+    };
+
     return (
         <>
             <QuerySectionHeader spaceAbove title="Add Columns" description="Each corresponds to a column in the table" />
-            {/* <Row gutter={[10, 0]} style={{ marginBottom: 10, textAlign: "center" }}>
-                <Col style={headerStyle} flex="80px">
-                    <span># </span>
-                </Col>
-                <Col style={headerStyle} flex="3 3 120px">
-                    <span>Select Stat Type </span>
-                    <Tooltip title="prompt text">
-                        <InfoCircleOutlined />
-                    </Tooltip>
-                </Col>
-                <Col style={headerStyle} flex="2 2 120px">
-                    <span>Column Title (Optional) </span>
-                    <Tooltip title="prompt text">
-                        <InfoCircleOutlined />
-                    </Tooltip>
-                </Col>
-                <Col style={headerStyle} flex="130px">
-                    <span>Minimum Value </span>
-                    <Tooltip title="prompt text">
-                        <InfoCircleOutlined />
-                    </Tooltip>
-                </Col>
-                <Col style={headerStyle} flex="185px">
-                    <span>Actions </span>
-                    <Tooltip title="prompt text">
-                        <InfoCircleOutlined />
-                    </Tooltip>
-                </Col>
-            </Row> */}
             <Form.List name="columns">
                 {(fields, { add, remove, move }) => (
                     <>
@@ -169,17 +158,9 @@ export default function QueryColumn(props: any) {
                                         paddingBottom: `${colNum !== 0 ? 5 : 10}px`,
                                     }}
                                 >
-                                    {/* verticalAlign: `${colNum !== 0 ? 0 : -180}%`  */}
-                                    {/* <Form.Item
-                                        label={colNum !== 0 ? null : "Column #"}
-                                        labelAlign="left"
-                                        labelCol={{ span: 24 }}
-                                        wrapperCol={{ span: 24 }}
-                                    > */}
                                     <Text strong style={{ marginBottom: 0 }}>
                                         Column {colNum + 1}:
                                     </Text>
-                                    {/* </Form.Item> */}
                                 </div>
                                 <div style={{ ...colStyle, width: widths.statType }}>
                                     <Form.Item
@@ -252,32 +233,44 @@ export default function QueryColumn(props: any) {
                                                 </Form.Item>
                                             </div>
                                             {fields.map(({ key, name: filterNum, fieldKey, ...restField }) => (
-                                                <div key={key}>
-                                                    <Row style={{ margin: "0 220px 0 80px" }} align="middle" gutter={[5, 5]}>
+                                                <div key={key} style={{ margin: "12px 0" }}>
+                                                    {/* <Divider dashed style={filterDividerStyle} /> */}
+                                                    <div style={{ ...colStyle, width: widths.colNum }}>
+                                                        <Text style={{ marginBottom: 0, verticalAlign: "middle" }}>
+                                                            Filter {filterNum + 1}:
+                                                        </Text>
+                                                    </div>
+
+                                                    <div style={{ display: "inline-block", verticalAlign: "middle" }}>
                                                         <MinusCircleOutlined
-                                                            style={{ position: "absolute", left: 60 }}
+                                                            style={{ margin: "0 10px 0 0", verticalAlign: "middle" }}
                                                             onClick={() => remove(filterNum)}
                                                         />
-                                                        <Col span={8}>
-                                                            <Form.Item
-                                                                {...restField}
-                                                                name={[filterNum, "activeFilter"]}
-                                                                fieldKey={[fieldKey, "activeFilter"]}
-                                                                rules={[{ required: true, message: "Missing filter type" }]}
-                                                            >
-                                                                <Select {...filterTypeSelectProps} />
-                                                            </Form.Item>
-                                                        </Col>
+                                                    </div>
+                                                    <div style={{ display: "inline-block" }}>
+                                                        <Form.Item
+                                                            {...restField}
+                                                            style={{
+                                                                display: "inline-block",
+                                                                verticalAlign: "middle",
+                                                                margin: "0 10px 0 0",
+                                                            }}
+                                                            name={[filterNum, "activeFilter"]}
+                                                            fieldKey={[fieldKey, "activeFilter"]}
+                                                            rules={[{ required: true, message: "Missing filter type" }]}
+                                                        >
+                                                            <Select {...filterTypeSelectProps} />
+                                                        </Form.Item>
                                                         {filterComponents.map((FilterComponent: FilterComponent) =>
                                                             conditionallyRenderFilterComponent(colNum, filterNum, FilterComponent)
                                                         )}
-                                                    </Row>
+                                                    </div>
                                                 </div>
                                             ))}
                                         </>
                                     )}
                                 </Form.List>
-                                <Divider style={{ margin: "6px 0" }} />
+                                <Divider style={colDividerStyle} />
                             </div>
                         ))}
                         <Form.Item>

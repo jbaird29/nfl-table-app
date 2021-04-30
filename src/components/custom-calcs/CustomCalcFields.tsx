@@ -22,15 +22,6 @@ export default function CustomCalcFields(props: CustomCalcFieldsProps) {
                       value: column.children?.[0].dataIndex as string, // need to tell TS this will not be undefined
                   }));
 
-    //                 // only includes Calculations that have a lower CalcIndex than the current one;
-    //     // because Calculations are added sequentially to TableData; so later calcs can only draw from earlier ones
-    //     .concat(
-    //     Object.entries(calcsForm.getFieldsValue() as CustomCalcObj[])
-    //         .filter(([calcIndex, calc]) => calcIndex.slice(4) < props.calcIndex.slice(4))
-    //         .sort((a, b) => a[0].slice(4) - b[0].slice(4))
-    //         .map(([calcIndex, calc]) => ({ label: `Calc ${calcIndex.slice(4)}: ${calc.title}`, value: calcIndex }))
-    // )
-
     const formattingStyle = {
         marginBottom: 12,
     };
