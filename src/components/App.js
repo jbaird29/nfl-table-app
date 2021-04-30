@@ -7,6 +7,7 @@ import QueryPage from "./QueryPage.tsx";
 import { Switch, Route, Link, useLocation, Redirect } from "react-router-dom";
 import logo from "../images/logo-site-header.png";
 import StandardPage from "./standard-pages/StandardPage";
+import HomePage from "./HomePage";
 
 const { Header } = Layout;
 const { Title, Paragraph } = Typography;
@@ -14,27 +15,6 @@ const { Title, Paragraph } = Typography;
 function App() {
     const location = useLocation();
     const [collapsed, setCollapsed] = useState(false);
-
-    // use this for the Home page instead
-    function onHelp() {
-        notification.open({
-            duration: 2,
-            description: helpMessage,
-        });
-    }
-
-    const helpMessage = (
-        <>
-            <Title level={5}>About</Title>
-            <Paragraph style={{ marginBottom: 4 }}>
-                NFL Table is a site for slicing and dicing football statistics on a play-by-play level.
-            </Paragraph>
-            <Paragraph>Interact with the data, rather being stuck with a static page.</Paragraph>
-            <Title level={5}>Help</Title>
-            <Paragraph style={{ marginBottom: 4 }}>Click Edit Query Fields in the left-hand menu to build a custom query.</Paragraph>
-            <Paragraph>Select a Row Type, then Add Columns to choose statistics and filters.</Paragraph>
-        </>
-    );
 
     const selectedKeys = location.pathname.includes("query")
         ? ["query"]
@@ -94,7 +74,7 @@ function App() {
 
                 <Switch>
                     <Route exact path="/">
-                        <p>Welcome home.</p>
+                        <HomePage />
                     </Route>
 
                     <Route path="/query">

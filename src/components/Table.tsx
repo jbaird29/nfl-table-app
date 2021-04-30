@@ -42,7 +42,7 @@ function Table(props: TableComponentProps) {
                 bordered
                 scroll={{
                     x: 230,
-                    y: "calc(100vh - 180px)",
+                    y: "calc(100vh - 200px)",
                 }}
                 size="small"
                 showSorterTooltip={true}

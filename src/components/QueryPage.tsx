@@ -74,21 +74,25 @@ export default function QueryPage(props: QueryPageProps) {
     const loadQuery = async (saveID: string) => {
         const hide = message.loading({ content: "Loading the data", style: { fontSize: "1rem" } }, 0);
         setLoadingPage(true);
-        const response = await fetch(`/loadQuery?saveID=${saveID}`, { method: "GET" });
-        if (response.ok) {
-            const data: SaveData = await response.json();
-            const { queryFormV, calcsFormV, tableInfo, tableData, queryFields, calcsFields, timestamp } = data;
-            tableData.queryTitle = generateQueryTitle(tableData.queryTitle, timestamp);
-            loadQueryForm(queryFields);
-            loadCalcsForm(calcsFields);
-            addRenderSorterToTable(tableData, tableInfo);
-            setTableInfo(tableInfo);
-            setTableData(tableData);
-            setResetTableCount((prev) => prev + 1); // forces a rerender of the table; defaultSortOrder wouldn't work otherwise
-        } else {
-            const data: { error: string } = await response.json();
-            console.log(data.error);
-            messageDisplay("error", `There was an error loading the query. Unfortunately the link is no longer valid.`);
+        try {
+            const response = await fetch(`/loadQuery?saveID=${saveID}`, { method: "GET" });
+            if (response.ok) {
+                const data: SaveData = await response.json();
+                const { queryFormV, calcsFormV, tableInfo, tableData, queryFields, calcsFields, timestamp } = data;
+                tableData.queryTitle = generateQueryTitle(tableData.queryTitle, timestamp);
+                loadQueryForm(queryFields);
+                loadCalcsForm(calcsFields);
+                addRenderSorterToTable(tableData, tableInfo);
+                setTableInfo(tableInfo);
+                setTableData(tableData);
+                setResetTableCount((prev) => prev + 1); // forces a rerender of the table; defaultSortOrder wouldn't work otherwise
+            } else {
+                const data: { error: string } = await response.json();
+                console.log(data.error);
+                messageDisplay("error", `There was an error loading the query. Unfortunately the link is no longer valid.`);
+            }
+        } catch (err) {
+            console.log(err);
         }
         hide();
         setLoadingPage(false);
@@ -114,13 +118,18 @@ export default function QueryPage(props: QueryPageProps) {
             queryFields: savedQueryFields,
             calcsFields: savedCalcsFields,
         };
-        const response = await fetch(`/saveQuery`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(saveData),
-        });
-        const data = await response.json();
-        return response.ok ? { success: true, saveID: data.saveID } : { success: false, error: response.statusText };
+        try {
+            const response = await fetch(`/saveQuery`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(saveData),
+            });
+            const data = await response.json();
+            return response.ok ? { success: true, saveID: data.saveID } : { success: false, error: response.statusText };
+        } catch (err) {
+            console.log(err);
+            return { success: false, error: err };
+        }
     };
 
     const handleShareURL = async () => {
