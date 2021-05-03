@@ -6,7 +6,7 @@ import filterComponents from "../../inputs/filterComponents.json";
 import filterInputs from "../../inputs/filterInputs.json";
 import { NamePath } from "rc-field-form/lib/interface";
 import QuerySectionHeader from "./QuerySectionHeader";
-const { Paragraph, Text } = Typography;
+const { Text } = Typography;
 
 export default function QueryColumn(props: any) {
     const [columnForm] = Form.useForm();
