@@ -1,9 +1,8 @@
 import { Card, Col, Divider, Row, Statistic, Typography } from "antd";
-import { CSSProperties } from "react";
 import { Link } from "react-router-dom";
-import { HomeOutlined, UserOutlined, TeamOutlined, MonitorOutlined, MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
+import { MonitorOutlined } from "@ant-design/icons";
 
-const { Paragraph, Title, Text } = Typography;
+const { Paragraph, Title } = Typography;
 
 export default function HomePage() {
     const emoji = <span style={{ fontSize: "1.2rem" }}>{String.fromCodePoint(0x1f448)}</span>;
