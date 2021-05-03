@@ -96,12 +96,6 @@ export default function QueryColumn(props: any) {
         },
     };
 
-    const headerStyle = {
-        color: "black",
-        // border: "1px solid grey",
-        // backgroundColor: "lightgrey",
-    };
-
     const widths = {
         colNum: 80,
         statType: 280,
@@ -111,27 +105,14 @@ export default function QueryColumn(props: any) {
         filter: 95,
     };
 
-    const wrappers = {
-        colNum: `1 1 ${widths.colNum}px`,
-        statType: `3 3 ${widths.statType}px`,
-        title: `2 2 ${widths.title}px`,
-        minValue: `1 1 ${widths.minValue}px`,
-        actions: `1 1 ${widths.actions}px`,
-    };
-
     const colStyle = {
         display: "inline-block",
         padding: "5px 5px",
     };
 
     const colDividerStyle: CSSProperties = {
-        margin: "12px 0",
-        borderTop: "1px solid rgba(0, 0, 0, 0.1)",
-    };
-
-    const filterDividerStyle: CSSProperties = {
-        margin: "0",
-        borderTop: "1px solid rgba(0, 0, 0, 0.1)",
+        margin: "8px 0",
+        borderTop: "1px dotted rgba(0, 0, 0, 0.07)",
     };
 
     return (
@@ -150,9 +131,7 @@ export default function QueryColumn(props: any) {
                                         paddingBottom: `${colNum !== 0 ? 5 : 10}px`,
                                     }}
                                 >
-                                    <Text strong style={{ marginBottom: 0 }}>
-                                        Column {colNum + 1}:
-                                    </Text>
+                                    <Text style={{ marginBottom: 0 }}>Column {colNum + 1}:</Text>
                                 </div>
                                 <div style={{ ...colStyle, width: widths.statType }}>
                                     <Form.Item
@@ -219,17 +198,16 @@ export default function QueryColumn(props: any) {
                                                     labelCol={{ span: 24 }}
                                                     wrapperCol={{ span: 24 }}
                                                 >
-                                                    <Button type="dashed" onClick={() => add()} icon={<PlusOutlined />}>
+                                                    <Button type="default" onClick={() => add()} icon={<PlusOutlined />}>
                                                         Filter
                                                     </Button>
                                                 </Form.Item>
                                             </div>
                                             {fields.map(({ key, name: filterNum, fieldKey, ...restField }) => (
                                                 <div key={key} style={{ margin: "12px 0" }}>
-                                                    {/* <Divider dashed style={filterDividerStyle} /> */}
-                                                    <div style={{ ...colStyle, width: widths.colNum }}>
-                                                        <Text style={{ marginBottom: 0, verticalAlign: "middle" }}>
-                                                            Filter {filterNum + 1}:
+                                                    <div style={{ ...colStyle, width: widths.colNum, textAlign: "right" }}>
+                                                        <Text style={{ marginBottom: 0, marginRight: 6, verticalAlign: "middle" }}>
+                                                            Filter:
                                                         </Text>
                                                     </div>
 
