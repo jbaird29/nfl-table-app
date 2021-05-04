@@ -118,10 +118,12 @@ export function addRenderSorterToTable(tableData, tableInfo) {
             column.children.forEach((child) => {
                 addSorter(child, tableInfo);
                 addRender(child);
+                child.className = "custom-table-col";
             });
         } else {
             addSorter(column, tableInfo);
             addRender(column);
+            column.className = "custom-table-col";
         }
     });
     return tableData;

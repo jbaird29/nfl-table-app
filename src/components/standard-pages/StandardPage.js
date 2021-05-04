@@ -1,20 +1,16 @@
 import { useState } from "react";
-import { Select, Layout, Row, Col, Steps, Tabs, Typography } from "antd";
+import { Select, Layout, Row, Col } from "antd";
 import { Switch, Route, useHistory, Redirect } from "react-router-dom";
 import Table from "../Table";
 import LoadPage from "./LoadPage";
 import teamList from "../../inputs/teamList.json";
 import playerList from "../../inputs/playerList.json";
 
-const { Header, Sider, Content, Footer } = Layout;
-const { Step } = Steps;
-const { TabPane } = Tabs;
-const { Title, Paragraph } = Typography;
+const { Sider, Content } = Layout;
 
 function StandardPage(props) {
     const { siderProps, pageType } = props;
 
-    // const initialTableData: TableData = { columns: [], dataSource: [] };
     const initialTableData = { columns: [], dataSource: [] };
     const [tableData, setTableData] = useState(initialTableData);
     const [tableInfo, setTableInfo] = useState({ sorter: { field: null, order: null }, filters: {} });
@@ -31,9 +27,6 @@ function StandardPage(props) {
             setPageID(null);
         }
     };
-
-    // const onPlayerSelect = (id) => history.push(`/player/${encodeURI(id)}`)
-    // const onTeamSelect   = (id) => history.push(`/team/${encodeURI(id)}`)
 
     const selectProps = {
         style: {
@@ -80,7 +73,7 @@ function StandardPage(props) {
                     </Switch>
                 </Sider>
 
-                <Content style={{ margin: "0 5px" }}>
+                <Content style={{ margin: "0 5px", maxHeight: "calc(100vh - 64px)" }}>
                     <Table setTableInfo={setTableInfo} tableData={tableData} />
                 </Content>
 

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import "./App.css";
 import "antd/dist/antd.css";
-import { Layout, Row, Col, Image, Typography, Menu } from "antd";
+import { Layout, Row, Col, Image, Menu } from "antd";
 import { HomeOutlined, UserOutlined, TeamOutlined, MonitorOutlined, MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
 import QueryPage from "./QueryPage.tsx";
 import { Switch, Route, Link, useLocation, Redirect } from "react-router-dom";
@@ -10,7 +10,6 @@ import StandardPage from "./standard-pages/StandardPage";
 import HomePage from "./HomePage";
 
 const { Header } = Layout;
-const { Title, Paragraph } = Typography;
 
 function App() {
     const location = useLocation();

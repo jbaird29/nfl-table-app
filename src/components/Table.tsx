@@ -23,6 +23,9 @@ function Table(props: TableComponentProps) {
     // if the first column is the rnk, use the second column, otherwise use first coumn
     const rowKey = columns[0]?.dataIndex === "rnk" ? columns[1].dataIndex : columns[0]?.dataIndex;
 
+    // if average_time_in_pocket is selected, you need 200px of margin; otherwise you only need ~160px
+    const yHeight = `calc(100vh - 200px - ${queryTitle ? "40" : "0"}px)`;
+
     return (
         <>
             <AntTable
@@ -41,13 +44,13 @@ function Table(props: TableComponentProps) {
                 bordered
                 scroll={{
                     x: 230,
-                    y: "calc(100vh - 200px)",
+                    y: yHeight,
                 }}
                 size="small"
                 showSorterTooltip={true}
                 rowKey={rowKey}
                 sortDirections={["descend", "ascend", "descend"]}
-                className={"custom-table"}
+                className={"custom-table-col"}
                 rowClassName={"custom-table-row"}
             />
         </>

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import "./App.css";
 import "antd/dist/antd.css";
-import { Layout, Button, message, Divider, Row, Form, Steps, Spin, Tabs, Typography, FormInstance } from "antd";
+import { Layout, Button, message, Divider, Row, Form, Spin, FormInstance } from "antd";
 import { DownloadOutlined, CloudUploadOutlined } from "@ant-design/icons";
 import Table from "./Table";
 import { useLocation, useHistory } from "react-router-dom";
@@ -11,10 +11,7 @@ import CustomCalcForm from "./custom-calcs/CustomCalcForm";
 import { addRenderSorterToTable, downloadData, messageDisplay } from "./helper-functions";
 import SaveQuery from "./save-query/SaveQuery";
 
-const { Header, Sider, Content, Footer } = Layout;
-const { Step } = Steps;
-const { TabPane } = Tabs;
-const { Title, Paragraph } = Typography;
+const { Sider, Content } = Layout;
 const queryFormV = 1;
 const calcsFormV = 1;
 
@@ -78,7 +75,7 @@ export default function QueryPage(props: QueryPageProps) {
             const response = await fetch(`/loadQuery?saveID=${saveID}`, { method: "GET" });
             if (response.ok) {
                 const data: SaveData = await response.json();
-                const { queryFormV, calcsFormV, tableInfo, tableData, queryFields, calcsFields, timestamp } = data;
+                const { tableInfo, tableData, queryFields, calcsFields, timestamp } = data;
                 tableData.queryTitle = generateQueryTitle(tableData.queryTitle, timestamp);
                 loadQueryForm(queryFields);
                 loadCalcsForm(calcsFields);
@@ -185,7 +182,7 @@ export default function QueryPage(props: QueryPageProps) {
                         </Row>
                     </Spin>
                 </Sider>
-                <Content style={{ margin: "0 5px" }}>
+                <Content style={{ margin: "0 5px", maxHeight: "calc(100vh - 64px)" }}>
                     <Table setTableInfo={setTableInfo} tableData={tableData} key={`reset_${resetTableCount}`} />
                 </Content>
 

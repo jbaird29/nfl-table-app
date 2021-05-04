@@ -34,11 +34,16 @@ body {
 
 /* this sets styles for the table */
 .custom-table-row {
-    font-size: small;
+    font-size: 0.8rem;
 }
-
+.custom-table-col {
+    font-size: 0.8rem;
+}
 .ant-table-cell {
-    padding: 3px 8px !important;
+    padding: 2px 4px !important;
+}
+.ant-table-column-sorters {
+    padding: 4px 2px !important;
 }
 
 /* this sets the format for the custom calculations in the table */

@@ -96,7 +96,7 @@ export default function LoadPage(props) {
             cover={<Image alt={info.full_name} src={info.headshot_url} />}
         >
             <Card.Meta
-                title={info.full_name}
+                title={<span>{info.full_name}</span>}
                 description={`${info.team_name} (${info.team_abbreviation})`}
                 style={{ marginBottom: 8, marginTop: 4, lineHeight: 1.2 }}
             />
@@ -132,7 +132,7 @@ export default function LoadPage(props) {
             cover={<Image alt={info.team_name} src={info.logo_url} />}
         >
             <Card.Meta
-                title={info.team_name}
+                title={<span>{info.team_name}</span>}
                 description={`(${info.team_abbreviation})`}
                 style={{ marginBottom: 8, marginTop: 4, lineHeight: 1.2 }}
             />
