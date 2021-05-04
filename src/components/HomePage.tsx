@@ -3,6 +3,9 @@ import { Link } from "react-router-dom";
 import { MonitorOutlined } from "@ant-design/icons";
 import { Content } from "antd/lib/layout/layout";
 import HighlightCard, { HighlightCardProps } from "./home-pages/HighlightCard";
+import jalen_hurts from "../images/headshots/jalen_hurts.png";
+import patrick_mahomes from "../images/headshots/patrick_mahomes.png";
+import tom_brady from "../images/headshots/tom_brady.png";
 
 const { Paragraph, Title } = Typography;
 
@@ -15,7 +18,7 @@ export default function HomePage() {
             suffix: "%",
             description: "Effect of Throwaways on CMP %",
             url: "/saves/21mmcjzpkzgzxe7f8hkf",
-            imageURL: "https://a.espncdn.com/combiner/i?img=/i/headshots/nfl/players/full/4040715.png",
+            imageURL: jalen_hurts,
         },
         {
             title: "Patrick Mahomes",
@@ -24,7 +27,7 @@ export default function HomePage() {
             suffix: "%",
             description: "Rush YDS came from Scrambles",
             url: "/saves/p51keepwn29gfpv107kh",
-            imageURL: "https://a.espncdn.com/combiner/i?img=/i/headshots/nfl/players/full/3139477.png",
+            imageURL: patrick_mahomes,
         },
         {
             title: "Tom Brady",
@@ -33,7 +36,7 @@ export default function HomePage() {
             suffix: "",
             description: "Passer Rating while under Blitz",
             url: "/saves/qmrggvfmweemuynud9a7",
-            imageURL: "https://a.espncdn.com/combiner/i?img=/i/headshots/nfl/players/full/2330.png",
+            imageURL: tom_brady,
         },
     ];
 
